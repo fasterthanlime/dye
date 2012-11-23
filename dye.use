@@ -1,0 +1,5 @@
+Name: dye
+Description: an simple graphics library
+Requires: sdl
+SourcePath: source
+
