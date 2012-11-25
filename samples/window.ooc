@@ -1,13 +1,13 @@
 use dye
 import dye
 
-use sdl
+use sdl, cairo, glew, glu
 
 import os/Time
 
 main: func (argc: Int, argv: CString*) {
 
-  dye := Dye new(640, 480)
+  dye := Dye new(640, 480, "Dye example")
 
   dye draw()
   Time sleepSec(1)
