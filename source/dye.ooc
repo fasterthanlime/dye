@@ -45,19 +45,22 @@ Dye: class {
 	SDL glSetAttribute(SDL_GL_DOUBLEBUFFER, 1)
 
 	screen = SDL setMode(width, height, 0, SDL_OPENGL)
+
+	initGL()
     }
 
     render: func {
-	draw()
-
 	glClear(GL_COLOR_BUFFER_BIT)
+	draw()
 	SDL glSwapBuffers()
     }
 
     draw: func {
+	begin2D()
 	for (d in glDrawables) {
 	    d draw(this)
 	}
+	end2D()
     }
 
     quit: func {
@@ -74,6 +77,8 @@ Dye: class {
 	glEnable(GL_BLEND)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 	glEnable(GL_TEXTURE_RECTANGLE_ARB)
+
+	reshape()
     }
 
     reshape: func {
@@ -101,6 +106,14 @@ Dye: class {
 
 	glEnable(GL_DEPTH_TEST)
 	glDisable(GL_BLEND)
+    }
+
+    add: func (d: GlDrawable) {
+	glDrawables add(d)
+    }
+
+    remove: func (d: GlDrawable) {
+	glDrawables remove(d)
     }
 
 }
@@ -182,11 +195,9 @@ CairoRenderTarget: class extends GlDrawable {
     }
 
     draw: func (dye: Dye) {
-	dye begin2D()
 	cairoDrawable draw(dye, context)	
 
 	drawTexture()
-	dye end2D()
     }
 
     drawTexture: func {
@@ -206,6 +217,25 @@ CairoRenderTarget: class extends GlDrawable {
 
 	glTexCoord2f(0.0, height)
 	glVertex2f(0.0, height)
+
+	glEnd()
+    }
+
+}
+
+GlTriangle: class extends GlDrawable {
+
+    draw: func (dye: Dye) {
+	glBegin(GL_TRIANGLES)
+
+	glColor3f(1.0, 0.0, 0.0)
+	glVertex2f(0.0, 0.0)
+
+	glColor3f(0.0, 1.0, 0.0)
+	glVertex2f(dye width, 0.0)
+
+	glColor3f(0.0, 0.0, 1.0)
+	glVertex2f(0.0, dye height)
 
 	glEnd()
     }
