@@ -1,7 +1,7 @@
 use dye
 import dye/core
 
-use sdl, cairo, glew, glu
+use sdl, glew, glu
 
 import os/Time
 
