@@ -1,5 +1,5 @@
 use dye
-import dye
+import dye/core
 
 use sdl, cairo, glew, glu
 
