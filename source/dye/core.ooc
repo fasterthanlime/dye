@@ -140,3 +140,4 @@ GlTriangle: class extends GlDrawable {
     }
 
 }
+
