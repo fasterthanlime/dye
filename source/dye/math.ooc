@@ -168,10 +168,20 @@ Vec3: class {
         z = v z
     }
 
+    set!: func ~vec2 (v: Vec2) {
+        x = v x
+        y = v y
+    }
+
     set!: func ~threefloats (px, py, pz: Float) {
         x = px
         y = py
         z = pz
+    }
+
+    set!: func ~twofloats (px, py: Float) {
+        x = px
+        y = py
     }
 
     interpolate: func (target: This, alpha: Float) {

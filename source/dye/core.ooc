@@ -10,6 +10,9 @@ import glu
 
 import structs/ArrayList
 
+use dye
+import dye/math
+
 Color: class {
 
     r, g, b: UInt8
@@ -44,6 +47,10 @@ Dye: class {
 	screen = SDL setMode(width, height, 0, SDL_OPENGL)
 
 	initGL()
+    }
+
+    setShowCursor: func (visible: Bool) {
+        SDL showCursor(visible)
     }
 
     render: func {
@@ -119,6 +126,48 @@ GlDrawable: abstract class {
 
     // You can use OpenGL calls here
     draw: abstract func (dye: Dye)
+
+}
+
+GlGroup: class extends GlDrawable {
+
+    children := ArrayList<GlDrawable> new()
+
+    draw: func (dye: Dye) {
+        drawChildren(dye)
+    }
+    
+    drawChildren: func (dye: Dye) {
+        for (c in children) {
+            c draw(dye)
+        }
+    }
+
+    add: func (d: GlDrawable) {
+        children add(d)
+    }
+
+    remove: func (d: GlDrawable) {
+        children remove(d)
+    }
+
+}
+
+GlTransformGroup: class extends GlGroup {
+
+    pos := vec3(0, 0, 0)
+    angle := 0.0
+
+    draw: func (dye: Dye) {
+        glPushMatrix()
+
+        glRotatef(angle, 0.0, 0.0, 1.0) 
+        glTranslatef(pos x, pos y, pos z)
+
+        drawChildren(dye)
+
+        glPopMatrix()
+    }
 
 }
 
