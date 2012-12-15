@@ -192,8 +192,12 @@ GlDrawable: abstract class {
     pos := vec2(0, 0)
     angle := 0.0
 
+    visible := true
+
     // You can use OpenGL calls here
     render: func (dye: DyeContext) {
+        if (!visible) return
+
         glPushMatrix()
 
         glTranslatef(pos x, pos y, 0.0)

@@ -428,6 +428,7 @@ Keys: enum from Int {
     ESC   = SDLK_ESCAPE
     ALT   = SDLK_LALT // opinionated, but meh.
     CTRL  = SDLK_LCTRL
+    SHIFT = SDLK_LSHIFT
     BACKSPACE = SDLK_BACKSPACE
 }
 
