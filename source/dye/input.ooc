@@ -45,11 +45,29 @@ Proxy: abstract class {
         )
     }
 
+    onKeyPress: func ~any (cb: Func (KeyPress)) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case kp: KeyPress => 
+                    cb(kp)
+            }
+        )
+    }
+
     onKeyPress: func (which: UInt, cb: Func) -> Listener {
         onEvent(|ev|
             match (ev) {
                 case kp: KeyPress => 
                     if(kp code == which) cb()
+            }
+        )
+    }
+
+    onKeyRelease: func ~any (cb: Func (KeyRelease)) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case kr: KeyRelease => 
+                    cb(kr)
             }
         )
     }
@@ -116,6 +134,7 @@ Proxy: abstract class {
     }
 
     ungrab: func {
+        listeners add(_grab)
         _grab = null
     }
 
@@ -235,8 +254,8 @@ Input: class extends Proxy {
 
         while(SDLEvent poll(event&)) {
             match (event type) {
-                case SDL_KEYDOWN => _keyPressed (event key keysym sym)
-                case SDL_KEYUP   => _keyReleased(event key keysym sym)
+                case SDL_KEYDOWN => _keyPressed (event key keysym sym, event key keysym unicode)
+                case SDL_KEYUP   => _keyReleased(event key keysym sym, event key keysym unicode)
                 case SDL_MOUSEBUTTONUP   => _mouseReleased(event button button)
                 case SDL_MOUSEBUTTONDOWN => _mousePressed (event button button)
                 case SDL_MOUSEMOTION => _mouseMoved (event motion x, event motion y)
@@ -256,20 +275,20 @@ Input: class extends Proxy {
         _notifyListeners(ExitEvent new())
     }
 
-    _keyPressed: func (keyval: Int) {
+    _keyPressed: func (keyval: UInt, unicode: UInt16) {
         if(debug) {
             logger debug("Key pressed! code %d" format(keyval))
         }
         if (keyval < MAX_KEY) {
             keyState[keyval] = true
-            _notifyListeners(KeyPress new(keyval))
+            _notifyListeners(KeyPress new(keyval, unicode))
         }
     }
 
-    _keyReleased: func (keyval: Int) {
+    _keyReleased: func (keyval: UInt, unicode: UInt16) {
         if (keyval < MAX_KEY) {
             keyState[keyval] = false
-            _notifyListeners(KeyRelease new(keyval))
+            _notifyListeners(KeyRelease new(keyval, unicode))
         }
     }
 
@@ -349,7 +368,8 @@ MouseRelease: class extends MouseEvent {
 KeyboardEvent: class extends LEvent {
 
     code: UInt
-    init: func (=code) {}
+    unicode: UInt16
+    init: func (=code, =unicode) {}
 
 }
 
