@@ -2,23 +2,26 @@
 use ftgl
 import ftgl
 
+use glew
+import glew
+
 use dye
-import dye/core
+import dye/[core, math]
 
 GlText: class extends GlDrawable {
 
     ftgl: Ftgl
-    x, y: Int
+    pos := vec2(20, 40)
+    color := Color blue()
     text: String
 
     init: func (fontPath: String, =text) {
         ftgl = Ftgl new(80, 72, fontPath)
-        x = 20
-        y = 40
     }
 
     draw: func (dye: DyeContext) {
-        ftgl render(x, y, 0.4, true, text)
+        dye color(color)
+        ftgl render(pos x, pos y, 0.4, true, text)
     }
 
 }

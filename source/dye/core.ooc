@@ -39,6 +39,15 @@ Color: class {
 
     black: static func -> This { new(0, 0, 0) }
     white: static func -> This { new(255, 255, 255) }
+    red: static func -> This { new(255, 0, 0) }
+    green: static func -> This { new(0, 255, 0) }
+    blue: static func -> This { new(0, 0, 255) }
+
+    toString: func -> String {
+        "(%d, %d, %d)" format(r, g, b)
+    }
+
+    _: String { get { toString() } }
 
 }
 
@@ -93,7 +102,7 @@ DyeContext: class {
 
     setClearColor: func (c: Color) {
         clearColor set!(c)
-	glClearColor(clearColor R, clearColor G, clearColor B, 0.0)
+	glClearColor(clearColor R, clearColor G, clearColor B, 1.0)
     }
 
     initGL: func {
@@ -137,6 +146,36 @@ DyeContext: class {
 	glDisable(GL_BLEND)
     }
 
+    color: func (color: Color) {
+        glColor4f(color R, color G, color B, 1.0)
+    }
+
+    texCoord: func (v: Vec2) {
+        glTexCoord2f(v x, v y)
+    }
+
+    vertex: func (v: Vec2) {
+        glVertex2f(v x, v y)
+    }
+
+    pushMatrix: func (f: Func) {
+        glPushMatrix()
+        f()
+        glPopMatrix()
+    }
+
+    begin: func (type: GLenum, f: Func) {
+        glBegin(type)
+        f()
+        glEnd()
+    }
+
+    withTexture: func (textureType: GLenum, textureID: GLuint, f: Func) {
+        glBindTexture(textureType, textureID)
+        f()
+        glBindTexture(textureType, 0) // unbind it for later draw operations
+    }
+
     add: func (d: GlDrawable) {
 	glDrawables add(d)
     }
@@ -157,9 +196,9 @@ GlDrawable: abstract class {
     render: func (dye: DyeContext) {
         glPushMatrix()
 
-        glScalef(scale x, scale y, 1.0)
-        glRotatef(angle, 0.0, 0.0, 1.0) 
         glTranslatef(pos x, pos y, 0.0)
+        glRotatef(angle, 0.0, 0.0, 1.0) 
+        glScalef(scale x, scale y, 1.0)
 
         draw(dye)
 
@@ -180,7 +219,7 @@ GlGroup: class extends GlDrawable {
     
     drawChildren: func (dye: DyeContext) {
         for (c in children) {
-            c draw(dye)
+            c render(dye)
         }
     }
 
@@ -190,25 +229,6 @@ GlGroup: class extends GlDrawable {
 
     remove: func (d: GlDrawable) {
         children remove(d)
-    }
-
-}
-
-GlTriangle: class extends GlDrawable {
-
-    draw: func (dye: DyeContext) {
-	glBegin(GL_TRIANGLES)
-
-	glColor3f(1.0, 0.0, 0.0)
-	glVertex2f(0.0, 0.0)
-
-	glColor3f(0.0, 1.0, 0.0)
-	glVertex2f(dye width, 0.0)
-
-	glColor3f(0.0, 0.0, 1.0)
-	glVertex2f(0.0, dye height)
-
-	glEnd()
     }
 
 }

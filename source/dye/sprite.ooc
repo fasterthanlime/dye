@@ -7,6 +7,8 @@ import dye/[core, math]
 use glew
 import glew
 
+import structs/HashMap
+
 Texture: class {
 
   id: Int
@@ -20,7 +22,13 @@ Texture: class {
 
 TextureLoader: class {
 
+    cache := static HashMap<String, Texture> new()
+
     load: static func (path: String) -> Texture {
+        if (cache contains?(path)) {
+            return cache get(path)
+        }
+
         bitmap := Bitmap new(path)
         bitmap = bitmap convertTo32Bits()
 
@@ -45,7 +53,9 @@ TextureLoader: class {
                     GL_BGRA,
                     GL_UNSIGNED_BYTE,
                     bitmap bits())
-        Texture new(textureID, bitmap width, bitmap height, path)
+        texture := Texture new(textureID, bitmap width, bitmap height, path)
+        cache put(path, texture)
+        texture
     }
 
 }
@@ -53,33 +63,50 @@ TextureLoader: class {
 GlSprite: class extends GlDrawable {
 
     texture: Texture
-    width, height: Int
+    size: Vec2
+
+    width: Float { get { size x } }
+    height: Float { get { size y } }
+
+    center := true
 
     init: func (path: String) {
         texture = TextureLoader load(path)
-        width = texture width
-        height = texture height
+        size = vec2(texture width, texture height)
+    }
+
+    render: func (dye: DyeContext) {
+        if (center) {
+            glPushMatrix()
+
+            glTranslatef(width * -0.5, height * -0.5, 0.0)
+            super()
+
+            glPopMatrix()
+        } else {
+            super()
+        }
     }
 
     draw: func (dye: DyeContext) {
-        glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture id)
-
         glColor3f(1.0, 1.0, 1.0)
-        glBegin(GL_QUADS)
 
-        glTexCoord2f(0.0, 0.0)
-        glVertex2f(0.0, height)
+        dye withTexture(GL_TEXTURE_RECTANGLE_ARB, texture id, ||
+            this
+            dye begin(GL_QUADS, ||
+                glTexCoord2f(0.0, 0.0)
+                glVertex2f(0.0, height)
 
-        glTexCoord2f(width, 0.0)
-        glVertex2f(width, height)
+                glTexCoord2f(width, 0.0)
+                glVertex2f(width, height)
 
-        glTexCoord2f(width, height)
-        glVertex2f(width, 0.0)
+                glTexCoord2f(width, height)
+                glVertex2f(width, 0.0)
 
-        glTexCoord2f(0.0, height)
-        glVertex2f(0.0, 0.0)
-
-        glEnd()
+                glTexCoord2f(0.0, height)
+                glVertex2f(0.0, 0.0)
+            )
+        )
     }
 
 }
@@ -99,34 +126,31 @@ GlCroppedSprite: class extends GlSprite {
     }
 
     draw: func (dye: DyeContext) {
-        glBindTexture(GL_TEXTURE_RECTANGLE_ARB, texture id)
-
         glColor3f(1.0, 1.0, 1.0)
-        glBegin(GL_QUADS)
 
-        vertices := [
-            vec2(0.0, 0.0)
-            vec2(0.0, height - bottom - top)
-            vec2(width - left - right, height - bottom - top)
-            vec2(width - left - right, 0.0)
-        ]
+        dye withTexture(GL_TEXTURE_RECTANGLE_ARB, texture id, ||
+            this
+            dye begin(GL_QUADS, ||
+                vertices := [
+                    vec2(0.0, 0.0)
+                    vec2(0.0, height - bottom - top)
+                    vec2(width - left - right, height - bottom - top)
+                    vec2(width - left - right, 0.0)
+                ]
 
-        texcoords := [
-            vec2(left, height - top)
-            vec2(left, bottom)
-            vec2(width - right, bottom)
-            vec2(width - right, height - top)
-        ]
+                texCoords := [
+                    vec2(left, height - top)
+                    vec2(left, bottom)
+                    vec2(width - right, bottom)
+                    vec2(width - right, height - top)
+                ]
 
-        for (i in 0..vertices length) {
-            t := texcoords[i]
-            glTexCoord2f (t x, t y)
-
-            v := vertices[i]
-            glVertex2f   (v x, v y)
-        }
-
-        glEnd()
+                for (i in 0..vertices length) {
+                    dye texCoord(texCoords[i])
+                    dye vertex(vertices[i])
+                }
+            )
+        )
     }
 
 }
