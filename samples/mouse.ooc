@@ -8,7 +8,7 @@ import os/Time
 
 main: func (argc: Int, argv: CString*) {
 
-    dye := Dye new(640, 480, "Dye mouse example")
+    dye := DyeContext new(640, 480, "Dye mouse example")
     dye setShowCursor(false)
 
     crosshair := GlSprite new("crosshair.png")

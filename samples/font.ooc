@@ -8,7 +8,7 @@ import os/Time
 
 main: func (argc: Int, argv: CString*) {
 
-  dye := Dye new(640, 480, "Dye font example")
+  dye := DyeContext new(640, 480, "Dye font example")
 
   text := GlText new("Sansation_Regular.ttf", "Dye with text o/")
   dye add(text)

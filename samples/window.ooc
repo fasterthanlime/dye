@@ -7,7 +7,7 @@ import os/Time
 
 main: func (argc: Int, argv: CString*) {
 
-  dye := Dye new(640, 480, "Dye example")
+  dye := DyeContext new(640, 480, "Dye example")
   dye add(GlTriangle new())
 
   dye render()

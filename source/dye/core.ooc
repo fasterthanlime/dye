@@ -1,4 +1,7 @@
 
+use deadlogger
+import deadlogger/[Log]
+
 use sdl
 import sdl/Core
 
@@ -15,6 +18,7 @@ import dye/math
 
 Color: class {
 
+    /* r, g, b = [0, 255] UInt8 */
     r, g, b: UInt8
     init: func (=r, =g, =b)
 
@@ -22,14 +26,30 @@ Color: class {
 	SDL mapRgb(format, r, g, b)
     }
 
+    /* R, G, B = [0.0, 1.0] Float */
+    R: Float { get { r / 255.0 } }
+    G: Float { get { g / 255.0 } }
+    B: Float { get { b / 255.0 } }
+
+    set!: func (c: This) {
+        r = c r
+        g = c g
+        b = c b
+    }
+
+    black: static func -> This { new(0, 0, 0) }
+    white: static func -> This { new(255, 255, 255) }
+
 }
 
-Dye: class {
+DyeContext: class {
 
     screen: SdlSurface*
-    bgColor := Color new(72, 60, 50)
+    clearColor := Color new(72, 60, 50)
 
     width, height: Int
+
+    logger := static Log getLogger("dye")
 
     glDrawables := ArrayList<GlDrawable> new()
 
@@ -62,7 +82,7 @@ Dye: class {
     draw: func {
 	begin2D()
 	for (d in glDrawables) {
-	    d draw(this)
+	    d render(this)
 	}
 	end2D()
     }
@@ -71,12 +91,17 @@ Dye: class {
 	SDL quit()
     }
 
-    initGL: func {
-	"OpenGL version: %s" printfln(glGetString (GL_VERSION))
-	"OpenGL vendor: %s" printfln(glGetString (GL_VENDOR))
-	"OpenGL renderer: %s" printfln(glGetString (GL_RENDERER))
+    setClearColor: func (c: Color) {
+        clearColor set!(c)
+	glClearColor(clearColor R, clearColor G, clearColor B, 0.0)
+    }
 
-	glClearColor(0.0, 0.0, 0.0, 0.0)
+    initGL: func {
+	logger info("OpenGL version: %s" format(glGetString (GL_VERSION)))
+	logger info("OpenGL vendor: %s" format(glGetString (GL_VENDOR)))
+	logger info("OpenGL renderer: %s" format(glGetString (GL_RENDERER)))
+
+        setClearColor(clearColor)
 	glDisable(GL_DEPTH_TEST)
 	glEnable(GL_BLEND)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -124,8 +149,24 @@ Dye: class {
 
 GlDrawable: abstract class {
 
+    scale := vec2(1, 1)
+    pos := vec2(0, 0)
+    angle := 0.0
+
     // You can use OpenGL calls here
-    draw: abstract func (dye: Dye)
+    render: func (dye: DyeContext) {
+        glPushMatrix()
+
+        glScalef(scale x, scale y, 1.0)
+        glRotatef(angle, 0.0, 0.0, 1.0) 
+        glTranslatef(pos x, pos y, 0.0)
+
+        draw(dye)
+
+        glPopMatrix()
+    }
+
+    draw: abstract func (dye: DyeContext)
 
 }
 
@@ -133,11 +174,11 @@ GlGroup: class extends GlDrawable {
 
     children := ArrayList<GlDrawable> new()
 
-    draw: func (dye: Dye) {
+    draw: func (dye: DyeContext) {
         drawChildren(dye)
     }
     
-    drawChildren: func (dye: Dye) {
+    drawChildren: func (dye: DyeContext) {
         for (c in children) {
             c draw(dye)
         }
@@ -153,27 +194,9 @@ GlGroup: class extends GlDrawable {
 
 }
 
-GlTransformGroup: class extends GlGroup {
-
-    pos := vec3(0, 0, 0)
-    angle := 0.0
-
-    draw: func (dye: Dye) {
-        glPushMatrix()
-
-        glRotatef(angle, 0.0, 0.0, 1.0) 
-        glTranslatef(pos x, pos y, pos z)
-
-        drawChildren(dye)
-
-        glPopMatrix()
-    }
-
-}
-
 GlTriangle: class extends GlDrawable {
 
-    draw: func (dye: Dye) {
+    draw: func (dye: DyeContext) {
 	glBegin(GL_TRIANGLES)
 
 	glColor3f(1.0, 0.0, 0.0)

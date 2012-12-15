@@ -17,7 +17,7 @@ GlText: class extends GlDrawable {
         y = 40
     }
 
-    draw: func (dye: Dye) {
+    draw: func (dye: DyeContext) {
         ftgl render(x, y, 0.4, true, text)
     }
 
