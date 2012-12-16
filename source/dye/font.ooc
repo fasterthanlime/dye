@@ -8,7 +8,15 @@ import glew
 use dye
 import dye/[core, math]
 
+use deadlogger
+import deadlogger/[Log, Logger]
+
+import structs/HashMap
+
 GlText: class extends GlDrawable {
+
+    cache := static HashMap<String, Ftgl> new()
+    logger := static Log getLogger("GlText")
 
     fontPath: String
     ftgl: Ftgl
@@ -21,12 +29,25 @@ GlText: class extends GlDrawable {
     fontWidth, fontHeight: Int
 
     init: func (=fontPath, =value, fontSize := 20) {
-        ftgl = Ftgl new(fontSize, fontSize, fontPath)
+        ftgl = loadFont(fontPath, fontSize)
     }
 
     draw: func (dye: DyeContext) {
         dye color(color)
         ftgl render(pos x, pos y, scale, true, value)
+    }
+
+    loadFont: static func (fontPath: String, fontSize: Int) -> Ftgl {
+        key := "%s-%d" format(fontPath, fontSize)
+
+        if (cache contains?(key)) {
+            cache get(key)
+        } else {
+            logger info("Loading font %s at size %d" format(fontPath, fontSize))
+            ftgl := Ftgl new(fontSize, fontSize, fontPath)
+            cache put(key, ftgl)
+            ftgl
+        }
     }
 
 }

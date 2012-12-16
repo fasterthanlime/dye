@@ -9,6 +9,9 @@ import glew
 
 import structs/HashMap
 
+use deadlogger
+import deadlogger/[Log, Logger]
+
 Texture: class {
 
   id: Int
@@ -23,6 +26,7 @@ Texture: class {
 TextureLoader: class {
 
     cache := static HashMap<String, Texture> new()
+    logger := static Log getLogger("texture")
 
     load: static func (path: String) -> Texture {
         if (cache contains?(path)) {
@@ -33,11 +37,11 @@ TextureLoader: class {
         bitmap = bitmap convertTo32Bits()
 
         if (bitmap width == 0 || bitmap height == 0 || bitmap bpp == 0) {
-          "Failed to load %s!" printfln(path)
+          logger warn("Failed to load %s!" format(path))
           return Texture new(-1, 0, 0, "<missing>")
         }
 
-        "Loaded %s, size %dx%d, %d bpp" printfln(path, bitmap width, bitmap height, bitmap bpp)
+        logger info("Loading %s, size %dx%d, %d bpp" format(path, bitmap width, bitmap height, bitmap bpp))
 
         textureID: Int
 
@@ -94,7 +98,7 @@ GlSprite: class extends GlDrawable {
         glColor3f(1.0, 1.0, 1.0)
 
         dye withTexture(GL_TEXTURE_RECTANGLE_ARB, texture id, ||
-            this
+            self := this
 
             if (xSwap) {
                 dye begin(GL_QUADS, ||
@@ -148,7 +152,8 @@ GlCroppedSprite: class extends GlSprite {
         glColor3f(1.0, 1.0, 1.0)
 
         dye withTexture(GL_TEXTURE_RECTANGLE_ARB, texture id, ||
-            this
+            self := this
+
             dye begin(GL_QUADS, ||
                 vertices := [
                     vec2(0.0, 0.0)
