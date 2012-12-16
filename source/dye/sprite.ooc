@@ -70,6 +70,8 @@ GlSprite: class extends GlDrawable {
 
     center := true
 
+    xSwap := false
+
     init: func (path: String) {
         texture = TextureLoader load(path)
         size = vec2(texture width, texture height)
@@ -93,19 +95,36 @@ GlSprite: class extends GlDrawable {
 
         dye withTexture(GL_TEXTURE_RECTANGLE_ARB, texture id, ||
             this
-            dye begin(GL_QUADS, ||
-                glTexCoord2f(0.0, 0.0)
-                glVertex2f(0.0, height)
 
-                glTexCoord2f(width, 0.0)
-                glVertex2f(width, height)
+            if (xSwap) {
+                dye begin(GL_QUADS, ||
+                    glTexCoord2f(width, 0.0)
+                    glVertex2f(0.0, height)
 
-                glTexCoord2f(width, height)
-                glVertex2f(width, 0.0)
+                    glTexCoord2f(0.0, 0.0)
+                    glVertex2f(width, height)
 
-                glTexCoord2f(0.0, height)
-                glVertex2f(0.0, 0.0)
-            )
+                    glTexCoord2f(0.0, height)
+                    glVertex2f(width, 0.0)
+
+                    glTexCoord2f(width, height)
+                    glVertex2f(0.0, 0.0)
+                )
+            } else {
+                dye begin(GL_QUADS, ||
+                    glTexCoord2f(0.0, 0.0)
+                    glVertex2f(0.0, height)
+
+                    glTexCoord2f(width, 0.0)
+                    glVertex2f(width, height)
+
+                    glTexCoord2f(width, height)
+                    glVertex2f(width, 0.0)
+
+                    glTexCoord2f(0.0, height)
+                    glVertex2f(0.0, 0.0)
+                )
+            }
         )
     }
 
