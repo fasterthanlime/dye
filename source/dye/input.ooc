@@ -470,6 +470,7 @@ Keys: enum from Int {
     CTRL  = SDLK_LCTRL
     SHIFT = SDLK_LSHIFT
     BACKSPACE = SDLK_BACKSPACE
+    DELETE = SDLK_DELETE
 }
 
 /*
