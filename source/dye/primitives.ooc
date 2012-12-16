@@ -85,3 +85,61 @@ GlTriangle: class extends GlDrawable {
 
 }
 
+GlCross: class extends GlDrawable {
+
+    color := Color new(100, 100, 100)
+    lineWidth := 1.0
+
+    init: func
+
+    draw: func (dye: DyeContext) {
+        infinity := 1_000_000.0
+
+        dye color(color)
+        glLineWidth(lineWidth)
+        dye begin(GL_LINES, ||
+            glVertex2f(-infinity, 0)
+            glVertex2f( infinity, 0)
+
+            glVertex2f(0, -infinity)
+            glVertex2f(0,  infinity)
+        )
+    }
+
+}
+
+GlGrid: class extends GlDrawable {
+
+    color := Color new(100, 100, 100)
+    lineWidth := 1.0
+
+    width := 16.0
+    num := 30
+
+    init: func {
+    }
+
+    draw: func (dye: DyeContext) {
+        infinity := 1_000_000.0
+
+        dye color(color)
+        glLineWidth(lineWidth)
+
+        offset := num * 0.5 * width
+
+        dye begin(GL_LINES, ||
+            for (i in 0..num) for (j in 0..num) {
+                x := i * width - offset
+                y := j * width - offset
+
+                glVertex2f(-offset, y)
+                glVertex2f( offset, y)
+
+                glVertex2f(x, -offset)
+                glVertex2f(x,  offset)
+            }
+        )
+    }
+
+}
+

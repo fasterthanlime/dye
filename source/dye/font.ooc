@@ -16,17 +16,17 @@ GlText: class extends GlDrawable {
     color := Color blue()
     value: String
 
-    size := 0.4
+    scale := 1.0
     
     fontWidth, fontHeight: Int
 
-    init: func ~defaultSize (=fontPath, =value) {
-        ftgl = Ftgl new(80, 72, fontPath)
+    init: func (=fontPath, =value, fontSize := 20) {
+        ftgl = Ftgl new(fontSize, fontSize, fontPath)
     }
 
     draw: func (dye: DyeContext) {
         dye color(color)
-        ftgl render(pos x, pos y, size, true, value)
+        ftgl render(pos x, pos y, scale, true, value)
     }
 
 }
