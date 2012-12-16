@@ -67,12 +67,15 @@ DyeContext: class {
     clearColor := Color new(72, 60, 50)
 
     width, height: Int
+    center: Vec2
 
     logger := static Log getLogger("dye")
 
     glDrawables := ArrayList<GlDrawable> new()
 
-    init: func (=width, =height, title: String) {
+    init: func (=width, =height, title: String, fullscreen := false) {
+        center = vec2(width / 2, height / 2)
+
 	SDL init(SDL_INIT_EVERYTHING)
 
 	SDL wmSetCaption(title, null)
@@ -83,7 +86,12 @@ DyeContext: class {
 	SDL glSetAttribute(SDL_GL_DEPTH_SIZE, 16)
 	SDL glSetAttribute(SDL_GL_DOUBLEBUFFER, 1)
 
-	screen = SDL setMode(width, height, 0, SDL_OPENGL)
+        flags := SDL_OPENGL
+        if (fullscreen) {
+            flags |= SDL_FULLSCREEN
+        }
+
+	screen = SDL setMode(width, height, 0, flags)
 
 	initGL()
     }
