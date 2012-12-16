@@ -128,7 +128,7 @@ GlGrid: class extends GlDrawable {
         offset := num * 0.5 * width
 
         dye begin(GL_LINES, ||
-            for (i in 0..num) for (j in 0..num) {
+            for (i in 0..(num + 1)) for (j in 0..(num + 1)) {
                 x := i * width - offset
                 y := j * width - offset
 
