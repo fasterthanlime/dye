@@ -37,6 +37,12 @@ Color: class {
         b = c b
     }
 
+    set!: func ~floats (r, g, b: Float) {
+        this r = r
+        this g = g
+        this b = b
+    }
+
     black: static func -> This { new(0, 0, 0) }
     white: static func -> This { new(255, 255, 255) }
     red: static func -> This { new(255, 0, 0) }
@@ -48,6 +54,10 @@ Color: class {
     }
 
     _: String { get { toString() } }
+
+    lighten: func (factor: Float) -> This {
+        new(r as Float / factor, g as Float / factor, b as Float / factor)
+    }
 
 }
 
@@ -208,6 +218,14 @@ GlDrawable: abstract class {
         draw(dye)
 
         glPopMatrix()
+    }
+
+    center!: func (dye: DyeContext, size: Vec2) {
+        pos set!(dye width / 2 - size x / 2, dye height / 2 - size y / 2)
+    }
+
+    center!: func ~childCentered (dye: DyeContext) {
+        pos set!(dye width / 2, dye height / 2)
     }
 
     draw: abstract func (dye: DyeContext)

@@ -54,7 +54,7 @@ Proxy: abstract class {
         )
     }
 
-    onKeyPress: func (which: UInt, cb: Func) -> Listener {
+    onKeyPress: func (which: Int, cb: Func) -> Listener {
         onEvent(|ev|
             match (ev) {
                 case kp: KeyPress => 
@@ -72,7 +72,7 @@ Proxy: abstract class {
         )
     }
 
-    onKeyRelease: func (which: UInt, cb: Func) -> Listener {
+    onKeyRelease: func (which: Int, cb: Func) -> Listener {
         onEvent(|ev|
             match (ev) {
                 case kr: KeyRelease => 
@@ -275,7 +275,7 @@ Input: class extends Proxy {
         _notifyListeners(ExitEvent new())
     }
 
-    _keyPressed: func (keyval: UInt, unicode: UInt16) {
+    _keyPressed: func (keyval: Int, unicode: UInt16) {
         if(debug) {
             logger debug("Key pressed! code %d" format(keyval))
         }
@@ -285,7 +285,7 @@ Input: class extends Proxy {
         }
     }
 
-    _keyReleased: func (keyval: UInt, unicode: UInt16) {
+    _keyReleased: func (keyval: Int, unicode: UInt16) {
         if (keyval < MAX_KEY) {
             keyState[keyval] = false
             _notifyListeners(KeyRelease new(keyval, unicode))
@@ -367,7 +367,7 @@ MouseRelease: class extends MouseEvent {
 
 KeyboardEvent: class extends LEvent {
 
-    code: UInt
+    code: Int
     unicode: UInt16
     init: func (=code, =unicode) {}
 

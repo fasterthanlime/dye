@@ -30,6 +30,11 @@ GlRectangle: class extends GlDrawable {
     size := vec2(16, 16)
     color := Color green()
     center := true
+    filled := true
+    lineWidth := 2.0
+
+    width: Float { get { size x } }
+    height: Float { get { size y } }
 
     init: func {
     }
@@ -49,7 +54,11 @@ GlRectangle: class extends GlDrawable {
 
     draw: func (dye: DyeContext) {
         dye color(color)
-        dye begin(GL_QUADS, ||
+        
+        if (!filled) {
+            glLineWidth(lineWidth)
+        }
+        dye begin(filled ? GL_QUADS : GL_LINE_LOOP, ||
             glVertex2f(0.0, 0.0)
             glVertex2f(size x, 0.0)
             glVertex2f(size x, size y)
