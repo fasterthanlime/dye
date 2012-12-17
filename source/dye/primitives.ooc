@@ -39,31 +39,31 @@ GlRectangle: class extends GlDrawable {
     init: func {
     }
 
-    render: func (dye: DyeContext) {
-        if (center) {
-            glPushMatrix()
-
-            glTranslatef(size x * -0.5, size y * -0.5, 0.0)
-            super()
-
-            glPopMatrix()
-        } else {
-            super()
-        }
-    }
-
     draw: func (dye: DyeContext) {
         dye color(color)
         
         if (!filled) {
             glLineWidth(lineWidth)
         }
-        dye begin(filled ? GL_QUADS : GL_LINE_LOOP, ||
-            glVertex2f(0.0, 0.0)
-            glVertex2f(size x, 0.0)
-            glVertex2f(size x, size y)
-            glVertex2f(0.0, size y)
-        )
+
+        if (center) {
+            halfX := size x * 0.5
+            halfY := size y * 0.5
+
+            dye begin(filled ? GL_QUADS : GL_LINE_LOOP, ||
+                glVertex2f(-halfX, -halfY)
+                glVertex2f( halfX, -halfY)
+                glVertex2f( halfX,  halfY)
+                glVertex2f(-halfX,  halfY)
+            )
+        } else {
+            dye begin(filled ? GL_QUADS : GL_LINE_LOOP, ||
+                glVertex2f(0.0, 0.0)
+                glVertex2f(size x, 0.0)
+                glVertex2f(size x, size y)
+                glVertex2f(0.0, size y)
+            )
+        }
     }
 
 }
