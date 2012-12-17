@@ -203,6 +203,10 @@ DyeContext: class {
 	glDrawables remove(d)
     }
 
+    clear: func {
+        glDrawables clear()
+    }
+
 }
 
 GlDrawable: abstract class {
@@ -260,6 +264,10 @@ GlGroup: class extends GlDrawable {
 
     remove: func (d: GlDrawable) {
         children remove(d)
+    }
+
+    clear: func {
+        children clear()
     }
 
 }
