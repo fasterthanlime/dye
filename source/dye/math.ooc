@@ -43,6 +43,10 @@ Vec2: class {
         new(x * f, y * f)
     }
 
+    mul!: func (f: Float) -> This {
+        set!(mul(f))
+    }
+
     set!: func (v: This) {
         x = v x
         y = v y

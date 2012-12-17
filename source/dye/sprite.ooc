@@ -67,10 +67,14 @@ TextureLoader: class {
 GlSprite: class extends GlDrawable {
 
     texture: Texture
+    texSize: Vec2
     size: Vec2
 
     width: Float { get { size x } }
     height: Float { get { size y } }
+
+    texWidth: Float { get { texSize x } }
+    texHeight: Float { get { texSize y } }
 
     center := true
 
@@ -79,6 +83,8 @@ GlSprite: class extends GlDrawable {
     init: func (path: String) {
         texture = TextureLoader load(path)
         size = vec2(texture width, texture height)
+        texSize = vec2(0, 0)
+        texSize set!(size)
     }
 
     render: func (dye: DyeContext) {
@@ -102,16 +108,16 @@ GlSprite: class extends GlDrawable {
 
             if (xSwap) {
                 dye begin(GL_QUADS, ||
-                    glTexCoord2f(width, 0.0)
+                    glTexCoord2f(texWidth, 0.0)
                     glVertex2f(0.0, height)
 
                     glTexCoord2f(0.0, 0.0)
                     glVertex2f(width, height)
 
-                    glTexCoord2f(0.0, height)
+                    glTexCoord2f(0.0, texHeight)
                     glVertex2f(width, 0.0)
 
-                    glTexCoord2f(width, height)
+                    glTexCoord2f(texWidth, texHeight)
                     glVertex2f(0.0, 0.0)
                 )
             } else {
@@ -119,13 +125,13 @@ GlSprite: class extends GlDrawable {
                     glTexCoord2f(0.0, 0.0)
                     glVertex2f(0.0, height)
 
-                    glTexCoord2f(width, 0.0)
+                    glTexCoord2f(texWidth, 0.0)
                     glVertex2f(width, height)
 
-                    glTexCoord2f(width, height)
+                    glTexCoord2f(texWidth, texHeight)
                     glVertex2f(width, 0.0)
 
-                    glTexCoord2f(0.0, height)
+                    glTexCoord2f(0.0, texHeight)
                     glVertex2f(0.0, 0.0)
                 )
             }
