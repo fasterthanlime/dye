@@ -80,6 +80,8 @@ GlSprite: class extends GlDrawable {
 
     xSwap := false
 
+    brightness := 1.0
+
     init: func (path: String) {
         texture = TextureLoader load(path)
         size = vec2(texture width, texture height)
@@ -101,7 +103,7 @@ GlSprite: class extends GlDrawable {
     }
 
     draw: func (dye: DyeContext) {
-        glColor3f(1.0, 1.0, 1.0)
+        glColor3f(brightness, brightness, brightness)
 
         dye withTexture(GL_TEXTURE_RECTANGLE_ARB, texture id, ||
             self := this
