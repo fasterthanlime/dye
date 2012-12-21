@@ -48,6 +48,20 @@ TextureLoader: class {
         glGenTextures(1, textureID&)
         glBindTexture(GL_TEXTURE_RECTANGLE_ARB, textureID)
 
+        data: UInt8* = bitmap bits()
+
+        factor := 1.0 / 255.0
+        for (i in 0..(bitmap width * bitmap height)) {
+            b     := data[i * 4 + 0] as Float
+            g     := data[i * 4 + 1] as Float
+            r     := data[i * 4 + 2] as Float
+            alpha := factor * data[i * 4 + 3]
+
+            data[i * 4 + 0] = (b * alpha)
+            data[i * 4 + 1] = (g * alpha)
+            data[i * 4 + 2] = (r * alpha)
+        }
+
         glTexImage2D(GL_TEXTURE_RECTANGLE_ARB,
                     0,
                     GL_RGBA,
@@ -56,7 +70,7 @@ TextureLoader: class {
                     0,
                     GL_BGRA,
                     GL_UNSIGNED_BYTE,
-                    bitmap bits())
+                    data)
         texture := Texture new(textureID, bitmap width, bitmap height, path)
         cache put(path, texture)
         texture

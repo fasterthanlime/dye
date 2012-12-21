@@ -136,7 +136,6 @@ DyeContext: class {
         setClearColor(clearColor)
 	glDisable(GL_DEPTH_TEST)
 	glEnable(GL_BLEND)
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
 	reshape()
     }
@@ -195,7 +194,10 @@ DyeContext: class {
     withTexture: func (textureType: GLenum, textureID: GLuint, f: Func) {
 	glEnable(textureType)
         glBindTexture(textureType, textureID)
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+
         f()
+
         glBindTexture(textureType, 0) // unbind it for later draw operations
 	glDisable(textureType)
     }
