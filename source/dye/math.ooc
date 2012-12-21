@@ -241,6 +241,14 @@ Vec2i: class {
         this y = v y
     }
 
+    div: func (i: Int) -> This {
+        new(x / i, y / i)
+    }
+
+    add: func ~vec2 (v: Vec2) -> Vec2 {
+        vec2(v x + x as Float, v y + y as Float)
+    }
+
     toString: func -> String {
         "(%d, %d)" format(x, y)
     }

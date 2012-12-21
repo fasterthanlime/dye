@@ -66,14 +66,19 @@ DyeContext: class {
     screen: SdlSurface*
     clearColor := Color new(72, 60, 50)
 
-    width, height: Int
+    size: Vec2i
+
+    width:  Int { get { size x } }
+    height: Int { get { size y } }
+
     center: Vec2
 
     logger := static Log getLogger("dye")
 
     glDrawables := ArrayList<GlDrawable> new()
 
-    init: func (=width, =height, title: String, fullscreen := false) {
+    init: func (width, height: Int, title: String, fullscreen := false) {
+        size = vec2i(width, height)
         center = vec2(width / 2, height / 2)
 
 	SDL init(SDL_INIT_EVERYTHING)
@@ -137,7 +142,7 @@ DyeContext: class {
     }
 
     reshape: func {
-	glViewport(0, 0, width, height)
+	glViewport(0, 0, size x, size y)
     }
 
     begin2D: func {
