@@ -253,6 +253,10 @@ Vec2i: class {
         "(%d, %d)" format(x, y)
     }
 
+    toVec2: func -> Vec2 {
+        vec2(x, y)
+    }
+
     _: String { get { toString() } }
 
 }
