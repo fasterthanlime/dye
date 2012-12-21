@@ -58,14 +58,25 @@ Vec2: class {
     }
 
     snap: func (size: Int) -> This {
-        ix := round(x / size as Float) * size
-        iy := round(y / size as Float) * size
+        ix := ceil(- 0.5 + (x / size as Float)) * size
+        iy := ceil(- 0.5 + (y / size as Float)) * size
 
         vec2(ix, iy)
     }
 
     snap!: func (size: Int) {
         set!(snap(size))
+    }
+
+    snap: func ~rect (size: This, gridSize: Int) -> This {
+        halfSize := vec2(size x * 0.5, - size y * 0.5)
+        vec2(this sub(halfSize) snap(gridSize) add(halfSize))
+    }
+
+    getColRow: func (gridSize: Int) -> Vec2i {
+        col := ceil(- 0.5 + (x / gridSize as Float))
+        row := ceil(- 0.5 + (y / gridSize as Float))
+        vec2i(col, row)
     }
 
     sub: func (v: This) -> This {
@@ -208,4 +219,33 @@ Vec3: class {
 
 // cuz I'm lazy (number two)
 vec3: func (x, y, z: Float) -> Vec3 { Vec3 new(x, y, z) }
+
+Vec2i: class {
+
+    x, y: Int
+
+    init: func (=x, =y) {
+    }
+
+    equals: func (v: This) -> Bool {
+        (x == v x && y == v y)
+    }
+
+    set!: func ~twoints (x, y: Int) {
+        this x = x
+        this y = y
+    }
+
+    set!: func ~vec2i (v: This) {
+        this x = v x
+        this y = v y
+    }
+
+}
+
+operator == (v1, v2: Vec2i) -> Bool {
+    v1 equals(v2)
+}
+
+vec2i: func (x, y: Int) -> Vec2i { Vec2i new(x, y) }
 
