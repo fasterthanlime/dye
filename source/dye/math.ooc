@@ -241,6 +241,12 @@ Vec2i: class {
         this y = v y
     }
 
+    toString: func -> String {
+        "(%d, %d)" format(x, y)
+    }
+
+    _: String { get { toString() } }
+
 }
 
 operator == (v1, v2: Vec2i) -> Bool {
