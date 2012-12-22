@@ -5,7 +5,33 @@ import dye/[core, sprite, math]
 use glew
 import glew
 
-import structs/[ArrayList, HashMap]
+import structs/[List, ArrayList, HashMap]
+
+GlSet: class extends GlGroup {
+
+    current := 0
+
+    init: func {
+        
+    }
+
+    drawChildren: func (dye: DyeContext) {
+        if (children empty?()) return
+
+        if (current < 0) {
+            current = current + children size
+        }
+        if (current >= children size) {
+            current = current - children size
+        }
+
+        child := children get(current)
+        if (child) {
+            child render(dye)
+        }
+    }
+
+}
 
 GlAnim: class extends GlGroup {
 
@@ -16,7 +42,7 @@ GlAnim: class extends GlGroup {
 
     frameDuration, counter: Int
 
-    init: func (frameDuration := 8) {
+    init: func (frameDuration := 4) {
         super()
 
         this frameDuration = frameDuration
@@ -96,9 +122,13 @@ GlAnimSet: class extends GlDrawable {
 
     play: func (name: String) {
         if (name != currentName) {
-            currentName = name
-            current = children get(name)
-            current rewind()
+            kiddo := children get(name)
+
+            if (kiddo) {
+                currentName = name
+                current = kiddo
+                current rewind()
+            }
         }
     }
 
