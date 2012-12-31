@@ -4,6 +4,8 @@ use deadlogger
 // libs deps
 import deadlogger/Log
 import structs/[ArrayList]
+
+use sdl2
 import sdl2/[Core, Event]
 
 import dye/math
@@ -255,8 +257,8 @@ Input: class extends Proxy {
 
         while(SDLEvent poll(event&)) {
             match (event type) {
-                case SDL_KEYDOWN => _keyPressed (event key keysym sym, event key keysym unicode)
-                case SDL_KEYUP   => _keyReleased(event key keysym sym, event key keysym unicode)
+                case SDL_KEYDOWN => _keyPressed (event key keysym sym, event key keysym scancode)
+                case SDL_KEYUP   => _keyReleased(event key keysym sym, event key keysym scancode)
                 case SDL_MOUSEBUTTONUP   => _mouseReleased(event button button)
                 case SDL_MOUSEBUTTONDOWN => _mousePressed (event button button)
                 case SDL_MOUSEMOTION => _mouseMoved (event motion x, event motion y)
@@ -276,7 +278,7 @@ Input: class extends Proxy {
         _notifyListeners(ExitEvent new())
     }
 
-    _keyPressed: func (keyval: Int, unicode: UInt16) {
+    _keyPressed: func (keyval: Int, unicode: Int) {
         if(debug) {
             logger debug("Key pressed! code %d" format(keyval))
         }
@@ -286,7 +288,7 @@ Input: class extends Proxy {
         }
     }
 
-    _keyReleased: func (keyval: Int, unicode: UInt16) {
+    _keyReleased: func (keyval: Int, unicode: Int) {
         if (keyval < MAX_KEY) {
             keyState[keyval] = false
             _notifyListeners(KeyRelease new(keyval, unicode))
@@ -369,8 +371,8 @@ MouseRelease: class extends MouseEvent {
 KeyboardEvent: class extends LEvent {
 
     code: Int
-    unicode: UInt16
-    init: func (=code, =unicode) {}
+    scancode: Int
+    init: func (=code, =scancode) {}
 
 }
 
@@ -446,16 +448,16 @@ Keys: enum from Int {
     X     = SDLK_x
     Y     = SDLK_y
     Z     = SDLK_z
-    KP0    = SDLK_KP0
-    KP1    = SDLK_KP1
-    KP2    = SDLK_KP2
-    KP3    = SDLK_KP3
-    KP4    = SDLK_KP4
-    KP5    = SDLK_KP5
-    KP6    = SDLK_KP6
-    KP7    = SDLK_KP7
-    KP8    = SDLK_KP8
-    KP9    = SDLK_KP9
+    KP0    = SDLK_KP_0
+    KP1    = SDLK_KP_1
+    KP2    = SDLK_KP_2
+    KP3    = SDLK_KP_3
+    KP4    = SDLK_KP_4
+    KP5    = SDLK_KP_5
+    KP6    = SDLK_KP_6
+    KP7    = SDLK_KP_7
+    KP8    = SDLK_KP_8
+    KP9    = SDLK_KP_9
     _0    = SDLK_0
     _1    = SDLK_1
     _2    = SDLK_2
