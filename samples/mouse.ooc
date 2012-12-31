@@ -10,7 +10,7 @@ main: func (argc: Int, argv: CString*) {
     dye setShowCursor(false)
 
     crosshair := GlSprite new("crosshair.png")
-    crosshairGroup := GlTransformGroup new()
+    crosshairGroup := GlGroup new()
     crosshairGroup add(crosshair)
     dye add(crosshairGroup)
 

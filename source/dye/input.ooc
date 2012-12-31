@@ -1,9 +1,10 @@
+
 use deadlogger
 
 // libs deps
 import deadlogger/Log
 import structs/[ArrayList]
-import sdl/[Core, Event]
+import sdl2/[Core, Event]
 
 import dye/math
 
