@@ -21,7 +21,7 @@ GlText: class extends GlDrawable {
     fontPath: String
     ftgl: Ftgl
     pos := vec2(20, 40)
-    color := Color blue()
+    color := Color white()
     value: String
 
     scale := 1.0

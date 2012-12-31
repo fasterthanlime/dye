@@ -14,7 +14,7 @@ main: func (argc: Int, argv: CString*) {
   dye add(triangle)
 
   dye render()
-  Time sleepSec(1)
+  Time sleepSec(o)
 
   dye quit()
 
