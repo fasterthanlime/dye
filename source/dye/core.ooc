@@ -2,8 +2,8 @@
 use deadlogger
 import deadlogger/[Log]
 
-use sdl
-import sdl/Core
+use sdl2
+import sdl2/Core
 
 use glew
 import glew
@@ -63,7 +63,8 @@ Color: class {
 
 DyeContext: class {
 
-    screen: SdlSurface*
+    window: SdlWindow
+    context: SdlGlContext
     clearColor := Color new(72, 60, 50)
 
     size: Vec2i
@@ -83,20 +84,20 @@ DyeContext: class {
 
 	SDL init(SDL_INIT_EVERYTHING)
 
-	SDL wmSetCaption(title, null)
-
 	SDL glSetAttribute(SDL_GL_RED_SIZE, 5)
 	SDL glSetAttribute(SDL_GL_GREEN_SIZE, 6)
 	SDL glSetAttribute(SDL_GL_BLUE_SIZE, 5)
 	SDL glSetAttribute(SDL_GL_DEPTH_SIZE, 16)
 	SDL glSetAttribute(SDL_GL_DOUBLEBUFFER, 1)
 
-        flags := SDL_OPENGL
+        flags := SDL_WINDOW_OPENGL
         if (fullscreen) {
-            flags |= SDL_FULLSCREEN
+            flags |= SDL_WINDOW_FULLSCREEN
         }
 
-	screen = SDL setMode(width, height, 0, flags)
+	window = SDL createWindow(title, 0, 0, width, height, flags)
+        context = SDL glCreateContext(window) 
+        SDL glMakeCurrent(window, context)
 
 	initGL()
     }
@@ -106,9 +107,10 @@ DyeContext: class {
     }
 
     render: func {
+        SDL glMakeCurrent(window, context)
 	glClear(GL_COLOR_BUFFER_BIT)
 	draw()
-	SDL glSwapBuffers()
+	SDL glSwapWindow(window)
     }
 
     draw: func {

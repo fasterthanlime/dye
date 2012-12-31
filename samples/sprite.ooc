@@ -1,8 +1,6 @@
 use dye
 import dye/[core, sprite]
 
-use sdl, glew, glu
-
 import os/Time
 
 main: func (argc: Int, argv: CString*) {

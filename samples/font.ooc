@@ -2,8 +2,6 @@
 use dye
 import dye/[core, font]
 
-use sdl, glew, glu, ftgl
-
 import os/Time
 
 main: func (argc: Int, argv: CString*) {

@@ -1,5 +1,5 @@
 Name: dye
 Description: an simple graphics library
-Requires: sdl, cairo, glew, glu
+Requires: sdl2, glew, glu
 SourcePath: source
 

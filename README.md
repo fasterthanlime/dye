@@ -9,5 +9,5 @@ dye is a simple graphics library for ooc, based on SDL
 
 ### Links
 
-  * ooc-sdl: https://github.com/nddrylliog/ooc-sdl
+  * ooc-sdl2: https://github.com/geckojsc/ooc-sdl2
 
