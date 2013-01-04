@@ -84,6 +84,10 @@ DyeContext: class {
 
 	SDL init(SDL_INIT_EVERYTHING)
 
+        SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
+        SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2)
+        SDL glSetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
+
 	SDL glSetAttribute(SDL_GL_RED_SIZE, 5)
 	SDL glSetAttribute(SDL_GL_GREEN_SIZE, 6)
 	SDL glSetAttribute(SDL_GL_BLUE_SIZE, 5)
@@ -95,7 +99,7 @@ DyeContext: class {
             flags |= SDL_WINDOW_FULLSCREEN
         }
 
-	window = SDL createWindow(title, 0, 0, width, height, flags)
+	window = SDL createWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags)
         context = SDL glCreateContext(window) 
         SDL glMakeCurrent(window, context)
 
