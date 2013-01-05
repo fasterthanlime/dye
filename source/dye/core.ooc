@@ -14,7 +14,7 @@ import glu
 import structs/ArrayList
 
 use dye
-import dye/[input, math]
+import dye/[input, math, fbo]
 
 Color: class {
 
@@ -75,6 +75,7 @@ DyeContext: class {
     center: Vec2
 
     logger := static Log getLogger("dye")
+    fbo: Fbo
 
     input: Input
 
@@ -86,8 +87,8 @@ DyeContext: class {
 
 	SDL init(SDL_INIT_EVERYTHING)
 
-        SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
-        SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0)
+        SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2)
+        SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1)
         SDL glSetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
 
 	SDL glSetAttribute(SDL_GL_RED_SIZE, 5)
@@ -122,8 +123,12 @@ DyeContext: class {
 
     render: func {
         SDL glMakeCurrent(window, context)
+
+        fbo bind()
 	glClear(GL_COLOR_BUFFER_BIT)
 	draw()
+        fbo unbind()
+
 	SDL glSwapWindow(window)
     }
 
@@ -145,6 +150,8 @@ DyeContext: class {
     }
 
     initGL: func {
+        glewInit()
+
 	logger info("OpenGL version: %s" format(glGetString (GL_VERSION)))
 	logger info("OpenGL vendor: %s" format(glGetString (GL_VENDOR)))
 	logger info("OpenGL renderer: %s" format(glGetString (GL_RENDERER)))
@@ -154,6 +161,8 @@ DyeContext: class {
 	glEnable(GL_BLEND)
 
 	reshape()
+
+        fbo = Fbo new(size x, size y)
     }
 
     reshape: func {
