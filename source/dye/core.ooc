@@ -68,6 +68,7 @@ DyeContext: class {
     clearColor := Color new(72, 60, 50)
 
     size: Vec2i
+    windowSize: Vec2i
 
     width:  Int { get { size x } }
     height: Int { get { size y } }
@@ -83,6 +84,8 @@ DyeContext: class {
 
     init: func (width, height: Int, title: String, fullscreen := false) {
         size = vec2i(width, height)
+        windowSize = vec2i(width, height)
+
         center = vec2(width / 2, height / 2)
 
 	SDL init(SDL_INIT_EVERYTHING)
@@ -110,8 +113,7 @@ DyeContext: class {
         SDL glMakeCurrent(window, context)
 
         input onWindowSizeChange(|x, y|
-            size set!(x, y)
-            reshape()
+            windowSize set!(x, y)
         )
 
 	initGL()
@@ -125,17 +127,20 @@ DyeContext: class {
         SDL glMakeCurrent(window, context)
 
         fbo bind()
+        glViewport(0, 0, size x, size y)
+	glClearColor(clearColor R, clearColor G, clearColor B, 1.0)
 	glClear(GL_COLOR_BUFFER_BIT)
 	draw()
         fbo unbind()
 
+        glViewport(0, 0, windowSize x, windowSize y)
         fbo render()
 
 	SDL glSwapWindow(window)
     }
 
     draw: func {
-	begin2D()
+	begin2D(size)
 	for (d in glDrawables) {
 	    d render(this)
 	}
@@ -148,7 +153,6 @@ DyeContext: class {
 
     setClearColor: func (c: Color) {
         clearColor set!(c)
-	glClearColor(clearColor R, clearColor G, clearColor B, 1.0)
     }
 
     initGL: func {
@@ -162,23 +166,17 @@ DyeContext: class {
 	glDisable(GL_DEPTH_TEST)
 	glEnable(GL_BLEND)
 
-	reshape()
-
         fbo = Fbo new(this, size x, size y)
     }
 
-    reshape: func {
-	glViewport(0, 0, size x, size y)
-    }
-
-    begin2D: func {
+    begin2D: func (canvasSize: Vec2i) {
 	glDisable(GL_DEPTH_TEST)
 	glEnable(GL_BLEND)
 	glMatrixMode(GL_PROJECTION)
 	glPushMatrix()
 	glLoadIdentity()
 
-	gluOrtho2D(0, width, height, 0)
+	gluOrtho2D(0, canvasSize x, canvasSize y, 0)
 	glMatrixMode(GL_MODELVIEW)
 	glPushMatrix()
 	glLoadIdentity()

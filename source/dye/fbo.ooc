@@ -21,8 +21,8 @@ Fbo: class {
         // create a texture object
         glGenTextures(1, textureId&)
         glBindTexture(GL_TEXTURE_2D, textureId)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, null)
         glBindTexture(GL_TEXTURE_2D, 0) 
 
@@ -62,28 +62,46 @@ Fbo: class {
     }
 
     render: func {
+        dye begin2D(dye windowSize)
+	glClearColor(0.0, 0.0, 0.0, 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-        dye begin2D()
 
         glEnable(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, textureId)
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
+        ratio := dye size y as Float / dye size x as Float
+        realRatio := dye windowSize y as Float / dye windowSize x as Float
+
+        realWidth, realHeight: Float
+
+        if (realRatio < ratio) {
+            realHeight = dye windowSize y as Float
+            realWidth = realHeight / ratio
+        } else {
+            realWidth = dye windowSize x as Float
+            realHeight = realWidth * ratio
+        }
+
+        glPushMatrix()
+        glTranslatef(dye windowSize x / 2 - realWidth / 2, dye windowSize y/ 2 - realHeight / 2, 0)
+
         glColor4f(1, 1, 1, 1)
         glBegin(GL_QUADS)
-            glTexCoord2f(0.0, 2.0)
+            glTexCoord2f(0.0, 1.0)
             glVertex2f(0, 0)
 
-            glTexCoord2f(2.0, 2.0)
-            glVertex2f(width, 0)
+            glTexCoord2f(1.0, 1.0)
+            glVertex2f(realWidth, 0)
 
-            glTexCoord2f(2.0, 0.0)
-            glVertex2f(width, height)
+            glTexCoord2f(1.0, 0.0)
+            glVertex2f(realWidth, realHeight)
 
             glTexCoord2f(0.0, 0.0)
-            glVertex2f(0, height)
+            glVertex2f(0, realHeight)
         glEnd()
+
+        glPopMatrix()
 
         glBindTexture(GL_TEXTURE_2D, 0)
         glDisable(GL_TEXTURE_2D)
