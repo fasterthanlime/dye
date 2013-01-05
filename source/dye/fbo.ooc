@@ -6,24 +6,23 @@ use glu
 import glu
 
 use dye
-import dye/math
+import dye/[core, math]
 
 Fbo: class {
+
+    dye: DyeContext
 
     width, height: Int
     textureId: Int
     rboId: Int
     fboId: Int
 
-    init: func (=width, =height) {
+    init: func (=dye, =width, =height) {
         // create a texture object
         glGenTextures(1, textureId&)
         glBindTexture(GL_TEXTURE_2D, textureId)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE) // automatic mipmap
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, null)
         glBindTexture(GL_TEXTURE_2D, 0) 
 
@@ -60,6 +59,36 @@ Fbo: class {
 
     unbind: func {
         glBindFramebuffer(GL_FRAMEBUFFER, 0)
+    }
+
+    render: func {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+        dye begin2D()
+
+        glEnable(GL_TEXTURE_2D)
+        glBindTexture(GL_TEXTURE_2D, textureId)
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+
+        glColor4f(1, 1, 1, 1)
+        glBegin(GL_QUADS)
+            glTexCoord2f(0.0, 2.0)
+            glVertex2f(0, 0)
+
+            glTexCoord2f(2.0, 2.0)
+            glVertex2f(width, 0)
+
+            glTexCoord2f(2.0, 0.0)
+            glVertex2f(width, height)
+
+            glTexCoord2f(0.0, 0.0)
+            glVertex2f(0, height)
+        glEnd()
+
+        glBindTexture(GL_TEXTURE_2D, 0)
+        glDisable(GL_TEXTURE_2D)
+
+        dye end2D()
     }
 
 }

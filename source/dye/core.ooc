@@ -129,6 +129,8 @@ DyeContext: class {
 	draw()
         fbo unbind()
 
+        fbo render()
+
 	SDL glSwapWindow(window)
     }
 
@@ -162,7 +164,7 @@ DyeContext: class {
 
 	reshape()
 
-        fbo = Fbo new(size x, size y)
+        fbo = Fbo new(this, size x, size y)
     }
 
     reshape: func {
