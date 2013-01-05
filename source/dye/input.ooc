@@ -40,6 +40,14 @@ Proxy: abstract class {
         listener
     }
 
+    onWindowSizeChange: func (cb: Func (Int, Int)) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case wscv: WindowSizeChanged => cb(wscv x, wscv y)
+            }
+        )
+    }
+
     onExit: func (cb: Func) -> Listener {
         onEvent(|ev|
             match (ev) {
@@ -253,9 +261,9 @@ Input: class extends Proxy {
     // --------------------------------
 
     _poll: func {
-        event: Event
+        event: SdlEvent
 
-        while(SDLEvent poll(event&)) {
+        while(SdlEvent poll(event&)) {
             match (event type) {
                 case SDL_KEYDOWN => _keyPressed (event key keysym sym, event key keysym scancode)
                 case SDL_KEYUP   => _keyReleased(event key keysym sym, event key keysym scancode)
@@ -263,6 +271,9 @@ Input: class extends Proxy {
                 case SDL_MOUSEBUTTONDOWN => _mousePressed (event button button)
                 case SDL_MOUSEMOTION => _mouseMoved (event motion x, event motion y)
                 case SDL_QUIT => _quit()
+                case SDL_WINDOWEVENT => match (event window event) {
+                    case SDL_WINDOWEVENT_SIZE_CHANGED => _windowSizeChanged (event window data1, event window data2)
+                }
             }
         }
     }
@@ -316,6 +327,13 @@ Input: class extends Proxy {
         _notifyListeners(MouseRelease new(_mousepos, button))
     }
 
+    _windowSizeChanged: func (x, y: Int) {
+        if(debug) {
+            logger debug("Window size changed to %dx%d" format(x, y))
+        }
+        _notifyListeners(WindowSizeChanged new(x, y))
+    }
+
     getMousePos: func -> Vec2 {
         _mousepos
     }
@@ -324,6 +342,13 @@ Input: class extends Proxy {
 
 LEvent: class {
     // base class for all events
+}
+
+WindowSizeChanged: class extends LEvent {
+
+    x, y: Int
+    init: func (=x, =y)
+        
 }
 
 ExitEvent: class extends LEvent { }

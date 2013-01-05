@@ -14,7 +14,7 @@ import glu
 import structs/ArrayList
 
 use dye
-import dye/math
+import dye/[input, math]
 
 Color: class {
 
@@ -76,6 +76,8 @@ DyeContext: class {
 
     logger := static Log getLogger("dye")
 
+    input: Input
+
     glDrawables := ArrayList<GlDrawable> new()
 
     init: func (width, height: Int, title: String, fullscreen := false) {
@@ -94,14 +96,22 @@ DyeContext: class {
 	SDL glSetAttribute(SDL_GL_DEPTH_SIZE, 16)
 	SDL glSetAttribute(SDL_GL_DOUBLEBUFFER, 1)
 
+        input = Input new()
+
         flags := SDL_WINDOW_OPENGL
         if (fullscreen) {
             flags |= SDL_WINDOW_FULLSCREEN
         }
+        flags |= SDL_WINDOW_RESIZABLE
 
 	window = SDL createWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags)
         context = SDL glCreateContext(window) 
         SDL glMakeCurrent(window, context)
+
+        input onWindowSizeChange(|x, y|
+            size set!(x, y)
+            reshape()
+        )
 
 	initGL()
     }
