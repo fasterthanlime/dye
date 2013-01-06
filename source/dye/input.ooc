@@ -22,7 +22,6 @@ Proxy: abstract class {
     }
 
     getMousePos: abstract func -> Vec2
-    getMouseWorldPos: abstract func -> Vec2
 
     enabled := true
 
@@ -208,10 +207,6 @@ SubProxy: class extends Proxy {
         parent getMousePos()
     }
 
-    getMouseWorldPos: func -> Vec2 {
-        parent getMouseWorldPos()
-    }
-
     nuke: func {
         parent listeners remove(own)
     }
@@ -341,10 +336,6 @@ Input: class extends Proxy {
     }
 
     getMousePos: func -> Vec2 {
-        _mousepos
-    }
-
-    getMouseWorldPos: func -> Vec2 {
         if (dye size == dye windowSize) {
             // all good, no transformation to make
             _mousepos

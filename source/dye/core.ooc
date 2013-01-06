@@ -105,14 +105,15 @@ DyeContext: class {
 
         flags := SDL_WINDOW_OPENGL
         if (fullscreen) {
-            flags |= SDL_WINDOW_FULLSCREEN
-        }
-        flags |= SDL_WINDOW_BORDERLESS
-        flags |= SDL_WINDOW_MAXIMIZED
+            flags |= SDL_WINDOW_BORDERLESS
+            flags |= SDL_WINDOW_MAXIMIZED
 
-        rect: SdlRect
-        SDL getDisplayBounds(0, rect&)
-        windowSize = vec2i(rect w, rect h)
+            rect: SdlRect
+            SDL getDisplayBounds(0, rect&)
+            windowSize = vec2i(rect w, rect h)
+        } else {
+            windowSize = vec2i(size x, size y)
+        }
 
 	window = SDL createWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowSize x, windowSize y, flags)
         context = SDL glCreateContext(window) 
