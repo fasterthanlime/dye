@@ -8,7 +8,7 @@ import structs/[ArrayList]
 use sdl2
 import sdl2/[Core, Event]
 
-import dye/math
+import dye/[math, core, fbo]
 
 Proxy: abstract class {
 
@@ -22,6 +22,7 @@ Proxy: abstract class {
     }
 
     getMousePos: abstract func -> Vec2
+    getMouseWorldPos: abstract func -> Vec2
 
     enabled := true
 
@@ -204,7 +205,11 @@ SubProxy: class extends Proxy {
     }
 
     getMousePos: func -> Vec2 {
-        parent mousepos
+        parent getMousePos()
+    }
+
+    getMouseWorldPos: func -> Vec2 {
+        parent getMouseWorldPos()
     }
 
     nuke: func {
@@ -215,6 +220,7 @@ SubProxy: class extends Proxy {
 
 Input: class extends Proxy {
 
+    dye: DyeContext
     logger := static Log getLogger(This name)
 
     MAX_KEY := static 65536
@@ -227,7 +233,7 @@ Input: class extends Proxy {
 
     _mousepos := vec2(0.0, 0.0)
 
-    init: func () {
+    init: func (=dye) {
         keyState = gc_malloc(Bool size * MAX_KEY)
         buttonState = gc_malloc(Bool size * MAX_BUTTON)
 
@@ -336,6 +342,19 @@ Input: class extends Proxy {
 
     getMousePos: func -> Vec2 {
         _mousepos
+    }
+
+    getMouseWorldPos: func -> Vec2 {
+        if (dye size == dye windowSize) {
+            // all good, no transformation to make
+            _mousepos
+        } else {
+            // in this case, windowSize is bigger than size
+            // we have two things to account for: 1) scaling
+            // 2) offset (there might be black bars on top/bottom
+            // or left/right)
+            _mousepos sub(dye fbo targetOffset) mul(1.0 / dye fbo scale)
+        }
     }
 
 }

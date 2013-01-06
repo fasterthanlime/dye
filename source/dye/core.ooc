@@ -101,7 +101,7 @@ DyeContext: class {
 	SDL glSetAttribute(SDL_GL_DEPTH_SIZE, 16)
 	SDL glSetAttribute(SDL_GL_DOUBLEBUFFER, 1)
 
-        input = Input new()
+        input = Input new(this)
 
         flags := SDL_WINDOW_OPENGL
         if (fullscreen) {

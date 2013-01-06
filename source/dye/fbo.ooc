@@ -17,6 +17,10 @@ Fbo: class {
     rboId: Int
     fboId: Int
 
+    targetSize := vec2(-1, -1)
+    targetOffset := vec2(0, 0)
+    scale := 1.0
+
     init: func (=dye, =width, =height) {
         // create a texture object
         glGenTextures(1, textureId&)
@@ -45,8 +49,7 @@ Fbo: class {
         // check FBO status
         status := glCheckFramebufferStatus(GL_FRAMEBUFFER)
         if(status != GL_FRAMEBUFFER_COMPLETE) {
-            "Can't use FBO" println()
-            //fboUsed = false
+            Exception new("FBO (Framebuffer Objects) not supported, cannot continue") throw()
         }
 
         // switch back to window-system-provided framebuffer
@@ -70,21 +73,24 @@ Fbo: class {
         glBindTexture(GL_TEXTURE_2D, textureId)
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
-        ratio := dye size y as Float / dye size x as Float
-        realRatio := dye windowSize y as Float / dye windowSize x as Float
+        ratio := dye size ratio()
+        targetRatio := dye windowSize ratio()
 
-        realWidth, realHeight: Float
-
-        if (realRatio < ratio) {
-            realHeight = dye windowSize y as Float
-            realWidth = realHeight / ratio
+        if (targetRatio < ratio) {
+            targetSize y = dye windowSize y
+            targetSize x = targetSize y / ratio
         } else {
-            realWidth = dye windowSize x as Float
-            realHeight = realWidth * ratio
+            targetSize x = dye windowSize x
+            targetSize y = targetSize x * ratio
         }
 
+        scale = targetSize x as Float / dye size x as Float
+
+        targetOffset x = dye windowSize x / 2 - targetSize x / 2
+        targetOffset y = dye windowSize y / 2 - targetSize y / 2
+
         glPushMatrix()
-        glTranslatef(dye windowSize x / 2 - realWidth / 2, dye windowSize y/ 2 - realHeight / 2, 0)
+        glTranslatef(targetOffset x, targetOffset y, 0)
 
         glColor4f(1, 1, 1, 1)
         glBegin(GL_QUADS)
@@ -92,13 +98,13 @@ Fbo: class {
             glVertex2f(0, 0)
 
             glTexCoord2f(1.0, 1.0)
-            glVertex2f(realWidth, 0)
+            glVertex2f(targetSize x, 0)
 
             glTexCoord2f(1.0, 0.0)
-            glVertex2f(realWidth, realHeight)
+            glVertex2f(targetSize x, targetSize y)
 
             glTexCoord2f(0.0, 0.0)
-            glVertex2f(0, realHeight)
+            glVertex2f(0, targetSize y)
         glEnd()
 
         glPopMatrix()
