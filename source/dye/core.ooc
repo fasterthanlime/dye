@@ -105,12 +105,20 @@ DyeContext: class {
 
         flags := SDL_WINDOW_OPENGL
         if (fullscreen) {
-            flags |= SDL_WINDOW_BORDERLESS
-            flags |= SDL_WINDOW_MAXIMIZED
+            version (apple) {
+                flags |= SDL_WINDOW_FULLSCREEN
+            }
+            
+            version (!apple) {
+                flags |= SDL_WINDOW_BORDERLESS
+                flags |= SDL_WINDOW_MAXIMIZED
+            }
 
             rect: SdlRect
             SDL getDisplayBounds(0, rect&)
             windowSize = vec2i(rect w, rect h)
+
+            "Fake fullscreen window size = %s" printfln(windowSize _)
         } else {
             windowSize = vec2i(size x, size y)
         }
