@@ -14,7 +14,7 @@ import glu
 import structs/ArrayList
 
 use dye
-import dye/math
+import dye/[input, math, fbo]
 
 Color: class {
 
@@ -68,6 +68,7 @@ DyeContext: class {
     clearColor := Color new(72, 60, 50)
 
     size: Vec2i
+    windowSize: Vec2i
 
     width:  Int { get { size x } }
     height: Int { get { size y } }
@@ -75,14 +76,24 @@ DyeContext: class {
     center: Vec2
 
     logger := static Log getLogger("dye")
+    fbo: Fbo
+
+    input: Input
 
     glDrawables := ArrayList<GlDrawable> new()
 
     init: func (width, height: Int, title: String, fullscreen := false) {
         size = vec2i(width, height)
+
         center = vec2(width / 2, height / 2)
 
 	SDL init(SDL_INIT_EVERYTHING)
+
+        version (apple) {
+            SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2)
+            SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1)
+            SDL glSetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
+        }
 
 	SDL glSetAttribute(SDL_GL_RED_SIZE, 5)
 	SDL glSetAttribute(SDL_GL_GREEN_SIZE, 6)
@@ -90,14 +101,28 @@ DyeContext: class {
 	SDL glSetAttribute(SDL_GL_DEPTH_SIZE, 16)
 	SDL glSetAttribute(SDL_GL_DOUBLEBUFFER, 1)
 
+        input = Input new(this)
+
         flags := SDL_WINDOW_OPENGL
         if (fullscreen) {
-            flags |= SDL_WINDOW_FULLSCREEN
+            flags |= SDL_WINDOW_BORDERLESS
+            flags |= SDL_WINDOW_MAXIMIZED
+
+            rect: SdlRect
+            SDL getDisplayBounds(0, rect&)
+            windowSize = vec2i(rect w, rect h)
+        } else {
+            windowSize = vec2i(size x, size y)
         }
 
-	window = SDL createWindow(title, 0, 0, width, height, flags)
+	window = SDL createWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowSize x, windowSize y, flags)
         context = SDL glCreateContext(window) 
         SDL glMakeCurrent(window, context)
+
+        input onWindowSizeChange(|x, y|
+            "Window size changed to %dx%d" printfln(x, y)
+            windowSize set!(x, y)
+        )
 
 	initGL()
     }
@@ -108,13 +133,22 @@ DyeContext: class {
 
     render: func {
         SDL glMakeCurrent(window, context)
+
+        fbo bind()
+        glViewport(0, 0, size x, size y)
+	glClearColor(clearColor R, clearColor G, clearColor B, 1.0)
 	glClear(GL_COLOR_BUFFER_BIT)
 	draw()
+        fbo unbind()
+
+        glViewport(0, 0, windowSize x, windowSize y)
+        fbo render()
+
 	SDL glSwapWindow(window)
     }
 
     draw: func {
-	begin2D()
+	begin2D(size)
 	for (d in glDrawables) {
 	    d render(this)
 	}
@@ -127,10 +161,11 @@ DyeContext: class {
 
     setClearColor: func (c: Color) {
         clearColor set!(c)
-	glClearColor(clearColor R, clearColor G, clearColor B, 1.0)
     }
 
     initGL: func {
+        glewInit()
+
 	logger info("OpenGL version: %s" format(glGetString (GL_VERSION)))
 	logger info("OpenGL vendor: %s" format(glGetString (GL_VENDOR)))
 	logger info("OpenGL renderer: %s" format(glGetString (GL_RENDERER)))
@@ -139,21 +174,17 @@ DyeContext: class {
 	glDisable(GL_DEPTH_TEST)
 	glEnable(GL_BLEND)
 
-	reshape()
+        fbo = Fbo new(this, size x, size y)
     }
 
-    reshape: func {
-	glViewport(0, 0, size x, size y)
-    }
-
-    begin2D: func {
+    begin2D: func (canvasSize: Vec2i) {
 	glDisable(GL_DEPTH_TEST)
 	glEnable(GL_BLEND)
 	glMatrixMode(GL_PROJECTION)
 	glPushMatrix()
 	glLoadIdentity()
 
-	gluOrtho2D(0, width, height, 0)
+	gluOrtho2D(0, canvasSize x, canvasSize y, 0)
 	glMatrixMode(GL_MODELVIEW)
 	glPushMatrix()
 	glLoadIdentity()

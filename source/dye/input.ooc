@@ -8,7 +8,7 @@ import structs/[ArrayList]
 use sdl2
 import sdl2/[Core, Event]
 
-import dye/math
+import dye/[math, core, fbo]
 
 Proxy: abstract class {
 
@@ -40,6 +40,14 @@ Proxy: abstract class {
         listener
     }
 
+    onWindowSizeChange: func (cb: Func (Int, Int)) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case wscv: WindowSizeChanged => cb(wscv x, wscv y)
+            }
+        )
+    }
+
     onExit: func (cb: Func) -> Listener {
         onEvent(|ev|
             match (ev) {
@@ -57,11 +65,11 @@ Proxy: abstract class {
         )
     }
 
-    onKeyPress: func (which: Int, cb: Func) -> Listener {
+    onKeyPress: func (scancode: Int, cb: Func) -> Listener {
         onEvent(|ev|
             match (ev) {
                 case kp: KeyPress => 
-                    if(kp code == which) cb()
+                    if(kp scancode == scancode) cb()
             }
         )
     }
@@ -75,11 +83,11 @@ Proxy: abstract class {
         )
     }
 
-    onKeyRelease: func (which: Int, cb: Func) -> Listener {
+    onKeyRelease: func (scancode: Int, cb: Func) -> Listener {
         onEvent(|ev|
             match (ev) {
                 case kr: KeyRelease => 
-                    if(kr code == which) cb()
+                    if(kr scancode == scancode) cb()
             }
         )
     }
@@ -196,7 +204,7 @@ SubProxy: class extends Proxy {
     }
 
     getMousePos: func -> Vec2 {
-        parent mousepos
+        parent getMousePos()
     }
 
     nuke: func {
@@ -207,6 +215,7 @@ SubProxy: class extends Proxy {
 
 Input: class extends Proxy {
 
+    dye: DyeContext
     logger := static Log getLogger(This name)
 
     MAX_KEY := static 65536
@@ -219,15 +228,15 @@ Input: class extends Proxy {
 
     _mousepos := vec2(0.0, 0.0)
 
-    init: func () {
+    init: func (=dye) {
         keyState = gc_malloc(Bool size * MAX_KEY)
         buttonState = gc_malloc(Bool size * MAX_BUTTON)
 
         logger info("Input system initialized")
     }
 
-    isPressed: func (keyval: Int) -> Bool {
-        if (keyval >= MAX_KEY) {
+    isPressed: func (scancode: Int) -> Bool {
+        if (scancode >= MAX_KEY) {
             return false
         }
         // TODO: this is problematic - what if the
@@ -235,7 +244,7 @@ Input: class extends Proxy {
         if (_grab) {
             return false
         }
-        keyState[keyval]
+        keyState[scancode]
     }
 
     isButtonPressed: func (button: Int) -> Bool {
@@ -253,9 +262,9 @@ Input: class extends Proxy {
     // --------------------------------
 
     _poll: func {
-        event: Event
+        event: SdlEvent
 
-        while(SDLEvent poll(event&)) {
+        while(SdlEvent poll(event&)) {
             match (event type) {
                 case SDL_KEYDOWN => _keyPressed (event key keysym sym, event key keysym scancode)
                 case SDL_KEYUP   => _keyReleased(event key keysym sym, event key keysym scancode)
@@ -263,6 +272,9 @@ Input: class extends Proxy {
                 case SDL_MOUSEBUTTONDOWN => _mousePressed (event button button)
                 case SDL_MOUSEMOTION => _mouseMoved (event motion x, event motion y)
                 case SDL_QUIT => _quit()
+                case SDL_WINDOWEVENT => match (event window event) {
+                    case SDL_WINDOWEVENT_SIZE_CHANGED => _windowSizeChanged (event window data1, event window data2)
+                }
             }
         }
     }
@@ -278,20 +290,20 @@ Input: class extends Proxy {
         _notifyListeners(ExitEvent new())
     }
 
-    _keyPressed: func (keyval: Int, unicode: Int) {
+    _keyPressed: func (keycode, scancode: Int) {
         if(debug) {
-            logger debug("Key pressed! code %d" format(keyval))
+            logger debug("Key pressed! code %d" format(scancode))
         }
-        if (keyval < MAX_KEY) {
-            keyState[keyval] = true
-            _notifyListeners(KeyPress new(keyval, unicode))
+        if (scancode < MAX_KEY) {
+            keyState[scancode] = true
+            _notifyListeners(KeyPress new(keycode, scancode))
         }
     }
 
-    _keyReleased: func (keyval: Int, unicode: Int) {
-        if (keyval < MAX_KEY) {
-            keyState[keyval] = false
-            _notifyListeners(KeyRelease new(keyval, unicode))
+    _keyReleased: func (keycode, scancode: Int) {
+        if (scancode < MAX_KEY) {
+            keyState[scancode] = false
+            _notifyListeners(KeyRelease new(keycode, scancode))
         }
     }
 
@@ -316,14 +328,37 @@ Input: class extends Proxy {
         _notifyListeners(MouseRelease new(_mousepos, button))
     }
 
+    _windowSizeChanged: func (x, y: Int) {
+        if(debug) {
+            logger debug("Window size changed to %dx%d" format(x, y))
+        }
+        _notifyListeners(WindowSizeChanged new(x, y))
+    }
+
     getMousePos: func -> Vec2 {
-        _mousepos
+        if (dye size == dye windowSize) {
+            // all good, no transformation to make
+            _mousepos
+        } else {
+            // in this case, windowSize is bigger than size
+            // we have two things to account for: 1) scaling
+            // 2) offset (there might be black bars on top/bottom
+            // or left/right)
+            _mousepos sub(dye fbo targetOffset) mul(1.0 / dye fbo scale)
+        }
     }
 
 }
 
 LEvent: class {
     // base class for all events
+}
+
+WindowSizeChanged: class extends LEvent {
+
+    x, y: Int
+    init: func (=x, =y)
+        
 }
 
 ExitEvent: class extends LEvent { }
@@ -370,9 +405,9 @@ MouseRelease: class extends MouseEvent {
 
 KeyboardEvent: class extends LEvent {
 
-    code: Int
+    keycode: Int
     scancode: Int
-    init: func (=code, =scancode) {}
+    init: func (=keycode, =scancode) {}
 
 }
 
@@ -400,80 +435,90 @@ Listener: class {
 }
 
 /*
- * Key codes
- * TODO: have them all?
+ * Scancodes
  */
 Keys: enum from Int {
-    LEFT  = SDLK_LEFT
-    RIGHT = SDLK_RIGHT
-    UP    = SDLK_UP
-    DOWN  = SDLK_DOWN
-    SPACE = SDLK_SPACE
-    ENTER = SDLK_RETURN
-    F1    = SDLK_F1
-    F2    = SDLK_F2
-    F3    = SDLK_F3
-    F4    = SDLK_F4
-    F5    = SDLK_F5
-    F6    = SDLK_F6
-    F7    = SDLK_F7
-    F8    = SDLK_F8
-    F9    = SDLK_F9
-    F10   = SDLK_F10
-    F11   = SDLK_F11
-    F12   = SDLK_F12
-    A     = SDLK_a
-    B     = SDLK_b
-    C     = SDLK_c
-    D     = SDLK_d
-    E     = SDLK_e
-    F     = SDLK_f
-    G     = SDLK_g
-    H     = SDLK_h
-    I     = SDLK_i
-    J     = SDLK_j
-    K     = SDLK_k
-    L     = SDLK_l
-    M     = SDLK_m
-    N     = SDLK_n
-    O     = SDLK_o
-    P     = SDLK_p
-    Q     = SDLK_q
-    R     = SDLK_r
-    S     = SDLK_s
-    T     = SDLK_t
-    U     = SDLK_u
-    V     = SDLK_v
-    W     = SDLK_w
-    X     = SDLK_x
-    Y     = SDLK_y
-    Z     = SDLK_z
-    KP0    = SDLK_KP_0
-    KP1    = SDLK_KP_1
-    KP2    = SDLK_KP_2
-    KP3    = SDLK_KP_3
-    KP4    = SDLK_KP_4
-    KP5    = SDLK_KP_5
-    KP6    = SDLK_KP_6
-    KP7    = SDLK_KP_7
-    KP8    = SDLK_KP_8
-    KP9    = SDLK_KP_9
-    _0    = SDLK_0
-    _1    = SDLK_1
-    _2    = SDLK_2
-    _3    = SDLK_3
-    _4    = SDLK_4
-    _5    = SDLK_5
-    _6    = SDLK_6
-    _7    = SDLK_7
-    _8    = SDLK_8
-    _9    = SDLK_9
-    ESC   = SDLK_ESCAPE
-    ALT   = SDLK_LALT // opinionated, but meh.
-    CTRL  = SDLK_LCTRL
-    SHIFT = SDLK_LSHIFT
-    BACKSPACE = SDLK_BACKSPACE
-    DEL = SDLK_DELETE
+    LEFT  = SDL_SCANCODE_LEFT
+    RIGHT = SDL_SCANCODE_RIGHT
+    UP    = SDL_SCANCODE_UP
+    DOWN  = SDL_SCANCODE_DOWN
+    SPACE = SDL_SCANCODE_SPACE
+    ENTER = SDL_SCANCODE_RETURN
+    F1    = SDL_SCANCODE_F1
+    F2    = SDL_SCANCODE_F2
+    F3    = SDL_SCANCODE_F3
+    F4    = SDL_SCANCODE_F4
+    F5    = SDL_SCANCODE_F5
+    F6    = SDL_SCANCODE_F6
+    F7    = SDL_SCANCODE_F7
+    F8    = SDL_SCANCODE_F8
+    F9    = SDL_SCANCODE_F9
+    F10   = SDL_SCANCODE_F10
+    F11   = SDL_SCANCODE_F11
+    F12   = SDL_SCANCODE_F12
+    A     = SDL_SCANCODE_A
+    B     = SDL_SCANCODE_B
+    C     = SDL_SCANCODE_C
+    D     = SDL_SCANCODE_D
+    E     = SDL_SCANCODE_E
+    F     = SDL_SCANCODE_F
+    G     = SDL_SCANCODE_G
+    H     = SDL_SCANCODE_H
+    I     = SDL_SCANCODE_I
+    J     = SDL_SCANCODE_J
+    K     = SDL_SCANCODE_K
+    L     = SDL_SCANCODE_L
+    M     = SDL_SCANCODE_M
+    N     = SDL_SCANCODE_N
+    O     = SDL_SCANCODE_O
+    P     = SDL_SCANCODE_P
+    Q     = SDL_SCANCODE_Q
+    R     = SDL_SCANCODE_R
+    S     = SDL_SCANCODE_S
+    T     = SDL_SCANCODE_T
+    U     = SDL_SCANCODE_U
+    V     = SDL_SCANCODE_V
+    W     = SDL_SCANCODE_W
+    X     = SDL_SCANCODE_X
+    Y     = SDL_SCANCODE_Y
+    Z     = SDL_SCANCODE_Z
+    KP0   = SDL_SCANCODE_KP_0
+    KP1   = SDL_SCANCODE_KP_1
+    KP2   = SDL_SCANCODE_KP_2
+    KP3   = SDL_SCANCODE_KP_3
+    KP4   = SDL_SCANCODE_KP_4
+    KP5   = SDL_SCANCODE_KP_5
+    KP6   = SDL_SCANCODE_KP_6
+    KP7   = SDL_SCANCODE_KP_7
+    KP8   = SDL_SCANCODE_KP_8
+    KP9   = SDL_SCANCODE_KP_9
+    _0    = SDL_SCANCODE_0
+    _1    = SDL_SCANCODE_1
+    _2    = SDL_SCANCODE_2
+    _3    = SDL_SCANCODE_3
+    _4    = SDL_SCANCODE_4
+    _5    = SDL_SCANCODE_5
+    _6    = SDL_SCANCODE_6
+    _7    = SDL_SCANCODE_7
+    _8    = SDL_SCANCODE_8
+    _9    = SDL_SCANCODE_9
+    ESC   = SDL_SCANCODE_ESCAPE
+
+    // opinionated, but meh.
+    ALT   = SDL_SCANCODE_LALT 
+    CTRL  = SDL_SCANCODE_LCTRL
+    SHIFT = SDL_SCANCODE_LSHIFT
+
+    LALT   = SDL_SCANCODE_LALT
+    LCTRL  = SDL_SCANCODE_LCTRL
+    LSHIFT = SDL_SCANCODE_LSHIFT
+
+    RALT   = SDL_SCANCODE_RALT
+    RCTRL  = SDL_SCANCODE_RCTRL
+    RSHIFT = SDL_SCANCODE_RSHIFT
+
+    DEL   = SDL_SCANCODE_DELETE
+    BACKSPACE = SDL_SCANCODE_BACKSPACE
 }
 
 /*

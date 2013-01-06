@@ -257,6 +257,13 @@ Vec2i: class {
         vec2(x, y)
     }
 
+    /**
+     * :return: the y / x ratio, as Float
+     */
+    ratio: func -> Float {
+        y as Float / x as Float
+    }
+
     _: String { get { toString() } }
 
 }
