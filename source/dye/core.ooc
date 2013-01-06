@@ -84,15 +84,16 @@ DyeContext: class {
 
     init: func (width, height: Int, title: String, fullscreen := false) {
         size = vec2i(width, height)
-        windowSize = vec2i(width, height)
 
         center = vec2(width / 2, height / 2)
 
 	SDL init(SDL_INIT_EVERYTHING)
 
-        SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2)
-        SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1)
-        SDL glSetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
+        version (apple) {
+            SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2)
+            SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1)
+            SDL glSetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
+        }
 
 	SDL glSetAttribute(SDL_GL_RED_SIZE, 5)
 	SDL glSetAttribute(SDL_GL_GREEN_SIZE, 6)
@@ -106,13 +107,19 @@ DyeContext: class {
         if (fullscreen) {
             flags |= SDL_WINDOW_FULLSCREEN
         }
-        flags |= SDL_WINDOW_RESIZABLE
+        flags |= SDL_WINDOW_BORDERLESS
+        flags |= SDL_WINDOW_MAXIMIZED
 
-	window = SDL createWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, flags)
+        rect: SdlRect
+        SDL getDisplayBounds(0, rect&)
+        windowSize = vec2i(rect w, rect h)
+
+	window = SDL createWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowSize x, windowSize y, flags)
         context = SDL glCreateContext(window) 
         SDL glMakeCurrent(window, context)
 
         input onWindowSizeChange(|x, y|
+            "Window size changed to %dx%d" printfln(x, y)
             windowSize set!(x, y)
         )
 
