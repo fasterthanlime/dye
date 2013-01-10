@@ -82,7 +82,7 @@ DyeContext: class {
 
     glDrawables := ArrayList<GlDrawable> new()
 
-    init: func (width, height: Int, title: String, fullscreen := false) {
+    init: func (width, height: Int, title: String, fullscreen := false, windowWidth := -1, windowHeight := -1) {
         size = vec2i(width, height)
 
         center = vec2(width / 2, height / 2)
@@ -121,6 +121,9 @@ DyeContext: class {
             "Fake fullscreen window size = %s" printfln(windowSize _)
         } else {
             windowSize = vec2i(size x, size y)
+
+            if (windowWidth  != -1) windowSize x = windowWidth
+            if (windowHeight != -1) windowSize y = windowHeight
         }
 
 	window = SDL createWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowSize x, windowSize y, flags)
