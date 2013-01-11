@@ -2,7 +2,7 @@
 use freeimage
 import freeimage/[FreeImage, Bitmap, ImageFormat]
 
-import dye/[core, math]
+import dye/[core, math, anim]
 
 use glew
 import glew
@@ -78,7 +78,7 @@ TextureLoader: class {
 
 }
 
-GlGridSprite: class extends GlDrawable {
+GlGridSprite: class extends GlDrawable implements GlAnimSource {
 
     texture: Texture
     texSize: Vec2
@@ -121,6 +121,17 @@ GlGridSprite: class extends GlDrawable {
                 glVertex2f(size x * -0.5, size y * -0.5)
             )
         )
+    }
+
+    // implement GlAnimSource
+
+    numFrames: func -> Int { xnum }
+    getDrawable: func -> GlDrawable { this }
+    frameOffset: func (offset: Int) {
+        setFrame(x + offset)
+    }
+    setFrame: func (x: Int) {
+        this x = x repeat(0, xnum)
     }
 
 }

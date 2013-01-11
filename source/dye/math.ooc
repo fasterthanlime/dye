@@ -274,3 +274,39 @@ operator == (v1, v2: Vec2i) -> Bool {
 
 vec2i: func (x, y: Int) -> Vec2i { Vec2i new(x, y) }
 
+extend Int {
+
+    repeat: func (min, max: This) -> This {
+        if (max - min < 0) {
+            Exception new("Int repeat(), invalid range: %d..%d" format(min, max)) throw()
+        }
+
+        number := this
+        if (number < min) {
+            number += (max - min)
+        }
+
+        if (number >= max) {
+            number -= (max - min)
+        }
+        number
+    }
+
+    clamp: func (min, max: This) -> This {
+        if (max - min < 0) {
+            Exception new("Int clamp(), invalid range: %d..%d" format(min, max)) throw()
+        }
+
+        number := this
+        if (number < min) {
+            number = min
+        }
+
+        if (number > max) {
+            number = max
+        }
+        number
+    }
+
+}
+
