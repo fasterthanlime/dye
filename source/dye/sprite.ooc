@@ -165,7 +165,7 @@ GlSprite: class extends GlDrawable {
         if (center) {
             glPushMatrix()
 
-            glTranslatef(width * -0.5, height * -0.5, 0.0)
+            glTranslatef(width * scale x * -0.5, height * scale y * -0.5, 0.0)
             super()
 
             glPopMatrix()
