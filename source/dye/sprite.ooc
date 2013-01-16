@@ -133,6 +133,7 @@ GlGridSprite: class extends GlDrawable implements GlAnimSource {
     setFrame: func (x: Int) {
         this x = x repeat(0, xnum)
     }
+    currentFrame: func -> Int { x }
 
 }
 

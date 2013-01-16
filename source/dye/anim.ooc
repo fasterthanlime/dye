@@ -15,6 +15,7 @@ GlAnimSource: interface {
 
     numFrames: func -> Int
     setFrame: func (frame: Int)
+    currentFrame: func -> Int
     frameOffset: func (offset: Int)
     getDrawable: func -> GlDrawable
 
@@ -46,6 +47,7 @@ GlSet: class extends GlGroup implements GlAnimSource {
         current += offset
     }
     setFrame: func (=current)
+    currentFrame: func -> Int { current }
 
 }
 
@@ -126,6 +128,22 @@ GlAnimSet: class extends GlDrawable {
                 current rewind()
             }
         }
+    }
+
+    currentFrame: func -> Int {
+        if (!current) {
+            return -1
+        }
+
+        current source currentFrame()
+    }
+    
+    frameOffset: func (offset: Int) {
+        if (!current) {
+            return
+        }
+
+        current source frameOffset(offset)
     }
 
 }
