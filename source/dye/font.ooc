@@ -41,7 +41,12 @@ GlText: class extends GlDrawable {
 
     draw: func (dye: DyeContext) {
         dye color(color)
-        ftgl render(pos x, pos y, scale, true, value)
+
+        glPushMatrix()
+        glTranslatef(pos x, pos y, 0)
+        glScalef(scale, scale, 1.0)
+        ftgl render(value)
+        glPopMatrix()
     }
 
     loadFont: static func (fontPath: String, fontSize: Int) -> Ftgl {

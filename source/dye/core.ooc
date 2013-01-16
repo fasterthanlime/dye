@@ -195,7 +195,7 @@ DyeContext: class {
 	glPushMatrix()
 	glLoadIdentity()
 
-	gluOrtho2D(0, canvasSize x, canvasSize y, 0)
+	gluOrtho2D(0, canvasSize x, 0, canvasSize y)
 	glMatrixMode(GL_MODELVIEW)
 	glPushMatrix()
 	glLoadIdentity()

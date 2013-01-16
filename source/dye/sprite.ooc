@@ -109,16 +109,16 @@ GlGridSprite: class extends GlDrawable implements GlAnimSource {
                 ry := (ynum - 1) - y
 
                 glTexCoord2f(rx * size x, ry * size y)
-                glVertex2f(size x * -0.5, size y *  0.5)
+                glVertex2f(size x * -0.5, size y * -0.5)
 
                 glTexCoord2f((rx + 1) * size x, ry * size y)
-                glVertex2f(size x *  0.5, size y *  0.5)
-
-                glTexCoord2f((rx + 1) * size x, (ry + 1) * size y)
                 glVertex2f(size x *  0.5, size y * -0.5)
 
+                glTexCoord2f((rx + 1) * size x, (ry + 1) * size y)
+                glVertex2f(size x *  0.5, size y *  0.5)
+
                 glTexCoord2f(rx * size x, (ry + 1) * size y)
-                glVertex2f(size x * -0.5, size y * -0.5)
+                glVertex2f(size x * -0.5, size y *  0.5)
             )
         )
     }
@@ -151,8 +151,6 @@ GlSprite: class extends GlDrawable {
 
     center := true
 
-    xSwap := false
-
     brightness := 1.0
 
     init: func (path: String) {
@@ -181,79 +179,18 @@ GlSprite: class extends GlDrawable {
         dye withTexture(GL_TEXTURE_RECTANGLE_ARB, texture id, ||
             self := this
 
-            if (xSwap) {
-                dye begin(GL_QUADS, ||
-                    glTexCoord2f(texWidth, 0.0)
-                    glVertex2f(0.0, height)
-
-                    glTexCoord2f(0.0, 0.0)
-                    glVertex2f(width, height)
-
-                    glTexCoord2f(0.0, texHeight)
-                    glVertex2f(width, 0.0)
-
-                    glTexCoord2f(texWidth, texHeight)
-                    glVertex2f(0.0, 0.0)
-                )
-            } else {
-                dye begin(GL_QUADS, ||
-                    glTexCoord2f(0.0, 0.0)
-                    glVertex2f(0.0, height)
-
-                    glTexCoord2f(texWidth, 0.0)
-                    glVertex2f(width, height)
-
-                    glTexCoord2f(texWidth, texHeight)
-                    glVertex2f(width, 0.0)
-
-                    glTexCoord2f(0.0, texHeight)
-                    glVertex2f(0.0, 0.0)
-                )
-            }
-        )
-    }
-
-}
-
-GlCroppedSprite: class extends GlSprite {
-
-    /* For cropping purposes. Yes, yes, quite. */
-    left, right, top, bottom: Float
-
-    init: func (path: String) {
-        super(path)
-
-        left = 0
-        right = 0
-        top = 0
-        bottom = 0
-    }
-
-    draw: func (dye: DyeContext) {
-        glColor3f(1.0, 1.0, 1.0)
-
-        dye withTexture(GL_TEXTURE_RECTANGLE_ARB, texture id, ||
-            self := this
-
             dye begin(GL_QUADS, ||
-                vertices := [
-                    vec2(0.0, 0.0)
-                    vec2(0.0, height - bottom - top)
-                    vec2(width - left - right, height - bottom - top)
-                    vec2(width - left - right, 0.0)
-                ]
+                glTexCoord2f(0.0, 0.0)
+                glVertex2f(0.0, 0.0)
 
-                texCoords := [
-                    vec2(left, height - top)
-                    vec2(left, bottom)
-                    vec2(width - right, bottom)
-                    vec2(width - right, height - top)
-                ]
+                glTexCoord2f(texWidth, 0.0)
+                glVertex2f(width, 0.0)
 
-                for (i in 0..vertices length) {
-                    dye texCoord(texCoords[i])
-                    dye vertex(vertices[i])
-                }
+                glTexCoord2f(texWidth, texHeight)
+                glVertex2f(width, height)
+
+                glTexCoord2f(0.0, texHeight)
+                glVertex2f(0.0, height)
             )
         )
     }
