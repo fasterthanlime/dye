@@ -16,7 +16,7 @@ import structs/HashMap
 GlText: class extends GlDrawable {
 
     cache := static HashMap<String, Ftgl> new()
-    logger := static Log getLogger("GlText")
+    logger := static Log getLogger(This name)
 
     fontPath: String
     ftgl: Ftgl
@@ -30,6 +30,13 @@ GlText: class extends GlDrawable {
 
     init: func (=fontPath, =value, fontSize := 20) {
         ftgl = loadFont(fontPath, fontSize)
+    }
+
+    size: Vec2 {
+        get {
+            bb := ftgl getFontBBox(value)
+            vec2(bb urx - bb llx, bb ury - bb lly)
+        }
     }
 
     draw: func (dye: DyeContext) {
