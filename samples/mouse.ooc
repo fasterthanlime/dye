@@ -8,13 +8,12 @@ main: func (argc: Int, argv: CString*) {
 
     dye := DyeContext new(640, 480, "Dye mouse example")
     dye setShowCursor(false)
+    input := dye input
 
     crosshair := GlSprite new("crosshair.png")
     crosshairGroup := GlGroup new()
     crosshairGroup add(crosshair)
     dye add(crosshairGroup)
-
-    input := Input new()
 
     running := true
 
