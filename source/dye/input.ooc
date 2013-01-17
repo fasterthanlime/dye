@@ -1,21 +1,24 @@
 
+// third-party stuff
 use deadlogger
-
-// libs deps
 import deadlogger/Log
-import structs/[ArrayList]
 
 use sdl2
 import sdl2/[Core, Event]
 
 import dye/[math, core, fbo]
 
-Proxy: abstract class {
+// sdk stuff
+import structs/[ArrayList]
+
+/**
+ * Manage input events such as keyboard & mouse
+ */
+Input: abstract class {
 
     logger := static Log getLogger(This name)
 
     listeners := ArrayList<Listener> new()
-    _grab: Listener
 
     mousepos: Vec2 {
         get { getMousePos() }
@@ -139,18 +142,8 @@ Proxy: abstract class {
 
     isButtonPressed: abstract func (button: Int) -> Bool
 
-    grab: func (l: Listener) {
-        listeners remove(l)
-        _grab = l
-    }
-
-    ungrab: func {
-        listeners add(_grab)
-        _grab = null
-    }
-
-    sub: func -> SubProxy {
-        SubProxy new(this)
+    sub: func -> SubInput {
+        SubInput new(this)
     }
 
     nuke: func {
@@ -164,19 +157,20 @@ Proxy: abstract class {
     _notifyListeners: func (ev: LEvent) {
         if (!enabled) return
 
-        if (_grab) {
-            _grab cb(ev)
-        } else {
-            for(l in listeners) l cb(ev)
+        for(l in listeners) {
+            l cb(ev)
         }
     }
 
 }
 
-SubProxy: class extends Proxy {
+/**
+ * Input subordinate to another input
+ */
+SubInput: class extends Input {
 
     own: Listener
-    parent: Proxy
+    parent: Input
 
     init: func (=parent) {
         own = parent onEvent(|ev|
@@ -192,28 +186,20 @@ SubProxy: class extends Proxy {
         parent isButtonPressed(button)
     }
 
-    grab: func (l: Listener) {
-        listeners remove(l)
-        _grab = l
-        parent grab(l)
-    }
-
-    ungrab: func {
-        _grab = null
-        parent ungrab()
-    }
-
     getMousePos: func -> Vec2 {
         parent getMousePos()
     }
 
     nuke: func {
-        parent listeners remove(own)
+        parent unsubscribe(own)
     }
 
 }
 
-Input: class extends Proxy {
+/**
+ * Input implement for SDL
+ */
+SdlInput: class extends Input {
 
     dye: DyeContext
     logger := static Log getLogger(This name)
@@ -239,11 +225,6 @@ Input: class extends Proxy {
         if (scancode >= MAX_KEY) {
             return false
         }
-        // TODO: this is problematic - what if the
-        // grabbed listener wants to know?
-        if (_grab) {
-            return false
-        }
         keyState[scancode]
     }
 
@@ -251,10 +232,11 @@ Input: class extends Proxy {
         if (button >= MAX_BUTTON) {
             return false
         }
-        if (_grab) {
-            return false
-        }
         buttonState[button]
+    }
+
+    disconnect: func {
+        // useless, we'll just stop polling.
     }
 
     // --------------------------------
@@ -266,21 +248,25 @@ Input: class extends Proxy {
 
         while(SdlEvent poll(event&)) {
             match (event type) {
-                case SDL_KEYDOWN => _keyPressed (event key keysym sym, event key keysym scancode)
-                case SDL_KEYUP   => _keyReleased(event key keysym sym, event key keysym scancode)
-                case SDL_MOUSEBUTTONUP   => _mouseReleased(event button button)
-                case SDL_MOUSEBUTTONDOWN => _mousePressed (event button button)
-                case SDL_MOUSEMOTION => _mouseMoved (event motion x, event motion y)
-                case SDL_QUIT => _quit()
-                case SDL_WINDOWEVENT => match (event window event) {
-                    case SDL_WINDOWEVENT_SIZE_CHANGED => _windowSizeChanged (event window data1, event window data2)
-                }
+                case SDL_KEYDOWN =>
+                    _keyPressed (event key keysym sym, event key keysym scancode)
+                case SDL_KEYUP   =>
+                    _keyReleased(event key keysym sym, event key keysym scancode)
+                case SDL_MOUSEBUTTONUP   =>
+                    _mouseReleased(event button button)
+                case SDL_MOUSEBUTTONDOWN =>
+                    _mousePressed (event button button)
+                case SDL_MOUSEMOTION =>
+                    _mouseMoved (event motion x, event motion y)
+                case SDL_QUIT =>
+                    _quit()
+                case SDL_WINDOWEVENT =>
+                    match (event window event) {
+                        case SDL_WINDOWEVENT_SIZE_CHANGED =>
+                            _windowSizeChanged (event window data1, event window data2)
+                    }
             }
         }
-    }
-
-    disconnect: func {
-        // useless, we'll just stop polling.
     }
 
     _quit: func () {
@@ -292,7 +278,7 @@ Input: class extends Proxy {
 
     _keyPressed: func (keycode, scancode: Int) {
         if(debug) {
-            logger debug("Key pressed! code %d" format(scancode))
+            logger debug("Key pressed! code %d", scancode)
         }
         if (scancode < MAX_KEY) {
             keyState[scancode] = true
@@ -314,7 +300,7 @@ Input: class extends Proxy {
 
     _mousePressed: func (button: Int) {
         if(debug) {
-            logger debug("Mouse pressed at %s" format(_mousepos _))
+            logger debug("Mouse pressed at %s", _mousepos _)
         }
         buttonState[button] = true
         _notifyListeners(MousePress new(_mousepos, button))
@@ -322,7 +308,7 @@ Input: class extends Proxy {
 
     _mouseReleased: func (button: Int) {
         if(debug) {
-            logger debug("Mouse released at %s" format(_mousepos _))
+            logger debug("Mouse released at %s", _mousepos _)
         }
         buttonState[button] = false
         _notifyListeners(MouseRelease new(_mousepos, button))
@@ -330,7 +316,7 @@ Input: class extends Proxy {
 
     _windowSizeChanged: func (x, y: Int) {
         if(debug) {
-            logger debug("Window size changed to %dx%d" format(x, y))
+            logger debug("Window size changed to %dx%d", x, y)
         }
         _notifyListeners(WindowSizeChanged new(x, y))
     }
@@ -437,7 +423,7 @@ Listener: class {
 /*
  * Scancodes
  */
-Keys: enum from Int {
+KeyCode: enum from Int {
     LEFT  = SDL_SCANCODE_LEFT
     RIGHT = SDL_SCANCODE_RIGHT
     UP    = SDL_SCANCODE_UP
@@ -524,7 +510,7 @@ Keys: enum from Int {
 /*
  * Mouse button codes
  */
-Buttons: enum from Int {
+MouseButton: enum from Int {
     LEFT   = SDL_BUTTON_LEFT
     MIDDLE = SDL_BUTTON_MIDDLE
     RIGHT  = SDL_BUTTON_RIGHT

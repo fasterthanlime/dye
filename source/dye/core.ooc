@@ -78,7 +78,7 @@ DyeContext: class {
     logger := static Log getLogger("dye")
     fbo: Fbo
 
-    input: Input
+    input: SdlInput
 
     glDrawables := ArrayList<GlDrawable> new()
 
@@ -101,7 +101,7 @@ DyeContext: class {
 	SDL glSetAttribute(SDL_GL_DEPTH_SIZE, 16)
 	SDL glSetAttribute(SDL_GL_DOUBLEBUFFER, 1)
 
-        input = Input new(this)
+        input = SdlInput new(this)
 
         flags := SDL_WINDOW_OPENGL
         if (fullscreen) {
@@ -140,6 +140,10 @@ DyeContext: class {
 
     setShowCursor: func (visible: Bool) {
         SDL showCursor(visible)
+    }
+
+    poll: func {
+        input _poll()
     }
 
     render: func {

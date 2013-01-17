@@ -15,27 +15,29 @@ import structs/HashMap
 
 GlText: class extends GlDrawable {
 
-    cache := static HashMap<String, Ftgl> new()
+    cache := static HashMap<String, Font> new()
     logger := static Log getLogger(This name)
 
     fontPath: String
-    ftgl: Ftgl
+    font: Font
     pos := vec2(20, 40)
     color := Color white()
     value: String
 
     scale := 1.0
+    lineHeight: Float
     
     fontWidth, fontHeight: Int
 
     init: func (=fontPath, =value, fontSize := 20) {
-        ftgl = loadFont(fontPath, fontSize)
+        font = loadFont(fontPath, fontSize)
+        lineHeight = font getLineHeight()
     }
 
     size: Vec2 {
         get {
-            bb := ftgl getFontBBox(value)
-            vec2(bb urx - bb llx, bb ury - bb lly)
+            bounds := font getBounds(value)
+            vec2(bounds getWidth(), lineHeight)
         }
     }
 
@@ -45,20 +47,20 @@ GlText: class extends GlDrawable {
         glPushMatrix()
         glTranslatef(pos x, pos y, 0)
         glScalef(scale, scale, 1.0)
-        ftgl render(value)
+        font render(value)
         glPopMatrix()
     }
 
-    loadFont: static func (fontPath: String, fontSize: Int) -> Ftgl {
+    loadFont: static func (fontPath: String, fontSize: Int) -> Font {
         key := "%s-%d" format(fontPath, fontSize)
 
         if (cache contains?(key)) {
             cache get(key)
         } else {
             logger info("Loading font %s at size %d" format(fontPath, fontSize))
-            ftgl := Ftgl new(fontSize, fontSize, fontPath)
-            cache put(key, ftgl)
-            ftgl
+            font := Font new(fontSize, fontSize, fontPath)
+            cache put(key, font)
+            font
         }
     }
 
