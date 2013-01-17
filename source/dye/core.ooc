@@ -80,9 +80,11 @@ DyeContext: class {
 
     input: SdlInput
 
-    glDrawables := ArrayList<GlDrawable> new()
+    scenes := ArrayList<Scene> new()
+    currentScene: Scene
 
-    init: func (width, height: Int, title: String, fullscreen := false, windowWidth := -1, windowHeight := -1) {
+    init: func (width, height: Int, title: String, fullscreen := false,
+            windowWidth := -1, windowHeight := -1) {
         size = vec2i(width, height)
 
         center = vec2(width / 2, height / 2)
@@ -117,8 +119,6 @@ DyeContext: class {
             rect: SdlRect
             SDL getDisplayBounds(0, rect&)
             windowSize = vec2i(rect w, rect h)
-
-            "Fake fullscreen window size = %s" printfln(windowSize _)
         } else {
             windowSize = vec2i(size x, size y)
 
@@ -126,16 +126,19 @@ DyeContext: class {
             if (windowHeight != -1) windowSize y = windowHeight
         }
 
-	window = SDL createWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowSize x, windowSize y, flags)
+	window = SDL createWindow(title,
+            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+            windowSize x, windowSize y, flags)
         context = SDL glCreateContext(window) 
         SDL glMakeCurrent(window, context)
 
         input onWindowSizeChange(|x, y|
-            "Window size changed to %dx%d" printfln(x, y)
             windowSize set!(x, y)
         )
 
 	initGL()
+
+        setScene(createScene())
     }
 
     setShowCursor: func (visible: Bool) {
@@ -164,9 +167,7 @@ DyeContext: class {
 
     draw: func {
 	begin2D(size)
-	for (d in glDrawables) {
-	    d render(this)
-	}
+        currentScene render(this)
 	end2D()
     }
 
@@ -250,16 +251,29 @@ DyeContext: class {
 	glDisable(textureType)
     }
 
+    createScene: func -> Scene {
+        Scene new(input)
+    }
+
+    setScene: func (scene: Scene) {
+        if (currentScene) {
+            currentScene input enabled = false
+        }
+
+        currentScene = scene
+        currentScene input enabled = true
+    }
+
     add: func (d: GlDrawable) {
-	glDrawables add(d)
+        currentScene add(d)
     }
 
     remove: func (d: GlDrawable) {
-	glDrawables remove(d)
+        currentScene remove(d)
     }
 
     clear: func {
-        glDrawables clear()
+        currentScene clear()
     }
 
 }
@@ -323,6 +337,19 @@ GlGroup: class extends GlDrawable {
 
     clear: func {
         children clear()
+    }
+
+}
+
+/**
+ * Regroups a graphic scene (GlGroup) and some event handling (Input)
+ */
+Scene: class extends GlGroup {
+
+    input: Input
+
+    init: func (parentInput: Input) {
+        input = parentInput sub()
     }
 
 }
