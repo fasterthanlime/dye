@@ -252,7 +252,7 @@ DyeContext: class {
     }
 
     createScene: func -> Scene {
-        Scene new(input)
+        Scene new(this)
     }
 
     setScene: func (scene: Scene) {
@@ -346,10 +346,14 @@ GlGroup: class extends GlDrawable {
  */
 Scene: class extends GlGroup {
 
+    dye: DyeContext
     input: Input
 
-    init: func (parentInput: Input) {
-        input = parentInput sub()
+    size  : Vec2i { get { dye size } }
+    center: Vec2  { get { dye center } }
+
+    init: func (=dye) {
+        input = dye input sub()
     }
 
 }
