@@ -294,7 +294,7 @@ SdlInput: class extends Input {
     }
 
     _mouseMoved: func (x, y: Int) {
-        (_mousepos x, _mousepos y) = (x as Float, y as Float)
+        _mousepos set!(x, dye windowSize y - y)
         _notifyListeners(MouseMotion new(_mousepos))
     }
 
