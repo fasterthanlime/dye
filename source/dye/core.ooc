@@ -59,6 +59,10 @@ Color: class {
         new(r as Float / factor, g as Float / factor, b as Float / factor)
     }
 
+    mul: func (factor: Float) -> This {
+        new(r * factor, g * factor, b * factor)
+    }
+
 }
 
 DyeContext: class {

@@ -20,11 +20,9 @@ GlText: class extends GlDrawable {
 
     fontPath: String
     font: Font
-    pos := vec2(20, 40)
     color := Color white()
     value: String
 
-    scale := 1.0
     lineHeight: Float
     
     fontWidth, fontHeight: Int
@@ -43,12 +41,7 @@ GlText: class extends GlDrawable {
 
     draw: func (dye: DyeContext) {
         dye color(color)
-
-        glPushMatrix()
-        glTranslatef(pos x, pos y, 0)
-        glScalef(scale, scale, 1.0)
         font render(value)
-        glPopMatrix()
     }
 
     loadFont: static func (fontPath: String, fontSize: Int) -> Font {
