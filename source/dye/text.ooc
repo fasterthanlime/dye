@@ -27,7 +27,7 @@ GlText: class extends GlDrawable {
     
     fontWidth, fontHeight: Int
 
-    init: func (=fontPath, =value, fontSize := 20) {
+    init: func (=fontPath, =value, fontSize := 40) {
         font = loadFont(fontPath, fontSize)
         lineHeight = font getLineHeight()
     }
