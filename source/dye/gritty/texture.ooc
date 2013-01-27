@@ -35,7 +35,7 @@ Texture: class {
 TextureLoader: class {
 
     cache := static HashMap<String, Texture> new()
-    logger := static Log getLogger("texture")
+    logger := static Log getLogger(This name)
 
     load: static func (path: String) -> Texture {
         if (cache contains?(path)) {
@@ -50,7 +50,7 @@ TextureLoader: class {
           return Texture new(-1, 0, 0, "<missing>")
         }
 
-        logger info("Loading %s, size %dx%d, %d bpp" format(path, bitmap width, bitmap height, bitmap bpp))
+        logger debug("Loading %s, size %dx%d, %d bpp" format(path, bitmap width, bitmap height, bitmap bpp))
 
         textureID: Int
 

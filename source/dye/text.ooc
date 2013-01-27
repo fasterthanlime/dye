@@ -50,7 +50,7 @@ GlText: class extends GlDrawable {
         if (cache contains?(key)) {
             cache get(key)
         } else {
-            logger info("Loading font %s at size %d" format(fontPath, fontSize))
+            logger debug("Loading font %s at size %d" format(fontPath, fontSize))
             font := Font new(fontSize, fontSize, fontPath)
             cache put(key, font)
             font

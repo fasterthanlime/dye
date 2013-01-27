@@ -387,9 +387,15 @@ Scene: class extends GlGroup {
     size  : Vec2i { get { dye size } }
     center: Vec2  { get { dye center } }
 
-    init: func (=dye) {
-        input = dye input sub()
+    init: func (.dye) {
+        init(dye, dye input sub())
         input enabled = false
+    }
+
+    init: func ~specific (=dye, =input) { }
+
+    sub: func -> This {
+        new(dye, input sub())
     }
 
 }
