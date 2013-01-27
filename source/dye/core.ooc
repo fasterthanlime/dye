@@ -389,6 +389,7 @@ Scene: class extends GlGroup {
 
     init: func (=dye) {
         input = dye input sub()
+        input enabled = false
     }
 
 }
