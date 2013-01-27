@@ -89,6 +89,7 @@ DyeContext: class {
 
     // cursor sprite to use instead of the real mouse cursor
     cursorSprite: GlGridSprite
+    cursorOffset := vec2(0, 0)
     cursorNumStates := 0
 
     init: func (width, height: Int, title: String, fullscreen := false,
@@ -153,6 +154,10 @@ DyeContext: class {
         SDL showCursor(visible)
     }
 
+    setCursorOffset: func (v: Vec2) {
+        cursorOffset set!(v)
+    }
+
     setCursorSprite: func (path: String, numStates: Int) {
         cursorSprite = GlGridSprite new(path, numStates, 1)
         cursorNumStates = numStates
@@ -195,8 +200,10 @@ DyeContext: class {
     }
 
     renderCursor: func {
-        if (cursorSprite) {
-        }
+        if (!cursorSprite) { return }
+
+        cursorSprite pos set!(input getMousePos() add(cursorOffset))
+        cursorSprite render(this)
     }
 
     quit: func {
