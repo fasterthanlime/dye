@@ -14,7 +14,7 @@ import glu
 import structs/ArrayList
 
 use dye
-import dye/[input, math, fbo]
+import dye/[input, math, fbo, sprite]
 
 Color: class {
 
@@ -87,6 +87,10 @@ DyeContext: class {
     scenes := ArrayList<Scene> new()
     currentScene: Scene
 
+    // cursor sprite to use instead of the real mouse cursor
+    cursorSprite: GlGridSprite
+    cursorNumStates := 0
+
     init: func (width, height: Int, title: String, fullscreen := false,
             windowWidth := -1, windowHeight := -1) {
         size = vec2i(width, height)
@@ -149,6 +153,20 @@ DyeContext: class {
         SDL showCursor(visible)
     }
 
+    setCursorSprite: func (path: String, numStates: Int) {
+        cursorSprite = GlGridSprite new(path, numStates, 1)
+        cursorNumStates = numStates
+        setShowCursor(false)
+    }
+
+    setCursorState: func (state: Int) {
+        if (!cursorSprite) { return }
+
+        if (state >= 0 && state < cursorNumStates) {
+           cursorSprite x = state
+        }
+    }
+
     poll: func {
         input _poll()
     }
@@ -172,7 +190,13 @@ DyeContext: class {
     draw: func {
 	begin2D(size)
         currentScene render(this)
+        renderCursor()
 	end2D()
+    }
+
+    renderCursor: func {
+        if (cursorSprite) {
+        }
     }
 
     quit: func {

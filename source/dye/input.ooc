@@ -68,11 +68,11 @@ Input: abstract class {
         )
     }
 
-    onKeyPress: func (scancode: Int, cb: Func) -> Listener {
+    onKeyPress: func (scancode: Int, cb: Func (KeyPress)) -> Listener {
         onEvent(|ev|
             match (ev) {
                 case kp: KeyPress => 
-                    if(kp scancode == scancode) cb()
+                    if(kp scancode == scancode) cb(kp)
             }
         )
     }
@@ -86,49 +86,49 @@ Input: abstract class {
         )
     }
 
-    onKeyRelease: func (scancode: Int, cb: Func) -> Listener {
+    onKeyRelease: func (scancode: Int, cb: Func (KeyRelease)) -> Listener {
         onEvent(|ev|
             match (ev) {
                 case kr: KeyRelease => 
-                    if(kr scancode == scancode) cb()
+                    if(kr scancode == scancode) cb(kr)
             }
         )
     }
 
-    onMousePress: func (which: UInt, cb: Func) -> Listener {
+    onMousePress: func (which: UInt, cb: Func (MousePress)) -> Listener {
         onEvent(|ev|
             match (ev) {
                 case mp: MousePress =>
-                    if(mp button == which) cb()
+                    if(mp button == which) cb(mp)
             }
         )
     }
 
-    onMouseRelease: func (which: UInt, cb: Func) -> Listener {
+    onMouseRelease: func (which: UInt, cb: Func (MouseRelease)) -> Listener {
         onEvent(|ev|
             match (ev) {
-                case mp: MouseRelease =>
-                    if(mp button == which) cb()
+                case mr: MouseRelease =>
+                    if(mr button == which) cb(mr)
             }
         )
     }
 
-    onMouseMove: func (cb: Func) -> Listener {
+    onMouseMove: func (cb: Func (MouseMotion)) -> Listener {
         onEvent(|ev|
             match (ev) {
                 case mm: MouseMotion =>
-                    cb()
+                    cb(mm)
             }
         )
     }
 
-    onMouseDrag: func (which: UInt, cb: Func) -> Listener {
+    onMouseDrag: func (which: UInt, cb: Func (MouseMotion)) -> Listener {
         onEvent(|ev|
             match (ev) {
                 case mm: MouseMotion =>
                     if(isButtonPressed(which)) {
                         // it's a drag!
-                        cb()
+                        cb(mm)
                     }
             }
         )
@@ -159,6 +159,10 @@ Input: abstract class {
 
         for(l in listeners) {
             l cb(ev)
+
+            if (ev consumed) {
+                break
+            }
         }
     }
 
@@ -338,6 +342,11 @@ SdlInput: class extends Input {
 
 LEvent: class {
     // base class for all events
+    consumed := false
+
+    consume: func {
+        consumed = true
+    }
 }
 
 WindowSizeChanged: class extends LEvent {
