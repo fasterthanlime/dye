@@ -159,12 +159,7 @@ DyeContext: class {
     }
 
     setCursorSprite: func (path: String, numStates: Int) {
-        SDL warpMouseInWindow(window, windowSize x / 2, windowSize y / 2)
         SDL setRelativeMouseMode(true)
-
-        x, y: Int
-        SDL getRelativeMouseState(x&, y&)
-        input _mouseMoved(x, y)
 
         cursorSprite = GlGridSprite new(path, numStates, 1)
         cursorNumStates = numStates
