@@ -22,6 +22,7 @@ GlGridSprite: class extends GlDrawable implements GlAnimSource {
     y := 0
 
     brightness := 1.0
+    opacity := 1.0
 
     init: func (path: String, =xnum, =ynum) {
         texture = TextureLoader load(path)
@@ -30,7 +31,7 @@ GlGridSprite: class extends GlDrawable implements GlAnimSource {
     }
 
     draw: func (dye: DyeContext) {
-        glColor3f(brightness, brightness, brightness)
+        glColor4f(brightness, brightness, brightness, opacity)
 
         dye withTexture(GL_TEXTURE_RECTANGLE_ARB, texture id, ||
             self := this
@@ -82,6 +83,7 @@ GlSprite: class extends GlDrawable {
     center := true
 
     brightness := 1.0
+    opacity := 1.0
 
     init: func (path: String) {
         texture = TextureLoader load(path)
@@ -104,7 +106,7 @@ GlSprite: class extends GlDrawable {
     }
 
     draw: func (dye: DyeContext) {
-        glColor3f(brightness, brightness, brightness)
+        glColor4f(brightness, brightness, brightness, opacity)
 
         dye withTexture(GL_TEXTURE_RECTANGLE_ARB, texture id, ||
             self := this
