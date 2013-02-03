@@ -1,5 +1,5 @@
 Name: dye
 Description: an simple graphics library
-Requires: sdl2, ftgl, freeimage
+Requires: sdl2, freeimage
 SourcePath: source
 
