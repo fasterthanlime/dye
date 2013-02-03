@@ -2,9 +2,6 @@
 use glew
 import glew
 
-use glu
-import glu
-
 use dye
 import dye/[core, math]
 

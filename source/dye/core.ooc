@@ -8,9 +8,6 @@ import sdl2/Core
 use glew
 import glew
 
-use glu
-import glu
-
 import structs/ArrayList
 
 use dye
@@ -237,7 +234,10 @@ DyeContext: class {
 	glPushMatrix()
 	glLoadIdentity()
 
-	gluOrtho2D(0, canvasSize x, 0, canvasSize y)
+        (left, right, bottom, top) := (0, canvasSize x, 0, canvasSize y)
+        (near, far) := (-1, 1)
+	glOrtho(left, right, bottom, top, near, far)
+
 	glMatrixMode(GL_MODELVIEW)
 	glPushMatrix()
 	glLoadIdentity()
