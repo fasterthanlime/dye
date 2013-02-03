@@ -1,6 +1,8 @@
 use dye
 import dye/[core, sprite]
 
+use sdl2-opengl
+
 import os/Time
 
 main: func (argc: Int, argv: CString*) {
@@ -12,7 +14,7 @@ main: func (argc: Int, argv: CString*) {
   dye add(sprite)
 
   dye render()
-  Time sleepSec(1)
+  Time sleepSec(5)
 
   dye quit()
 
