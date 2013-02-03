@@ -1,6 +1,5 @@
 
-use glew
-import glew
+import sdl2/[OpenGL]
 
 use dye
 import dye/[core, math]

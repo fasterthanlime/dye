@@ -2,8 +2,7 @@
 use dye
 import dye/[core, sprite, math]
 
-use glew
-import glew
+import sdl2/OpenGL
 
 import structs/[List, ArrayList, HashMap]
 

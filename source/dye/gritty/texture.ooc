@@ -3,8 +3,7 @@
 import dye/[core, math, anim]
 
 // third-party stuff
-use glew
-import glew
+import sdl2/[OpenGL]
 
 use freeimage
 import freeimage/[FreeImage, Bitmap, ImageFormat]

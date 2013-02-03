@@ -1,9 +1,8 @@
 
-use glew
-import glew
-
 use dye
 import dye/[core, math]
+
+import sdl2/[OpenGL]
 
 Fbo: class {
 

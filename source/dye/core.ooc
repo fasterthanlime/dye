@@ -3,10 +3,7 @@ use deadlogger
 import deadlogger/[Log]
 
 use sdl2
-import sdl2/Core
-
-use glew
-import glew
+import sdl2/[Core, OpenGL]
 
 import structs/ArrayList
 
@@ -214,8 +211,6 @@ DyeContext: class {
     }
 
     initGL: func {
-        glewInit()
-
 	logger info("OpenGL version: %s" format(glGetString (GL_VERSION)))
 	logger info("OpenGL vendor: %s" format(glGetString (GL_VENDOR)))
 	logger info("OpenGL renderer: %s" format(glGetString (GL_RENDERER)))

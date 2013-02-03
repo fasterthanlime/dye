@@ -4,9 +4,7 @@ import dye/[core, math, anim]
 import dye/gritty/[texture]
 
 // third-party stuff
-use glew
-import glew
-
+import sdl2/[OpenGL]
 
 GlGridSprite: class extends GlDrawable implements GlAnimSource {
 
