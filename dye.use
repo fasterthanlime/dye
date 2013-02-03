@@ -1,5 +1,5 @@
 Name: dye
 Description: a simple graphics library
-Requires: sdl2
+Requires: sdl2, stbi
 SourcePath: source
 
