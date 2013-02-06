@@ -311,15 +311,17 @@ GlDrawable: abstract class {
     render: func (dye: DyeContext) {
         if (!visible) return
 
-        glPushMatrix()
+        // FIXME: transformations
+        // glPushMatrix()
 
-        glTranslatef(pos x, pos y, 0.0)
-        glRotatef(angle, 0.0, 0.0, 1.0) 
-        glScalef(scale x, scale y, 1.0)
+        // glTranslatef(pos x, pos y, 0.0)
+        // glRotatef(angle, 0.0, 0.0, 1.0) 
+        // glScalef(scale x, scale y, 1.0)
 
         draw(dye)
 
-        glPopMatrix()
+        // FIXME: transformations
+        // glPopMatrix()
     }
 
     center!: func (dye: DyeContext, size: Vec2) {
