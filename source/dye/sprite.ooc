@@ -31,23 +31,25 @@ GlGridSprite: class extends GlDrawable implements GlAnimSource {
     draw: func (dye: DyeContext) {
         glColor4f(brightness, brightness, brightness, opacity)
 
-        dye withTexture(GL_TEXTURE_RECTANGLE_ARB, texture id, ||
+        dye withTexture(GL_TEXTURE_2D, texture id, ||
             self := this
-            dye begin(GL_QUADS, ||
+            dye begin(GL_TRIANGLE_STRIP, ||
                 rx := x
                 ry := (ynum - 1) - y
+                xFactor := x as Float / xnum as Float
+                yFactor := y as Float / ynum as Float
 
-                glTexCoord2f(rx * size x, ry * size y)
-                glVertex2f(size x * -0.5, size y * -0.5)
+                glTexCoord2f(rx * xFactor, ry * yFactor)
+                glVertex2f(xFactor * -0.5, yFactor * -0.5)
 
-                glTexCoord2f((rx + 1) * size x, ry * size y)
-                glVertex2f(size x *  0.5, size y * -0.5)
+                glTexCoord2f((rx + 1) * xFactor, ry * yFactor)
+                glVertex2f(xFactor *  0.5, yFactor * -0.5)
 
-                glTexCoord2f((rx + 1) * size x, (ry + 1) * size y)
-                glVertex2f(size x *  0.5, size y *  0.5)
+                glTexCoord2f(rx * xFactor, (ry + 1) * yFactor)
+                glVertex2f(xFactor * -0.5, yFactor *  0.5)
 
-                glTexCoord2f(rx * size x, (ry + 1) * size y)
-                glVertex2f(size x * -0.5, size y *  0.5)
+                glTexCoord2f((rx + 1) * xFactor, (ry + 1) * yFactor)
+                glVertex2f(xFactor *  0.5, yFactor *  0.5)
             )
         )
     }
@@ -106,21 +108,21 @@ GlSprite: class extends GlDrawable {
     draw: func (dye: DyeContext) {
         glColor4f(brightness, brightness, brightness, opacity)
 
-        dye withTexture(GL_TEXTURE_RECTANGLE_ARB, texture id, ||
+        dye withTexture(GL_TEXTURE_2D, texture id, ||
             self := this
 
-            dye begin(GL_QUADS, ||
+            dye begin(GL_TRIANGLE_STRIP, ||
                 glTexCoord2f(0.0, 0.0)
                 glVertex2f(0.0, 0.0)
 
-                glTexCoord2f(texWidth, 0.0)
+                glTexCoord2f(1.0, 0.0)
                 glVertex2f(width, 0.0)
 
-                glTexCoord2f(texWidth, texHeight)
-                glVertex2f(width, height)
-
-                glTexCoord2f(0.0, texHeight)
+                glTexCoord2f(0.0, 1.0)
                 glVertex2f(0.0, height)
+
+                glTexCoord2f(1.0, 1.0)
+                glVertex2f(width, height)
             )
         )
     }

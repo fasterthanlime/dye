@@ -53,12 +53,12 @@ TextureLoader: class {
         textureID: Int
 
         glGenTextures(1, textureID&)
-        glBindTexture(GL_TEXTURE_RECTANGLE_ARB, textureID)
+        glBindTexture(GL_TEXTURE_2D, textureID)
 
         _flip(data, width, height)
         _premultiply(data, width, height)
 
-        glTexImage2D(GL_TEXTURE_RECTANGLE_ARB,
+        glTexImage2D(GL_TEXTURE_2D,
                     0,
                     GL_RGBA,
                     width,
