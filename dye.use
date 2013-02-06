@@ -2,4 +2,5 @@ Name: dye
 Description: a simple graphics library
 Requires: sdl2
 SourcePath: source
+Imports: dye/core
 
