@@ -229,25 +229,14 @@ DyeContext: class {
     begin2D: func (canvasSize: Vec2i) {
 	glDisable(GL_DEPTH_TEST)
 	glEnable(GL_BLEND)
-	glMatrixMode(GL_PROJECTION)
-	glPushMatrix()
 	glLoadIdentity()
 
         (left, right, bottom, top) := (0, canvasSize x, 0, canvasSize y)
         (near, far) := (-1, 1)
 	glOrtho(left, right, bottom, top, near, far)
-
-	glMatrixMode(GL_MODELVIEW)
-	glPushMatrix()
-	glLoadIdentity()
     }
 
     end2D: func {
-	glMatrixMode(GL_PROJECTION)
-	glPopMatrix()
-	glMatrixMode(GL_MODELVIEW)
-	glPopMatrix()
-
 	glEnable(GL_DEPTH_TEST)
 	glDisable(GL_BLEND)
     }
