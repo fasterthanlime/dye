@@ -85,8 +85,9 @@ Fbo: class {
         targetOffset x = dye windowSize x / 2 - targetSize x / 2
         targetOffset y = dye windowSize y / 2 - targetSize y / 2
 
-        glPushMatrix()
-        glTranslatef(targetOffset x, targetOffset y, 0)
+        // FIXME: transformations
+        // glPushMatrix()
+        // glTranslatef(targetOffset x, targetOffset y, 0)
 
         glColor4f(1, 1, 1, 1)
         glBegin(GL_TRIANGLE_STRIP)
@@ -103,7 +104,8 @@ Fbo: class {
             glVertex2f(targetSize x, targetSize y)
         glEnd()
 
-        glPopMatrix()
+        // FIXME: transformations
+        // glPopMatrix()
 
         glBindTexture(GL_TEXTURE_2D, 0)
         glDisable(GL_TEXTURE_2D)
