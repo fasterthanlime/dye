@@ -326,7 +326,7 @@ SdlInput: class extends Input {
     }
 
     getMousePos: func -> Vec2 {
-        if (dye size == dye windowSize) {
+        if (dye size == dye windowSize || (!dye fbo)) {
             // all good, no transformation to make
             _mousepos
         } else {

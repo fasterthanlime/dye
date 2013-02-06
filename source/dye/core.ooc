@@ -8,7 +8,7 @@ import sdl2/[Core, OpenGL]
 import structs/ArrayList
 
 use dye
-import dye/[input, math, fbo, sprite]
+import dye/[input, math, sprite, fbo]
 
 Color: class {
 
@@ -100,6 +100,11 @@ DyeContext: class {
             SDL glSetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
         }
 
+        version (android) {
+            SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2)
+            SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0)
+        }
+
 	SDL glSetAttribute(SDL_GL_RED_SIZE, 5)
 	SDL glSetAttribute(SDL_GL_GREEN_SIZE, 6)
 	SDL glSetAttribute(SDL_GL_BLUE_SIZE, 5)
@@ -175,15 +180,15 @@ DyeContext: class {
     render: func {
         SDL glMakeCurrent(window, context)
 
-        fbo bind()
+        //fbo bind()
         glViewport(0, 0, size x, size y)
 	glClearColor(clearColor R, clearColor G, clearColor B, 1.0)
 	glClear(GL_COLOR_BUFFER_BIT)
 	draw()
-        fbo unbind()
+        //fbo unbind()
 
-        glViewport(0, 0, windowSize x, windowSize y)
-        fbo render()
+        //glViewport(0, 0, windowSize x, windowSize y)
+        //fbo render()
 
 	SDL glSwapWindow(window)
     }
@@ -216,7 +221,7 @@ DyeContext: class {
 	logger info("OpenGL renderer: %s" format(glGetString (GL_RENDERER)))
 
         setClearColor(clearColor)
-        fbo = Fbo new(this, size x, size y)
+        //fbo = Fbo new(this, size x, size y)
     }
 
     begin2D: func (canvasSize: Vec2i) {
