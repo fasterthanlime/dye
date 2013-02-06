@@ -23,7 +23,13 @@ Fbo: class {
         glBindTexture(GL_TEXTURE_2D, textureId)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, null)
+
+        texFormat := GL_RGBA
+        version (!android) {
+            texFormat = GL_RGBA8
+        }
+
+        glTexImage2D(GL_TEXTURE_2D, 0, texFormat, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, null)
         glBindTexture(GL_TEXTURE_2D, 0) 
 
         // create a renderbuffer object to store depth info
