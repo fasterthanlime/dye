@@ -29,29 +29,31 @@ GlGridSprite: class extends GlDrawable implements GlAnimSource {
     }
 
     draw: func (dye: DyeContext) {
-        glColor4f(brightness, brightness, brightness, opacity)
+        // FIXME: colors
+        //glColor4f(brightness, brightness, brightness, opacity)
 
-        dye withTexture(GL_TEXTURE_2D, texture id, ||
-            self := this
-            dye begin(GL_TRIANGLE_STRIP, ||
-                rx := x
-                ry := (ynum - 1) - y
-                xFactor := x as Float / xnum as Float
-                yFactor := y as Float / ynum as Float
+        // FIXME: drawing
+        //dye withTexture(GL_TEXTURE_2D, texture id, ||
+        //    self := this
+        //    dye begin(GL_TRIANGLE_STRIP, ||
+        //        rx := x
+        //        ry := (ynum - 1) - y
+        //        xFactor := x as Float / xnum as Float
+        //        yFactor := y as Float / ynum as Float
 
-                glTexCoord2f(rx * xFactor, ry * yFactor)
-                glVertex2f(xFactor * -0.5, yFactor * -0.5)
+        //        glTexCoord2f(rx * xFactor, ry * yFactor)
+        //        glVertex2f(xFactor * -0.5, yFactor * -0.5)
 
-                glTexCoord2f((rx + 1) * xFactor, ry * yFactor)
-                glVertex2f(xFactor *  0.5, yFactor * -0.5)
+        //        glTexCoord2f((rx + 1) * xFactor, ry * yFactor)
+        //        glVertex2f(xFactor *  0.5, yFactor * -0.5)
 
-                glTexCoord2f(rx * xFactor, (ry + 1) * yFactor)
-                glVertex2f(xFactor * -0.5, yFactor *  0.5)
+        //        glTexCoord2f(rx * xFactor, (ry + 1) * yFactor)
+        //        glVertex2f(xFactor * -0.5, yFactor *  0.5)
 
-                glTexCoord2f((rx + 1) * xFactor, (ry + 1) * yFactor)
-                glVertex2f(xFactor *  0.5, yFactor *  0.5)
-            )
-        )
+        //        glTexCoord2f((rx + 1) * xFactor, (ry + 1) * yFactor)
+        //        glVertex2f(xFactor *  0.5, yFactor *  0.5)
+        //    )
+        //)
     }
 
     // implement GlAnimSource
@@ -93,38 +95,41 @@ GlSprite: class extends GlDrawable {
     }
 
     render: func (dye: DyeContext) {
-        if (center) {
-            glPushMatrix()
+        // FIXME: transformations
+        //if (center) {
+        //    glPushMatrix()
 
-            glTranslatef(width * scale x * -0.5, height * scale y * -0.5, 0.0)
-            super()
+        //    glTranslatef(width * scale x * -0.5, height * scale y * -0.5, 0.0)
+        //    super()
 
-            glPopMatrix()
-        } else {
-            super()
-        }
+        //    glPopMatrix()
+        //} else {
+        //    super()
+        //}
     }
 
     draw: func (dye: DyeContext) {
-        glColor4f(brightness, brightness, brightness, opacity)
+        // FIXME: colors
+        // glColor4f(brightness, brightness, brightness, opacity)
 
-        dye withTexture(GL_TEXTURE_2D, texture id, ||
-            self := this
+        // FIXME: drawing
+        //dye withTexture(GL_TEXTURE_2D, texture id, ||
+        //    self := this
 
-            dye begin(GL_TRIANGLE_STRIP, ||
-                glTexCoord2f(0.0, 0.0)
-                glVertex2f(0.0, 0.0)
+        //    dye begin(GL_TRIANGLE_STRIP, ||
+        //        glTexCoord2f(0.0, 0.0)
+        //        glVertex2f(0.0, 0.0)
 
-                glTexCoord2f(1.0, 0.0)
-                glVertex2f(width, 0.0)
+        //        glTexCoord2f(1.0, 0.0)
+        //        glVertex2f(width, 0.0)
 
-                glTexCoord2f(0.0, 1.0)
-                glVertex2f(0.0, height)
+        //        glTexCoord2f(0.0, 1.0)
+        //        glVertex2f(0.0, height)
 
-                glTexCoord2f(1.0, 1.0)
-                glVertex2f(width, height)
-            )
-        )
+        //        glTexCoord2f(1.0, 1.0)
+        //        glVertex2f(width, height)
+        //    )
+        //)
     }
 
 }
