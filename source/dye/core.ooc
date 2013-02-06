@@ -220,60 +220,18 @@ DyeContext: class {
 	logger info("OpenGL renderer: %s" format(glGetString (GL_RENDERER)))
 
         setClearColor(clearColor)
-	glDisable(GL_DEPTH_TEST)
-	glEnable(GL_BLEND)
-
         fbo = Fbo new(this, size x, size y)
     }
 
     begin2D: func (canvasSize: Vec2i) {
-	glDisable(GL_DEPTH_TEST)
-	glEnable(GL_BLEND)
-	glLoadIdentity()
-
-        (left, right, bottom, top) := (0, canvasSize x, 0, canvasSize y)
-        (near, far) := (-1, 1)
-	glOrtho(left, right, bottom, top, near, far)
+        //(left, right, bottom, top) := (0, canvasSize x, 0, canvasSize y)
+        //(near, far) := (-1, 1)
+	//glOrtho(left, right, bottom, top, near, far)
     }
 
     end2D: func {
 	glEnable(GL_DEPTH_TEST)
 	glDisable(GL_BLEND)
-    }
-
-    color: func (color: Color) {
-        glColor4f(color R, color G, color B, 1.0)
-    }
-
-    texCoord: func (v: Vec2) {
-        glTexCoord2f(v x, v y)
-    }
-
-    vertex: func (v: Vec2) {
-        glVertex2f(v x, v y)
-    }
-
-    pushMatrix: func (f: Func) {
-        glPushMatrix()
-        f()
-        glPopMatrix()
-    }
-
-    begin: func (type: GLenum, f: Func) {
-        glBegin(type)
-        f()
-        glEnd()
-    }
-
-    withTexture: func (textureType: GLenum, textureID: GLuint, f: Func) {
-	glEnable(textureType)
-        glBindTexture(textureType, textureID)
-	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-
-        f()
-
-        glBindTexture(textureType, 0) // unbind it for later draw operations
-	glDisable(textureType)
     }
 
     createScene: func -> Scene {

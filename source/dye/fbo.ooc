@@ -66,7 +66,7 @@ Fbo: class {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         glEnable(GL_TEXTURE_2D)
-        glBindTexture(GL_TEXTURE_2D, textureId)
+        //glBindTexture(GL_TEXTURE_2D, textureId)
 	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
         ratio := dye size ratio()
@@ -89,25 +89,28 @@ Fbo: class {
         // glPushMatrix()
         // glTranslatef(targetOffset x, targetOffset y, 0)
 
-        glColor4f(1, 1, 1, 1)
-        glBegin(GL_TRIANGLE_STRIP)
-            glTexCoord2f(0.0, 0.0)
-            glVertex2f(0, 0)
+        // FIXME: colors
+        //glColor4f(1, 1, 1, 1)
 
-            glTexCoord2f(1.0, 0.0)
-            glVertex2f(targetSize x, 0)
+        // FIXME: drawing stuff
+        //glBegin(GL_TRIANGLE_STRIP)
+        //    glTexCoord2f(0.0, 0.0)
+        //    glVertex2f(0, 0)
 
-            glTexCoord2f(0.0, 1.0)
-            glVertex2f(0, targetSize y)
+        //    glTexCoord2f(1.0, 0.0)
+        //    glVertex2f(targetSize x, 0)
 
-            glTexCoord2f(1.0, 1.0)
-            glVertex2f(targetSize x, targetSize y)
-        glEnd()
+        //    glTexCoord2f(0.0, 1.0)
+        //    glVertex2f(0, targetSize y)
+
+        //    glTexCoord2f(1.0, 1.0)
+        //    glVertex2f(targetSize x, targetSize y)
+        //glEnd()
 
         // FIXME: transformations
         // glPopMatrix()
 
-        glBindTexture(GL_TEXTURE_2D, 0)
+        //glBindTexture(GL_TEXTURE_2D, 0)
         glDisable(GL_TEXTURE_2D)
 
         dye end2D()
