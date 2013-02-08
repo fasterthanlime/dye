@@ -37,8 +37,11 @@ GlRectangle: class extends GlDrawable {
 
     width: Float { get { size x } }
     height: Float { get { size y } }
+    
+    program: ShaderProgram
 
     init: func {
+        program = ShaderLoader getDefaultProgram()
     }
 
     draw: func (dye: DyeContext) {
@@ -68,6 +71,8 @@ GlRectangle: class extends GlDrawable {
         //         glVertex2f(0.0, size y)
         //     )
         // }
+
+        program use()
     }
 
 }

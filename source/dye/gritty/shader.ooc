@@ -21,7 +21,7 @@ ShaderLoader: class {
         ShaderProgram new(vertex, fragment)
     }
 
-    getDefaultProgram: func -> ShaderProgram {
+    getDefaultProgram: static func -> ShaderProgram {
         if (!_default) {
             _default = loadProgram(DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER)
         }
@@ -140,7 +140,7 @@ ShaderException: class extends Exception {
 // Default shaders follow:
 
 DEFAULT_VERTEX_SHADER := "
-#version 150
+#version 130
 
 in vec2 position;
 
@@ -151,7 +151,7 @@ void main()
 "
 
 DEFAULT_FRAGMENT_SHADER := "
-#version 150
+#version 130
 
 out vec4 outColor;
 
