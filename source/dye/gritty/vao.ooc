@@ -8,20 +8,20 @@ import sdl2/[OpenGL]
 // sdk stuff
 import structs/[ArrayList]
 
-VAO: class {
-
-    id: Int
-
-    init: func {
-        glGenVertexArrays(1, id&)
-        bind()
-    }
-
-    bind: func {
-        glBindVertexArray(id)
-    }
-
-}
+//VAO: class {
+//
+//    id: Int
+//
+//    init: func {
+//        glGenVertexArrays(1, id&)
+//        bind()
+//    }
+//
+//    bind: func {
+//        glBindVertexArray(id)
+//    }
+//
+//}
 
 FakeVAO: class {
 
