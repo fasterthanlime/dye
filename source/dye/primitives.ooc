@@ -29,7 +29,7 @@ GlSegment: class extends GlDrawable {
 
 GlRectangle: class extends GlDrawable {
 
-    size := vec2(16, 16)
+    size: Vec2
     color := Color green()
     center := true
     filled := true
@@ -41,62 +41,41 @@ GlRectangle: class extends GlDrawable {
     vbo: FloatVBO 
     vertices: Float[]
 
-    init: func {
+    init: func (size := vec2(16, 16)) {
+        this size = size clone()
         vbo = FloatVBO new()
-
-        if (center) {
-            halfX := size x * 0.5
-            halfY := size y * 0.5
-
-            vertices = [
-                -halfX, -halfY,
-                 halfX, -halfY,
-                -halfX,  halfY,
-                 halfX,  halfY
-            ]
-        } else {
-            vertices = [
-                0.0, 0.0,
-                size x, 0.0,
-                0.0, size y,
-                size x, size y
-            ]
-        }
-        vbo data(vertices)
+        rebuild()
 
         program = ShaderLoader getDefaultProgram()
         program vertexAttribPointer("position", 2, GL_FLOAT, false, 0, 0 as Pointer)
     }
 
     draw: func (dye: DyeContext) {
-        "Drawing" println()
-
         vbo bind()
         program use()
-
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
-
-        //vbo detach()
-        //program detach()
         program vao detach()
     }
 
-}
+    rebuild: func {
+        vertices = [
+            0.0, 0.0,
+            size x, 0.0,
+            0.0, size y,
+            size x, size y
+        ]
 
-GlTriangle: class extends GlDrawable {
+        if (center) {
+            halfX := size x * 0.5
+            halfY := size y * 0.5
 
-    draw: func (dye: DyeContext) {
-        // FIXME: drawing & color
-        //dye begin(GL_TRIANGLES, ||
-        //    glColor3f(1.0, 0.0, 0.0)
-        //    glVertex2f(-10.0, 0.0)
-
-        //    glColor3f(0.0, 1.0, 0.0)
-        //    glVertex2f(10.0, 0.0)
-
-        //    glColor3f(0.0, 0.0, 1.0)
-        //    glVertex2f(0.0, 10.0)
-        //)
+            for (i in 0..4) {
+                vertices[i * 2]     = vertices[i * 2]     - halfX
+                vertices[i * 2 + 1] = vertices[i * 2 + 1] - halfY
+            }
+        } else {
+        }
+        vbo data(vertices)
     }
 
 }
