@@ -65,7 +65,6 @@ GlRectangle: class extends GlDrawable {
         vbo data(vertices)
 
         program = ShaderLoader getDefaultProgram()
-        //program vertexAttribPointer("position", 2, GL_FLOAT, false, Float size * 2, 0 as Pointer)
         program vertexAttribPointer("position", 2, GL_FLOAT, false, 0, 0 as Pointer)
     }
 
@@ -76,10 +75,10 @@ GlRectangle: class extends GlDrawable {
         program use()
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
-        //glDrawElements(GL_TRIANGLE_STRIP, 4, GL_FLOAT, null)
 
         //vbo detach()
-        program detach()
+        //program detach()
+        program vao detach()
     }
 
 }
