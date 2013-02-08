@@ -95,8 +95,8 @@ DyeContext: class {
 	SDL init(SDL_INIT_EVERYTHING)
 
         version (apple) {
-            SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2)
-            SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1)
+            SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
+            SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2)
             SDL glSetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
         }
 
@@ -239,8 +239,8 @@ DyeContext: class {
     }
 
     end2D: func {
-	glEnable(GL_DEPTH_TEST)
-	glDisable(GL_BLEND)
+	//glEnable(GL_DEPTH_TEST)
+	//glDisable(GL_BLEND)
     }
 
     createScene: func -> Scene {

@@ -161,18 +161,18 @@ ShaderException: class extends Exception {
 // Default shaders follow:
 
 DEFAULT_VERTEX_SHADER := "
-#version 130
+#version 150
 
 in vec2 position;
 
 void main()
 {
-    gl_Position = vec4( 0.1 * position, 0.0, 1.0 );
+    gl_Position = vec4( position, 0.0, 1.0 );
 }
 "
 
 DEFAULT_FRAGMENT_SHADER := "
-#version 130
+#version 150
 
 out vec4 outColor;
 
