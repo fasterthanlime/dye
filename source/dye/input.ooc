@@ -51,6 +51,22 @@ Input: abstract class {
         )
     }
 
+    onWindowMinimized: func (cb: Func) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case wmin: WindowMinimized => cb()
+            }
+        )
+    }
+
+    onWindowRestored: func (cb: Func) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case wres: WindowRestored => cb()
+            }
+        )
+    }
+
     onExit: func (cb: Func) -> Listener {
         onEvent(|ev|
             match (ev) {
@@ -266,8 +282,12 @@ SdlInput: class extends Input {
                     _quit()
                 case SDL_WINDOWEVENT =>
                     match (event window event) {
+                        case SDL_WINDOWEVENT_MINIMIZED =>
+                            _windowMinimized()
+                        case SDL_WINDOWEVENT_RESTORED =>
+                            _windowRestored()
                         case SDL_WINDOWEVENT_SIZE_CHANGED =>
-                            _windowSizeChanged (event window data1, event window data2)
+                            _windowSizeChanged(event window data1, event window data2)
                     }
             }
         }
@@ -325,6 +345,20 @@ SdlInput: class extends Input {
         _notifyListeners(WindowSizeChanged new(x, y))
     }
 
+    _windowMinimized: func {
+        if(debug) {
+            logger debug("Window minimized")
+        }
+        _notifyListeners(WindowMinimized new())
+    }
+
+    _windowRestored: func {
+        if(debug) {
+            logger debug("Window restored")
+        }
+        _notifyListeners(WindowRestored new())
+    }
+
     getMousePos: func -> Vec2 {
         if (dye size == dye windowSize || (!dye fbo)) {
             // all good, no transformation to make
@@ -354,6 +388,14 @@ WindowSizeChanged: class extends LEvent {
     x, y: Int
     init: func (=x, =y)
         
+}
+
+WindowRestored: class extends LEvent {
+    init: func
+}
+
+WindowMinimized: class extends LEvent {
+    init: func
 }
 
 ExitEvent: class extends LEvent { }
@@ -514,6 +556,17 @@ KeyCode: enum from Int {
 
     DEL   = SDL_SCANCODE_DELETE
     BACKSPACE = SDL_SCANCODE_BACKSPACE
+
+    MENU = SDL_SCANCODE_MENU
+
+    // mobile-specific "keys"
+    AC_SEARCH    = SDL_SCANCODE_AC_SEARCH
+    AC_HOME      = SDL_SCANCODE_AC_HOME
+    AC_BACK      = SDL_SCANCODE_AC_BACK
+    AC_FORWARD   = SDL_SCANCODE_AC_FORWARD
+    AC_STOP      = SDL_SCANCODE_AC_STOP
+    AC_REFRESH   = SDL_SCANCODE_AC_REFRESH
+    AC_BOOKMARKS = SDL_SCANCODE_AC_BOOKMARKS
 }
 
 /*

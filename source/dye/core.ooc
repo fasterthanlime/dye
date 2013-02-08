@@ -209,6 +209,10 @@ DyeContext: class {
 
     quit: func {
 	SDL quit()
+        // on Desktop, chances are SDL quit will exit the app.
+        // on mobile, exit(0) is apparently needed.
+        // It can't hurt anyway.
+        exit(0)
     }
 
     setClearColor: func (c: Color) {
