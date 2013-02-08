@@ -1,4 +1,7 @@
 
+// our stuff
+import dye/gritty/vao
+
 // third-party stuff
 import sdl2/[OpenGL]
 
@@ -88,14 +91,20 @@ ShaderProgram: class {
     
     fragment: FragmentShader
     vertex: VertexShader
+
     id: Int
+
+    vao: FakeVAO
 
     init: func (=vertex, =fragment) {
         id = glCreateProgram()
+        vao = FakeVAO new()
+
         attach(vertex)
         attach(fragment)
 
         link()
+        use()
     }
 
     attach: func (shader: Shader) {
@@ -123,8 +132,20 @@ ShaderProgram: class {
         ShaderException new(class, message) throw()
     }
 
+    vertexAttribPointer: func (name: String, numComponents: Int, type: GLenum,
+        normalized: Bool, stride: Int, pointer: Pointer) {
+
+        vao add(VertexAttribInfo new(this, name, numComponents, type, normalized, stride, pointer))
+    }
+
     use: func {
         glUseProgram(id)
+        vao use()
+    }
+
+    detach: func {
+        vao detach()
+        glUseProgram(0)
     }
 
 }
@@ -146,7 +167,7 @@ in vec2 position;
 
 void main()
 {
-    gl_Position = vec4( position, 0.0, 1.0 );
+    gl_Position = vec4( 0.1 * position, 0.0, 1.0 );
 }
 "
 
@@ -157,7 +178,7 @@ out vec4 outColor;
 
 void main()
 {
-    outColor = vec4( 1.0, 1.0, 1.0, 1.0 );
+    outColor = vec4( 0.0, 1.0, 0.0, 1.0 );
 }
 "
 

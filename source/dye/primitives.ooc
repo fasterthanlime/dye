@@ -3,7 +3,7 @@ import sdl2/[OpenGL]
 
 use dye
 import dye/[core, math]
-import dye/gritty/[shader, texture]
+import dye/gritty/[shader, texture, vbo]
 
 GlSegment: class extends GlDrawable {
 
@@ -37,42 +37,49 @@ GlRectangle: class extends GlDrawable {
 
     width: Float { get { size x } }
     height: Float { get { size y } }
-    
     program: ShaderProgram
+    vbo: FloatVBO 
+    vertices: Float[]
 
     init: func {
+        vbo = FloatVBO new()
+
+        if (center) {
+            halfX := size x * 0.5
+            halfY := size y * 0.5
+
+            vertices = [
+                -halfX, -halfY,
+                 halfX, -halfY,
+                -halfX,  halfY,
+                 halfX,  halfY
+            ]
+        } else {
+            vertices = [
+                0.0, 0.0,
+                size x, 0.0,
+                0.0, size y,
+                size x, size y
+            ]
+        }
+        vbo data(vertices)
+
         program = ShaderLoader getDefaultProgram()
+        //program vertexAttribPointer("position", 2, GL_FLOAT, false, Float size * 2, 0 as Pointer)
+        program vertexAttribPointer("position", 2, GL_FLOAT, false, 0, 0 as Pointer)
     }
 
     draw: func (dye: DyeContext) {
-        // FIXME: color
-        // dye color(color)
-        
-        // FIXME: drawing
-        // if (!filled) {
-        //     glLineWidth(lineWidth)
-        // }
+        "Drawing" println()
 
-        // if (center) {
-        //     halfX := size x * 0.5
-        //     halfY := size y * 0.5
-
-        //     dye begin(filled ? GL_QUADS : GL_LINE_LOOP, ||
-        //         glVertex2f(-halfX, -halfY)
-        //         glVertex2f( halfX, -halfY)
-        //         glVertex2f( halfX,  halfY)
-        //         glVertex2f(-halfX,  halfY)
-        //     )
-        // } else {
-        //     dye begin(filled ? GL_QUADS : GL_LINE_LOOP, ||
-        //         glVertex2f(0.0, 0.0)
-        //         glVertex2f(size x, 0.0)
-        //         glVertex2f(size x, size y)
-        //         glVertex2f(0.0, size y)
-        //     )
-        // }
-
+        vbo bind()
         program use()
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+        //glDrawElements(GL_TRIANGLE_STRIP, 4, GL_FLOAT, null)
+
+        //vbo detach()
+        program detach()
     }
 
 }
