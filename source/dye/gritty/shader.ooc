@@ -28,11 +28,17 @@ ShaderLoader: class {
         if (!_default) {
             version (android) {
                 // TODO: detect by glGetString instead!
-                _default = loadProgram(DEFAULT_VERTEX_SHADER_ES, DEFAULT_FRAGMENT_SHADER_ES)
+                _default = loadProgram(DEFAULT_VERTEX_SHADER_100, DEFAULT_FRAGMENT_SHADER_100)
             }
             
             version (!android) {
-                _default = loadProgram(DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER)
+                version (apple) {
+                    // TODO: detect by glGetString instead!
+                    _default = loadProgram(DEFAULT_VERTEX_SHADER_150, DEFAULT_FRAGMENT_SHADER_150)
+                }
+                version (!apple) {
+                    _default = loadProgram(DEFAULT_VERTEX_SHADER_130, DEFAULT_FRAGMENT_SHADER_130)
+                }
             }
         }
 
@@ -101,11 +107,11 @@ ShaderProgram: class {
 
     id: Int
 
-    vao: FakeVAO
+    vao: VAO
 
     init: func (=vertex, =fragment) {
         id = glCreateProgram()
-        vao = FakeVAO new()
+        vao = VAO new()
 
         attach(vertex)
         attach(fragment)
@@ -147,7 +153,7 @@ ShaderProgram: class {
 
     use: func {
         glUseProgram(id)
-        vao use()
+        vao bind()
     }
 
     detach: func {
@@ -167,29 +173,7 @@ ShaderException: class extends Exception {
 
 // Default shaders follow:
 
-DEFAULT_VERTEX_SHADER := "
-#version 130
-
-in vec2 position;
-
-void main()
-{
-    gl_Position = vec4( position, 0.0, 1.0 );
-}
-"
-
-DEFAULT_FRAGMENT_SHADER := "
-#version 130
-
-out vec4 outColor;
-
-void main()
-{
-    outColor = vec4( 0.0, 1.0, 0.0, 1.0 );
-}
-"
-
-DEFAULT_VERTEX_SHADER_ES := "
+DEFAULT_VERTEX_SHADER_100 := "
 #version 100
 
 attribute vec2 position;
@@ -200,12 +184,57 @@ void main()
 }
 "
 
-DEFAULT_FRAGMENT_SHADER_ES := "
+DEFAULT_FRAGMENT_SHADER_100 := "
 #version 100
 
 void main()
 {
     gl_FragColor = vec4( 0.0, 1.0, 0.0, 1.0 );
+}
+"
+
+
+DEFAULT_VERTEX_SHADER_130 := "
+#version 130
+
+in vec2 position;
+
+void main()
+{
+    gl_Position = vec4( position, 0.0, 1.0 );
+}
+"
+
+DEFAULT_FRAGMENT_SHADER_130 := "
+#version 130
+
+out vec4 outColor;
+
+void main()
+{
+    outColor = vec4( 0.0, 1.0, 0.0, 1.0 );
+}
+"
+
+DEFAULT_VERTEX_SHADER_150 := "
+#version 150
+
+in vec2 position;
+
+void main()
+{
+    gl_Position = vec4( position, 0.0, 1.0 );
+}
+"
+
+DEFAULT_FRAGMENT_SHADER_150 := "
+#version 150
+
+out vec4 outColor;
+
+void main()
+{
+    outColor = vec4( 0.0, 1.0, 0.0, 1.0 );
 }
 "
 
