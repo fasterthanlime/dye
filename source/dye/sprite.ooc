@@ -1,7 +1,7 @@
 
 // our stuff
 import dye/[core, math, anim]
-import dye/gritty/[texture]
+import dye/gritty/[shader, texture]
 
 // third-party stuff
 import sdl2/[OpenGL]
