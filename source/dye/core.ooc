@@ -222,9 +222,10 @@ DyeContext: class {
     }
 
     initGL: func {
-	logger info("OpenGL version: %s" format(glGetString (GL_VERSION)))
-	logger info("OpenGL vendor: %s" format(glGetString (GL_VENDOR)))
-	logger info("OpenGL renderer: %s" format(glGetString (GL_RENDERER)))
+	logger info("OpenGL version: %s" format(glGetString(GL_VERSION)))
+	logger info("OpenGL vendor: %s" format(glGetString(GL_VENDOR)))
+	logger info("OpenGL renderer: %s" format(glGetString(GL_RENDERER)))
+	logger info("GLSL version: %s" format(glGetString(GL_SHADING_LANGUAGE_VERSION)))
 
         setClearColor(clearColor)
         //fbo = Fbo new(this, size x, size y)

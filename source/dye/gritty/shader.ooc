@@ -26,7 +26,14 @@ ShaderLoader: class {
 
     getDefaultProgram: static func -> ShaderProgram {
         if (!_default) {
-            _default = loadProgram(DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER)
+            version (android) {
+                // TODO: detect by glGetString instead!
+                _default = loadProgram(DEFAULT_VERTEX_SHADER_ES, DEFAULT_FRAGMENT_SHADER_ES)
+            }
+            
+            version (!android) {
+                _default = loadProgram(DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER)
+            }
         }
 
         _default
@@ -179,6 +186,26 @@ out vec4 outColor;
 void main()
 {
     outColor = vec4( 0.0, 1.0, 0.0, 1.0 );
+}
+"
+
+DEFAULT_VERTEX_SHADER_ES := "
+#version 100
+
+attribute vec2 position;
+
+void main()
+{
+    gl_Position = vec4( position, 0.0, 1.0 );
+}
+"
+
+DEFAULT_FRAGMENT_SHADER_ES := "
+#version 100
+
+void main()
+{
+    gl_FragColor = vec4( 0.0, 1.0, 0.0, 1.0 );
 }
 "
 
