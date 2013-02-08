@@ -33,8 +33,11 @@ FloatVBO: class extends VBO {
 
     data: func ~pointer (numElements: Int, data: Float*, type := GL_STATIC_DRAW) {
         numBytes := (numElements * Float size)
+
+        /*
         "Passing glBufferData with GL_ARRAY_BUFFER, %d bytes, data at %p and a GL_STATIC_DRAW type" printfln(
             numBytes, data)
+        */
             
         glBufferData(GL_ARRAY_BUFFER, numBytes as GLsizeiptr, data, type)
     }

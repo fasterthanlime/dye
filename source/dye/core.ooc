@@ -194,10 +194,8 @@ DyeContext: class {
     }
 
     draw: func {
-	begin2D(size)
         currentScene render(this)
         renderCursor()
-	end2D()
     }
 
     renderCursor: func {
@@ -226,17 +224,6 @@ DyeContext: class {
 
         setClearColor(clearColor)
         //fbo = Fbo new(this, size x, size y)
-    }
-
-    begin2D: func (canvasSize: Vec2i) {
-        //(left, right, bottom, top) := (0, canvasSize x, 0, canvasSize y)
-        //(near, far) := (-1, 1)
-	//glOrtho(left, right, bottom, top, near, far)
-    }
-
-    end2D: func {
-	//glEnable(GL_DEPTH_TEST)
-	//glDisable(GL_BLEND)
     }
 
     createScene: func -> Scene {
@@ -278,17 +265,7 @@ GlDrawable: abstract class {
     render: func (dye: DyeContext) {
         if (!visible) return
 
-        // FIXME: transformations
-        // glPushMatrix()
-
-        // glTranslatef(pos x, pos y, 0.0)
-        // glRotatef(angle, 0.0, 0.0, 1.0) 
-        // glScalef(scale x, scale y, 1.0)
-
         draw(dye)
-
-        // FIXME: transformations
-        // glPopMatrix()
     }
 
     center!: func (dye: DyeContext, size: Vec2) {

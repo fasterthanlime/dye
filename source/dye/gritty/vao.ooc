@@ -66,7 +66,10 @@ VertexAttribInfo: class {
     }
 
     use: func {
-        "Having glVertexAttribPointer with name %s, id %d, and numComponents %d, type %d, normalized %d, stride %d, pointer %p" printfln(name, id, numComponents, type as Int, normalized, stride, pointer)
+        /*
+        "VAI: name %s, id %d, and numComponents %d, type %d, norm %d, stride %d, pointer %p" printfln(
+            name, id, numComponents, type as Int, normalized, stride, pointer)
+        */
 
         glEnableVertexAttribArray(id)
         glVertexAttribPointer(id, numComponents, type, normalized, stride, pointer)

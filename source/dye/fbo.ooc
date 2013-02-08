@@ -67,13 +67,11 @@ Fbo: class {
     }
 
     render: func {
-        dye begin2D(dye windowSize)
 	glClearColor(0.0, 0.0, 0.0, 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        glEnable(GL_TEXTURE_2D)
         //glBindTexture(GL_TEXTURE_2D, textureId)
-	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+	//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
         ratio := dye size ratio()
         targetRatio := dye windowSize ratio()
@@ -117,9 +115,6 @@ Fbo: class {
         // glPopMatrix()
 
         //glBindTexture(GL_TEXTURE_2D, 0)
-        glDisable(GL_TEXTURE_2D)
-
-        dye end2D()
     }
 
 }
