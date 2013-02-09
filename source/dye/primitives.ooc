@@ -3,7 +3,7 @@ import sdl2/[OpenGL]
 
 use dye
 import dye/[core, math]
-import dye/gritty/[shader, texture, vbo]
+import dye/gritty/[shader, shaderlibrary, texture, vbo]
 
 GlSegment: class extends GlDrawable {
 
@@ -47,7 +47,7 @@ GlRectangle: class extends GlDrawable {
         vbo = FloatVBO new()
         rebuild()
 
-        program = ShaderLoader getDefaultProgram()
+        program = ShaderLibrary getSolidColor()
         program vertexAttribPointer("position", 2, GL_FLOAT, false, 0, 0 as Pointer)
     }
 

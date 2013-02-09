@@ -1,7 +1,7 @@
 
 // our stuff
 import dye/[core, math, anim]
-import dye/gritty/[shader, texture, vbo]
+import dye/gritty/[shader, shaderlibrary, texture, vbo]
 
 // third-party stuff
 import sdl2/[OpenGL]
@@ -102,7 +102,7 @@ GlSprite: class extends GlDrawable {
         vbo = FloatVBO new()
         rebuild()
 
-        program = loadProgram()
+        program = ShaderLibrary getTexture()
 
         stride := 4 * Float size
         program vertexAttribPointer("texcoord", 2, GL_FLOAT, false, stride, 0 as Pointer)
@@ -162,39 +162,6 @@ GlSprite: class extends GlDrawable {
         vbo bind()
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
         program vao detach()
-    }
-
-    loadProgram: func -> ShaderProgram {
-        vertex := "
-            #version 130
-
-            in vec2 position;
-            in vec2 texcoord;
-            out vec2 coord;
-
-            void main()
-            {
-                coord = texcoord;
-                gl_Position = vec4(position * 0.01, 0.0, 1.0);
-            }
-        "
-
-        fragment := "
-            #version 130
-
-            uniform vec4 inColor;
-            uniform sampler2D tex;
-
-            in vec2 coord;
-            out vec4 outColor;
-
-            void main()
-            {
-                outColor = texture2D(tex, coord);
-            }
-        "
-
-        ShaderLoader loadProgram(vertex, fragment)
     }
 
 }
