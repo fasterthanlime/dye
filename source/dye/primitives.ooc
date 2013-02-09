@@ -37,6 +37,7 @@ GlRectangle: class extends GlDrawable {
 
     width: Float { get { size x } }
     height: Float { get { size y } }
+
     program: ShaderProgram
     vbo: FloatVBO 
     vertices: Float[]
@@ -73,8 +74,9 @@ GlRectangle: class extends GlDrawable {
                 vertices[i * 2]     = vertices[i * 2]     - halfX
                 vertices[i * 2 + 1] = vertices[i * 2 + 1] - halfY
             }
-        } else {
         }
+
+        vbo bind()
         vbo data(vertices)
     }
 
