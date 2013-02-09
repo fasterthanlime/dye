@@ -26,6 +26,10 @@ RWopsReader: class extends Reader {
 
     init: func (path: String) {
         ops = RWops new(path, "rb")   
+
+        if (!ops) {
+            Exception new(This, "Couldn't open " + path + " for reading.") throw()
+        }
     }
 
     read: func (chars: Char*, offset: Int, count: Int) -> SizeT {
