@@ -22,7 +22,13 @@ Texture: class {
   width, height: Int
   path: String
 
-  init: func (=id, =width, =height, =path) {
+  init: func (=width, =height, =path) {
+    glGenTextures(1, id&)
+    bind()
+  }
+
+  bind: func {
+    glBindTexture(GL_TEXTURE_2D, id)
   }
 
 }
@@ -35,6 +41,8 @@ TextureLoader: class {
     cache := static HashMap<String, Texture> new()
     logger := static Log getLogger(This name)
 
+    _placeholder: static Texture
+
     load: static func (path: String) -> Texture {
         if (cache contains?(path)) {
             return cache get(path)
@@ -44,32 +52,46 @@ TextureLoader: class {
         data := StbImage fromPath(path, width&, height&, channels&, 4)
 
         if (width == 0 || height == 0 || channels == 0) {
-          logger warn("Failed to load %s!" format(path))
-          return Texture new(-1, 0, 0, "<missing>")
+            logger warn("Failed to load %s!" format(path))
+            return _getPlaceholder()
+        }
+
+        if (channels != 4) {
+            logger warn("Failed to load %s! - has %d channels, need 4" format(path, channels))
+            return _getPlaceholder()
         }
 
         logger debug("Loading %s, size %dx%d, %d bpp" format(path, width, height, channels))
 
-        textureID: Int
+        texture := Texture new(width, height, path)
 
-        glGenTextures(1, textureID&)
-        glBindTexture(GL_TEXTURE_2D, textureID)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE)
 
         _flip(data, width, height)
         _premultiply(data, width, height)
 
         glTexImage2D(GL_TEXTURE_2D,
                     0,
-                    GL_RGBA,
+                    GL_RGBA8,
                     width,
                     height,
                     0,
                     GL_RGBA,
                     GL_UNSIGNED_BYTE,
                     data)
-        texture := Texture new(textureID, width, height, path)
         cache put(path, texture)
+
         texture
+    }
+
+    _getPlaceholder: static func -> Texture {
+        if (!_placeholder) {
+            _placeholder = Texture new(0, 0, "<missing>")
+        }
+        _placeholder
     }
 
     _premultiply: static func (data: UInt8*, width: Int, height: Int) {
