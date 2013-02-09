@@ -1,6 +1,7 @@
 
 // our stuff
 import dye/[core, math, anim]
+import dye/gritty/[io]
 
 // third-party stuff
 import sdl2/[OpenGL]
@@ -49,7 +50,12 @@ TextureLoader: class {
         }
 
         width, height, channels: Int
-        data := StbImage fromPath(path, width&, height&, channels&, 4)
+
+        reader := RWopsReader new(path)
+        cb := StbIo callbacks()
+
+        data := StbImage fromCb(cb&, reader, width&, height&, channels&, 4)
+        reader close()
 
         if (width == 0 || height == 0 || channels == 0) {
             logger warn("Failed to load %s!" format(path))
@@ -73,9 +79,15 @@ TextureLoader: class {
         _flip(data, width, height)
         _premultiply(data, width, height)
 
+        internalFormat := GL_RGBA
+
+        version (!android) {
+            internalFormat = GL_RGBA8
+        }
+
         glTexImage2D(GL_TEXTURE_2D,
                     0,
-                    GL_RGBA8,
+                    internalFormat,
                     width,
                     height,
                     0,

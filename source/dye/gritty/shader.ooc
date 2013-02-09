@@ -15,34 +15,11 @@ import structs/HashMap
 
 ShaderLoader: class {
 
-    _default: static ShaderProgram
-
-    loadProgram: static func (vertexCode: String, fragmentCode: String) -> ShaderProgram {
+    load: static func (vertexCode: String, fragmentCode: String) -> ShaderProgram {
         vertex := VertexShader new(vertexCode)
         fragment := FragmentShader new(fragmentCode)
 
         ShaderProgram new(vertex, fragment)
-    }
-
-    getDefaultProgram: static func -> ShaderProgram {
-        if (!_default) {
-            version (android) {
-                // TODO: detect by glGetString instead!
-                _default = loadProgram(DEFAULT_VERTEX_SHADER_100, DEFAULT_FRAGMENT_SHADER_100)
-            }
-            
-            version (!android) {
-                version (apple) {
-                    // TODO: detect by glGetString instead!
-                    _default = loadProgram(DEFAULT_VERTEX_SHADER_150, DEFAULT_FRAGMENT_SHADER_150)
-                }
-                version (!apple) {
-                    _default = loadProgram(DEFAULT_VERTEX_SHADER_130, DEFAULT_FRAGMENT_SHADER_130)
-                }
-            }
-        }
-
-        _default
     }
 
 }
@@ -170,71 +147,4 @@ ShaderException: class extends Exception {
     }
 
 }
-
-// Default shaders follow:
-
-DEFAULT_VERTEX_SHADER_100 := "
-#version 100
-
-attribute vec2 position;
-
-void main()
-{
-    gl_Position = vec4( position, 0.0, 1.0 );
-}
-"
-
-DEFAULT_FRAGMENT_SHADER_100 := "
-#version 100
-
-void main()
-{
-    gl_FragColor = vec4( 0.0, 1.0, 0.0, 1.0 );
-}
-"
-
-
-DEFAULT_VERTEX_SHADER_130 := "
-#version 130
-
-in vec2 position;
-
-void main()
-{
-    gl_Position = vec4( position, 0.0, 1.0 );
-}
-"
-
-DEFAULT_FRAGMENT_SHADER_130 := "
-#version 130
-
-out vec4 outColor;
-
-void main()
-{
-    outColor = vec4( 0.0, 1.0, 0.0, 1.0 );
-}
-"
-
-DEFAULT_VERTEX_SHADER_150 := "
-#version 150
-
-in vec2 position;
-
-void main()
-{
-    gl_Position = vec4( position, 0.0, 1.0 );
-}
-"
-
-DEFAULT_FRAGMENT_SHADER_150 := "
-#version 150
-
-out vec4 outColor;
-
-void main()
-{
-    outColor = vec4( 0.0, 1.0, 0.0, 1.0 );
-}
-"
 
