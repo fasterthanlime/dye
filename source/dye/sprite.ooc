@@ -97,7 +97,7 @@ GlSprite: class extends GlDrawable {
     data: Float[]
 
     /* Uniforms */
-    texLoc, projLoc: Int
+    texLoc, projLoc, modelLoc: Int
 
     logger := static Log getLogger(This name)
 
@@ -119,7 +119,8 @@ GlSprite: class extends GlDrawable {
 
         texLoc = program getUniformLocation("Texture")
         projLoc = program getUniformLocation("Projection")
-        logger debug("texLoc = %d, projLoc = %d", texLoc, projLoc)
+        modelLoc = program getUniformLocation("ModelView")
+        logger debug("texLoc = %d, projLoc = %d, modelLoc = %d", texLoc, projLoc, modelLoc)
     }
 
     render: func (dye: DyeContext, modelView: Matrix4) {
@@ -166,6 +167,10 @@ GlSprite: class extends GlDrawable {
         glUniform1f(texLoc, 0)
 
         glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
+        glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
+
+        "ModelView matrix: " println()
+        modelView _ println()
 
         glEnable(GL_BLEND)
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)

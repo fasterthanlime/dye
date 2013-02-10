@@ -293,18 +293,27 @@ GlDrawable: abstract class {
             modelView = Matrix4 newIdentity()
         }
 
+        "input modelView = " println()
+        modelView _ println()
+
         // order of operations: translate, rotate, scale
 
         if (!pos zero?()) {
             modelView = Matrix4 newTranslate(pos x, pos y, 0.0) * modelView
+            "after translation modelView = " println()
+            modelView _ println()
         }
 
         if (angle != 0.0) {
             modelView = Matrix4 newRotateZ(angle) * modelView
+            "after rotation modelView = " println()
+            modelView _ println()
         }
 
         if (!scale unit?()) {
             modelView = Matrix4 newScale(scale x, scale y, 1.0) * modelView
+            "after scale modelView = " println()
+            modelView _ println()
         }
 
         modelView
