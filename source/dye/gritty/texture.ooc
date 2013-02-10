@@ -32,6 +32,10 @@ Texture: class {
     glBindTexture(GL_TEXTURE_2D, id)
   }
 
+  detach: func {
+    glBindTexture(GL_TEXTURE_2D, 0)
+  }
+
 }
 
 /**

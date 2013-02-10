@@ -13,13 +13,20 @@ import structs/[ArrayList]
  */
 VAO: abstract class {
 
+    program: ShaderProgram
 
-    new: static func -> This {
+    new: static func (program: ShaderProgram) -> This {
         version (!android) {
-            return HardVAO new()
+            return HardVAO new(program)
         }
 
-        return SoftVAO new()
+        return SoftVAO new(program)
+    }
+
+    add: func ~friendly (name: String, numComponents: Int, type: GLenum,
+        normalized: Bool, stride: Int, pointer: Pointer) {
+
+        add(VertexAttribInfo new(program, name, numComponents, type, normalized, stride, pointer))
     }
 
     add: abstract func (vai: VertexAttribInfo)
@@ -37,7 +44,7 @@ version (!android) {
 
         id: Int
 
-        init: func {
+        init: func (=program) {
             glGenVertexArrays(1, id&)
             bind()
         }
@@ -70,7 +77,7 @@ SoftVAO: class extends VAO {
 
     vertexAttribs := ArrayList<VertexAttribInfo> new()
 
-    init: func {
+    init: func (=program) {
 
     }
 

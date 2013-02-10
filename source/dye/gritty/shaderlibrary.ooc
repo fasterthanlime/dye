@@ -30,10 +30,11 @@ ShaderLibrary: class {
                 getTexture100()
             case ShaderVersion GLSL_130 =>
                 getTexture130()
-            //case ShaderVersion GLSL_150 =>
-            //    getTexture150()
+            case ShaderVersion GLSL_150 =>
+                // FIXME: write a GLSL 1.5 shader for that
+                getTexture130()
             case =>
-                Exception new("No texture shader for GLSL_150 yet!") throw()
+                Exception new("No texture shader for your target yet!") throw()
                 null
         }
     }
@@ -142,26 +143,26 @@ ShaderLibrary: class {
         vertex := "
             #version 100
 
-            attribute vec2 position;
-            attribute vec2 texcoord;
-            varying vec2 coord;
+            attribute vec2 Position;
+            attribute vec2 TexCoordIn;
+            varying vec2 TexCoordOut;
 
             void main()
             {
-                coord = texcoord;
-                gl_Position = vec4(position * 0.01, 0.0, 1.0);
+                TexCoordOut = TexCoordIn;
+                gl_Position = vec4(Position * 0.01, 0.0, 1.0);
             }
         "
 
         fragment := "
             #version 100
 
-            uniform sampler2D tex;
-            varying lowp vec2 coord;
+            uniform sampler2D Texture;
+            varying mediump vec2 TexCoordOut;
 
             void main()
             {
-                gl_FragColor = texture2D(tex, coord);
+                gl_FragColor = texture2D(Texture, TexCoordOut);
             }
         "
 
@@ -172,28 +173,28 @@ ShaderLibrary: class {
         vertex := "
             #version 130
 
-            in vec2 position;
-            in vec2 texcoord;
-            out vec2 coord;
+            in vec2 Position;
+            in vec2 TexCoordIn;
+            out vec2 TexCoordOut;
 
             void main()
             {
-                coord = texcoord;
-                gl_Position = vec4(position * 0.01, 0.0, 1.0);
+                TexCoordOut = TexCoordIn;
+                gl_Position = vec4(Position * 0.01, 0.0, 1.0);
             }
         "
 
         fragment := "
             #version 130
 
-            uniform sampler2D tex;
+            uniform sampler2D Texture;
 
-            in vec2 coord;
-            out vec4 outColor;
+            in vec2 TexCoordOut;
+            out vec4 OutColor;
 
             void main()
             {
-                outColor = texture2D(tex, coord);
+                OutColor = texture2D(Texture, TexCoordOut);
             }
         "
 

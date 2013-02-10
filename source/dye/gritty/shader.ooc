@@ -1,6 +1,5 @@
 
 // our stuff
-import dye/gritty/vao
 
 // third-party stuff
 import sdl2/[OpenGL]
@@ -84,11 +83,8 @@ ShaderProgram: class {
 
     id: Int
 
-    vao: VAO
-
     init: func (=vertex, =fragment) {
         id = glCreateProgram()
-        vao = VAO new()
 
         attach(vertex)
         attach(fragment)
@@ -122,19 +118,11 @@ ShaderProgram: class {
         ShaderException new(class, message) throw()
     }
 
-    vertexAttribPointer: func (name: String, numComponents: Int, type: GLenum,
-        normalized: Bool, stride: Int, pointer: Pointer) {
-
-        vao add(VertexAttribInfo new(this, name, numComponents, type, normalized, stride, pointer))
-    }
-
     use: func {
         glUseProgram(id)
-        vao bind()
     }
 
     detach: func {
-        vao detach()
         glUseProgram(0)
     }
 
