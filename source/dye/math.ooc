@@ -57,6 +57,14 @@ Vec2: class {
         y = py
     }
 
+    zero?: func -> Bool {
+        x == 0.0 && y == 0.0
+    }
+
+    unit?: func -> Bool {
+        x == 1.0 && y == 1.0
+    }
+
     snap: func (size: Int) -> This {
         ix := ceil(- 0.5 + (x / size as Float)) * size
         iy := ceil(- 0.5 + (y / size as Float)) * size
@@ -344,35 +352,21 @@ Matrix4: class {
     }
 
     /**
-     * Create a new orthographic projection matrix
-     *
-     * Somehow similar to glOrtho
+     * Create a new identity matrix
      */
-    newOrtho: static func (left, right, bottom, top, near, far: Float) -> This {
-        (l, r, b, t) := (left, right, bottom, top)
-        (n, f) := (near, far)
-
-        w := r - l // width
-        h := t - b // height
-        d := f - n // depth
-
-        /*
-         * Source: http://www.songho.ca/opengl/gl_projectionmatrix.html
-         *
-         * Converted by hand to column-major
-         */
+    newIdentity: static func -> This {
         new([
-            2.0 / w,        0.0,             0.0,           0.0,
-            0.0,            2.0 / h,         0.0,           0.0,
-            0.0,            0.0,            -2.0 / d,       0.0,
-            ((r + l) / -w), ((t + b) / -h), ((f + n) / -d), 1.0
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
         ])
     }
 
     /**
      * Create a new translation matrix
      */
-    newTranslation: static func (x, y, z: Float) -> This {
+    newTranslate: static func (x, y, z: Float) -> This {
         new([
             1.0,    0.0,    0.0,    0.0,
             0.0,    1.0,    0.0,    0.0,
@@ -423,6 +417,59 @@ Matrix4: class {
         ])
     }
 
+    /**
+     * Create a new orthographic projection matrix
+     *
+     * Somehow similar to glOrtho
+     */
+    newOrtho: static func (left, right, bottom, top, near, far: Float) -> This {
+        (l, r, b, t) := (left, right, bottom, top)
+        (n, f) := (near, far)
+
+        w := r - l // width
+        h := t - b // height
+        d := f - n // depth
+
+        /*
+         * Source: http://www.songho.ca/opengl/gl_projectionmatrix.html
+         *
+         * Converted by hand to column-major
+         */
+        new([
+            2.0 / w,        0.0,             0.0,           0.0,
+            0.0,            2.0 / h,         0.0,           0.0,
+            0.0,            0.0,            -2.0 / d,       0.0,
+            ((r + l) / -w), ((t + b) / -h), ((f + n) / -d), 1.0
+        ])
+    }
+
+    /**
+     * Multiply two matrices.
+     *
+     * This is a naive, unoptimized, O(n^3) function.
+     */
+    mul: func (m2: This) -> This {
+        m1 := this
+        res := Float[16] new()
+
+        for (row in 0..4) {
+            for (col in 0..4) {
+                product := 0.0
+
+                for (inner in 0..4) {
+                    product += m1 values[inner * 4 + row] * m2 values[col * 4 + inner]
+                }
+                res[col * 4 + row] = product
+            }
+        }
+
+        new(res)
+    }
+
+    /**
+     * Return a pointer to the raw data - suitable to be passed
+     * as an OpenGL uniform, for example.
+     */
     pointer: Float* {
         get {
             values data
@@ -449,6 +496,10 @@ Matrix4: class {
         }
     }
 
+}
+
+operator * (m1, m2: Matrix4) -> Matrix4 {
+    m1 mul(m2) 
 }
 
 MatrixException: class extends Exception {

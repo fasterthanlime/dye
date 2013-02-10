@@ -196,7 +196,7 @@ DyeContext: class {
     }
 
     draw: func {
-        currentScene render(this)
+        currentScene render(this, Matrix4 newIdentity())
         renderCursor()
     }
 
@@ -204,7 +204,7 @@ DyeContext: class {
         if (!cursorSprite) { return }
 
         cursorSprite pos set!(input getMousePos() add(cursorOffset))
-        cursorSprite render(this)
+        cursorSprite render(this, Matrix4 newIdentity())
     }
 
     quit: func {
@@ -268,10 +268,10 @@ GlDrawable: abstract class {
     visible := true
 
     // You can use OpenGL calls here
-    render: func (dye: DyeContext) {
+    render: func (dye: DyeContext, modelView: Matrix4) {
         if (!visible) return
 
-        draw(dye)
+        draw(dye, computeModelView(modelView))
     }
 
     center!: func (dye: DyeContext, size: Vec2) {
@@ -282,7 +282,33 @@ GlDrawable: abstract class {
         pos set!(dye width / 2, dye height / 2)
     }
 
-    draw: abstract func (dye: DyeContext)
+    draw: abstract func (dye: DyeContext, modelView: Matrix4)
+
+    computeModelView: func (input: Matrix4) -> Matrix4 {
+        modelView: Matrix4
+        
+        if (input) {
+            modelView = input
+        } else {
+            modelView = Matrix4 newIdentity()
+        }
+
+        // order of operations: translate, rotate, scale
+
+        if (!pos zero?()) {
+            modelView = Matrix4 newTranslate(pos x, pos y, 0.0) * modelView
+        }
+
+        if (angle != 0.0) {
+            modelView = Matrix4 newRotateZ(angle) * modelView
+        }
+
+        if (!scale unit?()) {
+            modelView = Matrix4 newScale(scale x, scale y, 1.0) * modelView
+        }
+
+        modelView
+    }
 
 }
 
@@ -290,13 +316,13 @@ GlGroup: class extends GlDrawable {
 
     children := ArrayList<GlDrawable> new()
 
-    draw: func (dye: DyeContext) {
-        drawChildren(dye)
+    draw: func (dye: DyeContext, modelView: Matrix4) {
+        drawChildren(dye, computeModelView(modelView))
     }
     
-    drawChildren: func (dye: DyeContext) {
+    drawChildren: func (dye: DyeContext, modelView: Matrix4) {
         for (c in children) {
-            c render(dye)
+            c render(dye, modelView)
         }
     }
 
