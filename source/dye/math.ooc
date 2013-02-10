@@ -310,3 +310,42 @@ extend Int {
 
 }
 
+
+/**
+ * A 4x4 matrix, mostly used for transformations
+ */
+Matrix4: class {
+
+    /* 16 floats, row-major format */
+    data: Float[]
+
+    init: func (=data) {
+        
+    }
+
+    /**
+     * Create a new orthographic projection matrix
+     *
+     * Somehow similar to glOrtho
+     */
+    ortho: func (left, right, bottom, top, near, far: Float) {
+        (l, r, b, t) := (left, right, bottom, top)
+        (n, f) := (near, far)
+
+        w := r - l // width
+        h := t - b // height
+        d := f - n // depth
+
+        /*
+         * Source: http://www.songho.ca/opengl/gl_projectionmatrix.html
+         */
+        new([
+            2.0 / w,     0.0,        0.0,      (r + l) / -w,
+            0.0,         2.0 / h,    0.0,      (t + b) / -h,
+            0.0,         0.0,       -2.0 / d,  (f + n) / -d,
+            0.0,         0.0,        0.0,      1.0
+        ])
+    }
+
+}
+
