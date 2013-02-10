@@ -358,15 +358,69 @@ Matrix4: class {
 
         /*
          * Source: http://www.songho.ca/opengl/gl_projectionmatrix.html
-         * Note: it's handier to write initializers in row-major format,
-         * but you have to transpose it afterwards to get it right
+         *
+         * Converted by hand to column-major
          */
         new([
-            2.0 / w,     0.0,        0.0,      0.0 - ((r + l) / w),
-            0.0,         2.0 / h,    0.0,      0.0 - ((t + b) / h),
-            0.0,         0.0,       -2.0 / d,  0.0 - ((f + n) / d),
-            0.0,         0.0,        0.0,      1.0
-        ]) transpose()
+            2.0 / w,        0.0,             0.0,           0.0,
+            0.0,            2.0 / h,         0.0,           0.0,
+            0.0,            0.0,            -2.0 / d,       0.0,
+            ((r + l) / -w), ((t + b) / -h), ((f + n) / -d), 1.0
+        ])
+    }
+
+    /**
+     * Create a new translation matrix
+     */
+    newTranslation: static func (x, y, z: Float) -> This {
+        new([
+            1.0,    0.0,    0.0,    0.0,
+            0.0,    1.0,    0.0,    0.0,
+            0.0,    0.0,    1.0,    0.0,
+            x,      y,      z,      1.0 
+        ])
+    }
+
+    /**
+     * Create a new rotation matrix around axis (0.0, 0.0, 1.0)
+     */
+    newRotateZ: static func (a: Float) -> This {
+
+        /*
+         * Source: http://stackoverflow.com/questions/3982418
+         *
+         * Converted by hand to column-major
+         */
+        b := -a
+
+        c := b cos()
+        s := b sin()
+
+        new([
+             c,  s,   0,   0,
+            -s,  c,   0,   0,
+            0,   0,   1,   0,
+            0,   0,   0,   1
+        ])
+    }
+
+    /**
+     * Create a new scaling matrix
+     */
+    newScale: static func (x, y, z: Float) -> This {
+        /*
+         * Source: http://en.wikipedia.org/wiki/Transformation_matrix#Scaling
+         * 
+         * Beautiful, it's the same in row-major and column-major :D
+         * ie. m transposed() == m
+         */
+
+        new([
+            x, 0, 0, 0
+            0, y, 0, 0
+            0, 0, z, 0
+            0, 0, 0, 1
+        ])
     }
 
     pointer: Float* {
