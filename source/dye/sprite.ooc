@@ -163,7 +163,11 @@ GlSprite: class extends GlDrawable {
         texture bind()
         glUniform1f(texloc, 0)
 
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+        glDisable(GL_BLEND)
 
         vao detach()
         program detach()
