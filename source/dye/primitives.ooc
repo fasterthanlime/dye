@@ -39,9 +39,13 @@ GlRectangle: class extends GlDrawable {
     height: Float { get { size y } }
 
     program: ShaderProgram
-    vbo: FloatVBO 
     vao: VAO
+
+    vbo: FloatVBO 
     vertices: Float[]
+
+    /* Uniforms */
+    projLoc: Int
 
     init: func (size := vec2(16, 16)) {
         this size = size clone()
@@ -52,6 +56,8 @@ GlRectangle: class extends GlDrawable {
 
         vao = VAO new(program)
         vao add("position", 2, GL_FLOAT, false, 0, 0 as Pointer)
+
+        projLoc = program getUniformLocation("Projection")
     }
 
     draw: func (dye: DyeContext) {
@@ -59,6 +65,8 @@ GlRectangle: class extends GlDrawable {
         vbo bind()
         program use()
         vao bind()
+
+        glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 

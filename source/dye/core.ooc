@@ -86,6 +86,8 @@ DyeContext: class {
     cursorOffset := vec2(0, 0)
     cursorNumStates := 0
 
+    projectionMatrix: Matrix4
+
     init: func (width, height: Int, title: String, fullscreen := false,
             windowWidth := -1, windowHeight := -1) {
         size = vec2i(width, height)
@@ -224,6 +226,9 @@ DyeContext: class {
 	logger info("GLSL version: %s" format(glGetString(GL_SHADING_LANGUAGE_VERSION)))
 
         setClearColor(clearColor)
+
+        projectionMatrix = Matrix4 newOrtho(0, size x, 0, size y, -1.0, 1.0)
+
         //fbo = Fbo new(this, size x, size y)
     }
 

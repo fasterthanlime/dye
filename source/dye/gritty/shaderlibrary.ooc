@@ -67,11 +67,12 @@ ShaderLibrary: class {
         vertex := "
             #version 100
 
+            uniform mat4 Projection;
             attribute vec2 position;
 
             void main()
             {
-                gl_Position = vec4( position, 0.0, 1.0 );
+                gl_Position = Projection * vec4(position, 0.0, 1.0);
             }
         "
 
@@ -80,7 +81,7 @@ ShaderLibrary: class {
 
             void main()
             {
-                gl_FragColor = vec4( 0.0, 1.0, 0.0, 1.0 );
+                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
             }
         "
 
@@ -91,11 +92,12 @@ ShaderLibrary: class {
         vertex := "
             #version 130
 
+            uniform mat4 Projection;
             in vec2 position;
 
             void main()
             {
-                gl_Position = vec4( position, 0.0, 1.0 );
+                gl_Position = Projection * vec4(position, 0.0, 1.0);
             }
         "
 
@@ -106,7 +108,7 @@ ShaderLibrary: class {
 
             void main()
             {
-                outColor = vec4( 0.0, 1.0, 0.0, 1.0 );
+                outColor = vec4(1.0, 1.0, 1.0, 1.0);
             }
         "
 
@@ -117,11 +119,12 @@ ShaderLibrary: class {
         vertex := "
             #version 150
 
+            uniform mat4 Projection;
             in vec2 position;
 
             void main()
             {
-                gl_Position = vec4( position, 0.0, 1.0 );
+                gl_Position = Projection * vec4(position, 0.0, 1.0);
             }
         "
 
@@ -132,7 +135,7 @@ ShaderLibrary: class {
 
             void main()
             {
-                outColor = vec4( 0.0, 1.0, 0.0, 1.0 );
+                outColor = vec4(1.0, 1.0, 1.0, 1.0);
             }
         "
 
@@ -143,6 +146,8 @@ ShaderLibrary: class {
         vertex := "
             #version 100
 
+            uniform mat4 Projection;
+
             attribute vec2 Position;
             attribute vec2 TexCoordIn;
             varying vec2 TexCoordOut;
@@ -150,7 +155,7 @@ ShaderLibrary: class {
             void main()
             {
                 TexCoordOut = TexCoordIn;
-                gl_Position = vec4(Position * 0.01, 0.0, 1.0);
+                gl_Position = Projection * vec4(Position, 0.0, 1.0);
             }
         "
 
@@ -173,6 +178,8 @@ ShaderLibrary: class {
         vertex := "
             #version 130
 
+            uniform mat4 Projection;
+
             in vec2 Position;
             in vec2 TexCoordIn;
             out vec2 TexCoordOut;
@@ -180,7 +187,7 @@ ShaderLibrary: class {
             void main()
             {
                 TexCoordOut = TexCoordIn;
-                gl_Position = vec4(Position * 0.01, 0.0, 1.0);
+                gl_Position = Projection * vec4(Position, 0.0, 1.0);
             }
         "
 

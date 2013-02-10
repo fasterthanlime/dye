@@ -316,11 +316,31 @@ extend Int {
  */
 Matrix4: class {
 
-    /* 16 floats, row-major format */
-    data: Float[]
+    /** 16 floats, column-major format */
+    values: Float[]
 
-    init: func (=data) {
-        
+    /**
+     * Initialize from a 16-floats array
+     */
+    init: func (=values) {
+        _checkSize(values)
+    }
+
+    transpose: func -> This {
+        new([
+            values[ 0], values[ 4], values[ 8], values[12]
+            values[ 1], values[ 5], values[ 9], values[13]
+            values[ 2], values[ 6], values[10], values[14]
+            values[ 3], values[ 7], values[11], values[15]
+        ])
+    }
+
+    get: func (column, row: Int) -> Float {
+        values[column * 4 + row]
+    }
+
+    set: func (column, row: Int, value: Float) {
+        values[column * 4 + row] = value
     }
 
     /**
@@ -328,7 +348,7 @@ Matrix4: class {
      *
      * Somehow similar to glOrtho
      */
-    ortho: func (left, right, bottom, top, near, far: Float) {
+    newOrtho: static func (left, right, bottom, top, near, far: Float) -> This {
         (l, r, b, t) := (left, right, bottom, top)
         (n, f) := (near, far)
 
@@ -338,13 +358,49 @@ Matrix4: class {
 
         /*
          * Source: http://www.songho.ca/opengl/gl_projectionmatrix.html
+         * Note: it's handier to write initializers in row-major format,
+         * but you have to transpose it afterwards to get it right
          */
         new([
-            2.0 / w,     0.0,        0.0,      (r + l) / -w,
-            0.0,         2.0 / h,    0.0,      (t + b) / -h,
-            0.0,         0.0,       -2.0 / d,  (f + n) / -d,
+            2.0 / w,     0.0,        0.0,      0.0 - ((r + l) / w),
+            0.0,         2.0 / h,    0.0,      0.0 - ((t + b) / h),
+            0.0,         0.0,       -2.0 / d,  0.0 - ((f + n) / d),
             0.0,         0.0,        0.0,      1.0
-        ])
+        ]) transpose()
+    }
+
+    pointer: Float* {
+        get {
+            values data
+        }
+    }
+
+    toString: func -> String {
+        "[%5.5f, %5.5f, %5.5f, %5.5f\n" format(values[0], values[4], values[8],  values[12]) +
+        " %5.5f, %5.5f, %5.5f, %5.5f\n" format(values[1], values[5], values[9],  values[13]) +
+        " %5.5f, %5.5f, %5.5f, %5.5f\n" format(values[2], values[6], values[10], values[14]) +
+        " %5.5f, %5.5f, %5.5f, %5.5f]"  format(values[3], values[7], values[11], values[15])
+    }
+
+    _: String {
+        get {
+            toString()
+        }
+    }
+
+    _checkSize: static func (m: Float[]) {
+        if (m length != 16) {
+            MatrixException new(This name, "Matrix4 initializers should take 16 floats, not %d" \
+                format(m length)) throw()
+        }
+    }
+
+}
+
+MatrixException: class extends Exception {
+
+    init: func (origin: String, msg: String) {
+        super(origin, msg)
     }
 
 }
