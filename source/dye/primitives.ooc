@@ -45,7 +45,7 @@ GlRectangle: class extends GlDrawable {
     vertices: Float[]
 
     /* Uniforms */
-    projLoc: Int
+    projLoc, modelLoc: Int
 
     init: func (size := vec2(16, 16)) {
         this size = size clone()
@@ -55,9 +55,18 @@ GlRectangle: class extends GlDrawable {
         program = ShaderLibrary getSolidColor()
 
         vao = VAO new(program)
-        vao add("position", 2, GL_FLOAT, false, 0, 0 as Pointer)
+        vao add("Position", 2, GL_FLOAT, false, 0, 0 as Pointer)
 
         projLoc = program getUniformLocation("Projection")
+        modelLoc = program getUniformLocation("ModelView")
+    }
+
+    render: func (dye: DyeContext, modelView: Matrix4) {
+        if (center) {
+            modelView = Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0) * modelView
+        }
+
+        super(dye, modelView)
     }
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
@@ -67,6 +76,7 @@ GlRectangle: class extends GlDrawable {
         vao bind()
 
         glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
+        glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 
@@ -82,16 +92,6 @@ GlRectangle: class extends GlDrawable {
             0.0, size y,
             size x, size y
         ]
-
-        if (center) {
-            halfX := size x * 0.5
-            halfY := size y * 0.5
-
-            for (i in 0..4) {
-                vertices[i * 2]     = vertices[i * 2]     - halfX
-                vertices[i * 2 + 1] = vertices[i * 2 + 1] - halfY
-            }
-        }
 
         vbo bind()
         vbo data(vertices)

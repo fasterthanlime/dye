@@ -68,11 +68,13 @@ ShaderLibrary: class {
             #version 100
 
             uniform mat4 Projection;
-            attribute vec2 position;
+            uniform mat4 ModelView;
+
+            attribute vec2 Position;
 
             void main()
             {
-                gl_Position = Projection * vec4(position, 0.0, 1.0);
+                gl_Position = Projection * ModelView * vec4(Position, 0.0, 1.0);
             }
         "
 
@@ -93,22 +95,24 @@ ShaderLibrary: class {
             #version 130
 
             uniform mat4 Projection;
-            in vec2 position;
+            uniform mat4 ModelView;
+
+            in vec2 Position;
 
             void main()
             {
-                gl_Position = Projection * vec4(position, 0.0, 1.0);
+                gl_Position = Projection * ModelView * vec4(Position, 0.0, 1.0);
             }
         "
 
         fragment := "
             #version 130
 
-            out vec4 outColor;
+            out vec4 OutColor;
 
             void main()
             {
-                outColor = vec4(1.0, 1.0, 1.0, 1.0);
+                OutColor = vec4(1.0, 1.0, 1.0, 1.0);
             }
         "
 
@@ -120,22 +124,24 @@ ShaderLibrary: class {
             #version 150
 
             uniform mat4 Projection;
-            in vec2 position;
+            uniform mat4 ModelView;
+
+            in vec2 Position;
 
             void main()
             {
-                gl_Position = Projection * vec4(position, 0.0, 1.0);
+                gl_Position = Projection * ModelView * vec4(Position, 0.0, 1.0);
             }
         "
 
         fragment := "
             #version 150
 
-            out vec4 outColor;
+            out vec4 OutColor;
 
             void main()
             {
-                outColor = vec4(1.0, 1.0, 1.0, 1.0);
+                OutColor = vec4(1.0, 1.0, 1.0, 1.0);
             }
         "
 
@@ -147,6 +153,7 @@ ShaderLibrary: class {
             #version 100
 
             uniform mat4 Projection;
+            uniform mat4 ModelView;
 
             attribute vec2 Position;
             attribute vec2 TexCoordIn;
@@ -155,7 +162,7 @@ ShaderLibrary: class {
             void main()
             {
                 TexCoordOut = TexCoordIn;
-                gl_Position = Projection * vec4(Position, 0.0, 1.0);
+                gl_Position = Projection * ModelView * vec4(Position, 0.0, 1.0);
             }
         "
 
@@ -179,6 +186,7 @@ ShaderLibrary: class {
             #version 130
 
             uniform mat4 Projection;
+            uniform mat4 ModelView;
 
             in vec2 Position;
             in vec2 TexCoordIn;
@@ -187,7 +195,7 @@ ShaderLibrary: class {
             void main()
             {
                 TexCoordOut = TexCoordIn;
-                gl_Position = Projection * vec4(Position, 0.0, 1.0);
+                gl_Position = Projection * ModelView * vec4(Position, 0.0, 1.0);
             }
         "
 
