@@ -91,11 +91,13 @@ GlSprite: class extends GlDrawable {
 
     texture: Texture
     program: ShaderProgram
-    vbo: FloatVBO 
     vao: VAO
+
+    vbo: FloatVBO 
     data: Float[]
-    texloc: Int
-    colorloc: Int
+
+    /* Uniforms */
+    texLoc, projLoc: Int
 
     logger := static Log getLogger(This name)
 
@@ -115,9 +117,9 @@ GlSprite: class extends GlDrawable {
         vao add("TexCoordIn", 2, GL_FLOAT, false, stride, 0 as Pointer)
         vao add("Position", 2, GL_FLOAT, false, stride, (2 * Float size) as Pointer)
 
-        texloc = glGetUniformLocation(program id, "Texture" toCString())
-        logger debug("texloc = %d", texloc)
-        //colorloc = glGetUniformLocation(program id, "inColor" toCString())
+        texLoc = program getUniformLocation("Texture")
+        projLoc = program getUniformLocation("Projection")
+        logger debug("texLoc = %d, projLoc = %d", texLoc, projLoc)
     }
 
     render: func (dye: DyeContext) {
@@ -161,7 +163,9 @@ GlSprite: class extends GlDrawable {
 
         glActiveTexture(GL_TEXTURE0)
         texture bind()
-        glUniform1f(texloc, 0)
+        glUniform1f(texLoc, 0)
+
+        glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
 
         glEnable(GL_BLEND)
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)

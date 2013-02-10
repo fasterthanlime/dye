@@ -126,6 +126,10 @@ ShaderProgram: class {
         glUseProgram(0)
     }
 
+    getUniformLocation: func (name: String) -> Int {
+        glGetUniformLocation(id, name toCString())
+    }
+
 }
 
 ShaderException: class extends Exception {
