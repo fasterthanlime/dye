@@ -477,10 +477,14 @@ Matrix4: class {
     }
 
     toString: func -> String {
-        "[%5.5f, %5.5f, %5.5f, %5.5f\n" format(values[0], values[4], values[8],  values[12]) +
-        " %5.5f, %5.5f, %5.5f, %5.5f\n" format(values[1], values[5], values[9],  values[13]) +
-        " %5.5f, %5.5f, %5.5f, %5.5f\n" format(values[2], values[6], values[10], values[14]) +
-        " %5.5f, %5.5f, %5.5f, %5.5f]"  format(values[3], values[7], values[11], values[15])
+"[[%5.5f], [%5.5f], [%5.5f], [%5.5f] 
+ [%5.5f], [%5.5f], [%5.5f], [%5.5f] 
+ [%5.5f], [%5.5f], [%5.5f], [%5.5f] 
+ [%5.5f], [%5.5f], [%5.5f], [%5.5f]]" format(
+         values[0], values[4], values[8],  values[12], 
+         values[1], values[5], values[9],  values[13], 
+         values[2], values[6], values[10], values[14], 
+         values[3], values[7], values[11], values[15])
     }
 
     _: String {
