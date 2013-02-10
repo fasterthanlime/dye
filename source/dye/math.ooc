@@ -282,6 +282,18 @@ operator == (v1, v2: Vec2i) -> Bool {
 
 vec2i: func (x, y: Int) -> Vec2i { Vec2i new(x, y) }
 
+extend Float {
+
+    toRadians: func -> This {
+        this * PI / 180.0
+    }
+
+    toDegrees: func -> This {
+        this * 180.0 /  PI
+    }
+
+}
+
 extend Int {
 
     repeat: func (min, max: This) -> This {
@@ -377,6 +389,8 @@ Matrix4: class {
 
     /**
      * Create a new rotation matrix around axis (0.0, 0.0, 1.0)
+     * 
+     * :param: a is the angle in radians
      */
     newRotateZ: static func (a: Float) -> This {
 

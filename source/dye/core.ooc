@@ -1,12 +1,15 @@
 
+// third-party stuff
 use deadlogger
 import deadlogger/[Log]
 
 use sdl2
 import sdl2/[Core, OpenGL]
 
+// sdk stuff
 import structs/ArrayList
 
+// our stuff
 use dye
 import dye/[input, math, sprite, fbo]
 
@@ -298,21 +301,21 @@ GlDrawable: abstract class {
 
         // order of operations: translate, rotate, scale
 
-        if (!pos zero?()) {
-            modelView = Matrix4 newTranslate(pos x, pos y, 0.0) * modelView
-            "after translation modelView = " println()
+        if (!scale unit?()) {
+            modelView = Matrix4 newScale(scale x, scale y, 1.0) * modelView
+            "after scale modelView = " println()
             modelView _ println()
         }
 
         if (angle != 0.0) {
-            modelView = Matrix4 newRotateZ(angle) * modelView
+            modelView = Matrix4 newRotateZ(angle toRadians()) * modelView
             "after rotation modelView = " println()
             modelView _ println()
         }
 
-        if (!scale unit?()) {
-            modelView = Matrix4 newScale(scale x, scale y, 1.0) * modelView
-            "after scale modelView = " println()
+        if (!pos zero?()) {
+            modelView = Matrix4 newTranslate(pos x, pos y, 0.0) * modelView
+            "after translation modelView = " println()
             modelView _ println()
         }
 

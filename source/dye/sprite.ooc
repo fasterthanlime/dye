@@ -125,7 +125,7 @@ GlSprite: class extends GlDrawable {
 
     render: func (dye: DyeContext, modelView: Matrix4) {
         if (center) {
-            modelView = Matrix4 newTranslate(width * scale x * -0.5, height * scale y * -0.5, 0.0) * modelView
+            modelView = Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0) * modelView
         }
 
         super(dye, modelView)
