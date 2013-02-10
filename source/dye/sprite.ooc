@@ -1,10 +1,13 @@
 
 // our stuff
 import dye/[core, math, anim]
-import dye/gritty/[shader, shaderlibrary, texture, vbo]
+import dye/gritty/[shader, shaderlibrary, texture, vbo, vao]
 
 // third-party stuff
 import sdl2/[OpenGL]
+
+use deadlogger
+import deadlogger/[Log, Logger]
 
 GlGridSprite: class extends GlDrawable implements GlAnimSource {
 
@@ -89,9 +92,12 @@ GlSprite: class extends GlDrawable {
     texture: Texture
     program: ShaderProgram
     vbo: FloatVBO 
+    vao: VAO
     data: Float[]
     texloc: Int
     colorloc: Int
+
+    logger := static Log getLogger(This name)
 
     init: func (path: String) {
         texture = TextureLoader load(path)
@@ -104,13 +110,14 @@ GlSprite: class extends GlDrawable {
 
         program = ShaderLibrary getTexture()
 
+        vao = VAO new(program)
         stride := 4 * Float size
-        program vertexAttribPointer("texcoord", 2, GL_FLOAT, false, stride, 0 as Pointer)
-        program vertexAttribPointer("position", 2, GL_FLOAT, false, stride, (2 * Float size) as Pointer)
+        vao add("TexCoordIn", 2, GL_FLOAT, false, stride, 0 as Pointer)
+        vao add("Position", 2, GL_FLOAT, false, stride, (2 * Float size) as Pointer)
 
-        texloc = glGetUniformLocation(program id, "tex" toCString())
-        colorloc = glGetUniformLocation(program id, "inColor" toCString())
-        "texloc = %d, colorloc = %d" printfln(texloc, colorloc)
+        texloc = glGetUniformLocation(program id, "Texture" toCString())
+        logger debug("texloc = %d", texloc)
+        //colorloc = glGetUniformLocation(program id, "inColor" toCString())
     }
 
     render: func (dye: DyeContext) {
@@ -148,20 +155,19 @@ GlSprite: class extends GlDrawable {
         // FIXME: colors
         // glColor4f(brightness, brightness, brightness, opacity)
 
-        // FIXME: texture
-        //dye withTexture(GL_TEXTURE_2D, texture id, ||
-
-        "Drawing" println()
-
+        vbo bind()
         program use()
+        vao bind()
 
         glActiveTexture(GL_TEXTURE0)
         texture bind()
         glUniform1f(texloc, 0)
 
-        vbo bind()
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
-        program vao detach()
+
+        vao detach()
+        program detach()
+        texture detach()
     }
 
 }

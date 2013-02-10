@@ -49,19 +49,19 @@ OpenGLVersion: class {
         // 4.2.0
 
         profile := OpenGLProfile DESKTOP
-        logger debug("ver string = %s", ver)
+        //logger debug("ver string = %s", ver)
 
         if (ver startsWith?(ES_PREFIX)) {
             profile = OpenGLProfile ES
             ver = ver[ES_PREFIX size..-1]
-            logger debug("got ES, now = %s", ver)
+            //logger debug("got ES, now = %s", ver)
         }
 
         numberString := ver split(" ")[0]
-        logger debug("numberString = %s", numberString)
+        //logger debug("numberString = %s", numberString)
 
         numbers := numberString split(".") map(|x| x toInt())
-        logger debug("elements in numbers = %d", numbers size)
+        //logger debug("elements in numbers = %d", numbers size)
 
         (major, minor) := (numbers[0], numbers[1])
 

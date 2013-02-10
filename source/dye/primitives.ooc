@@ -3,7 +3,7 @@ import sdl2/[OpenGL]
 
 use dye
 import dye/[core, math]
-import dye/gritty/[shader, shaderlibrary, texture, vbo]
+import dye/gritty/[shader, shaderlibrary, texture, vbo, vao]
 
 GlSegment: class extends GlDrawable {
 
@@ -40,6 +40,7 @@ GlRectangle: class extends GlDrawable {
 
     program: ShaderProgram
     vbo: FloatVBO 
+    vao: VAO
     vertices: Float[]
 
     init: func (size := vec2(16, 16)) {
@@ -48,14 +49,22 @@ GlRectangle: class extends GlDrawable {
         rebuild()
 
         program = ShaderLibrary getSolidColor()
-        program vertexAttribPointer("position", 2, GL_FLOAT, false, 0, 0 as Pointer)
+
+        vao = VAO new(program)
+        vao add("position", 2, GL_FLOAT, false, 0, 0 as Pointer)
     }
 
     draw: func (dye: DyeContext) {
+
         vbo bind()
         program use()
+        vao bind()
+
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
-        program vao detach()
+
+        vao detach()
+        program detach()
+
     }
 
     rebuild: func {
