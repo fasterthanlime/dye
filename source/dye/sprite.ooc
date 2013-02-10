@@ -31,7 +31,7 @@ GlGridSprite: class extends GlDrawable implements GlAnimSource {
         size = vec2(texture width / xnum, texture height / ynum)
     }
 
-    draw: func (dye: DyeContext) {
+    draw: func (dye: DyeContext, modelView: Matrix4) {
         // FIXME: colors
         //glColor4f(brightness, brightness, brightness, opacity)
 
@@ -122,12 +122,12 @@ GlSprite: class extends GlDrawable {
         logger debug("texLoc = %d, projLoc = %d", texLoc, projLoc)
     }
 
-    render: func (dye: DyeContext) {
-        // FIXME: transformations
-        //if (center) {
-        //  glTranslatef(width * scale x * -0.5, height * scale y * -0.5, 0.0)
+    render: func (dye: DyeContext, modelView: Matrix4) {
+        if (center) {
+            modelView = Matrix4 newTranslate(width * scale x * -0.5, height * scale y * -0.5, 0.0) * modelView
+        }
 
-        super()
+        super(dye, modelView)
     }
 
     rebuild: func {
@@ -153,7 +153,7 @@ GlSprite: class extends GlDrawable {
         vbo data(data)
     }
 
-    draw: func (dye: DyeContext) {
+    draw: func (dye: DyeContext, modelView: Matrix4) {
         // FIXME: colors
         // glColor4f(brightness, brightness, brightness, opacity)
 

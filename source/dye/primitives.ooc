@@ -13,7 +13,7 @@ GlSegment: class extends GlDrawable {
     init: func (=p1, =p2) {
     }
 
-    draw: func (dye: DyeContext) {
+    draw: func (dye: DyeContext, modelView: Matrix4) {
         // FIXME: colors
         //dye color(color)
         // glLineWidth(2.5)
@@ -60,7 +60,7 @@ GlRectangle: class extends GlDrawable {
         projLoc = program getUniformLocation("Projection")
     }
 
-    draw: func (dye: DyeContext) {
+    draw: func (dye: DyeContext, modelView: Matrix4) {
 
         vbo bind()
         program use()
@@ -106,7 +106,7 @@ GlCross: class extends GlDrawable {
 
     init: func
 
-    draw: func (dye: DyeContext) {
+    draw: func (dye: DyeContext, modelView: Matrix4) {
         infinity := 1_000_000.0
 
         // FIXME: drawing & color
@@ -134,7 +134,7 @@ GlGrid: class extends GlDrawable {
     init: func {
     }
 
-    draw: func (dye: DyeContext) {
+    draw: func (dye: DyeContext, modelView: Matrix4) {
         infinity := 1_000_000.0
 
         // FIXME: drawing and color
