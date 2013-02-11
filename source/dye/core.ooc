@@ -133,6 +133,10 @@ DyeContext: class {
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
             windowSize x, windowSize y, flags)
         context = SDL glCreateContext(window) 
+        if (!context) {
+            Exception new("Couldn't initialize OpenGL Context: %s" format(SDL getError())) throw()
+        }
+
         SDL glMakeCurrent(window, context)
 
         input onWindowSizeChange(|x, y|
