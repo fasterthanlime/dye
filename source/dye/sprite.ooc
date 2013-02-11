@@ -169,9 +169,6 @@ GlSprite: class extends GlDrawable {
         glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
 
-        "ModelView matrix: " println()
-        modelView _ println()
-
         glEnable(GL_BLEND)
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 

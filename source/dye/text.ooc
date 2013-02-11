@@ -1,6 +1,8 @@
 
+/*
 use ftgl
 import ftgl
+*/
 
 import sdl2/[OpenGL]
 
@@ -14,11 +16,13 @@ import structs/HashMap
 
 GlText: class extends GlDrawable {
 
-    cache := static HashMap<String, Font> new()
+    // FIXME
+    //cache := static HashMap<String, Font> new()
     logger := static Log getLogger(This name)
 
     fontPath: String
-    font: Font
+    // FIXME
+    //font: Font
     color := Color white()
     value: String
 
@@ -27,22 +31,32 @@ GlText: class extends GlDrawable {
     fontWidth, fontHeight: Int
 
     init: func (=fontPath, =value, fontSize := 40) {
-        font = loadFont(fontPath, fontSize)
-        lineHeight = font getLineHeight()
+        // FIXME
+        //font = loadFont(fontPath, fontSize)
+        //lineHeight = font getLineHeight()
     }
 
     size: Vec2 {
         get {
+            /*
             bounds := font getBounds(value)
             vec2(bounds getWidth(), lineHeight)
+            */
+
+            // FIXME
+            vec(0, 0)
         }
     }
 
-    draw: func (dye: DyeContext) {
+    draw: func (dye: DyeContext, modelView: Matrix4) {
+        /*
         dye color(color)
         font render(value)
+        */
     }
 
+    // FIXME
+    /*
     loadFont: static func (fontPath: String, fontSize: Int) -> Font {
         key := "%s-%d" format(fontPath, fontSize)
 
@@ -55,6 +69,7 @@ GlText: class extends GlDrawable {
             font
         }
     }
+    */
 
 }
 
