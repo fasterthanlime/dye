@@ -16,8 +16,6 @@ import structs/[ArrayList]
  */
 Input: abstract class {
 
-    logger := static Log getLogger(This name)
-
     listeners := ArrayList<Listener> new()
 
     mousepos: Vec2 {
