@@ -22,8 +22,6 @@ RWopsReader: class extends Reader {
     /* our own housekeeping to figure out if we're at the end of the file */
     eof := false
 
-    marker: Long = 0
-
     init: func (path: String) {
         ops = RWops new(path, "rb")   
 

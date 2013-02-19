@@ -31,8 +31,7 @@ ShaderLibrary: class {
             case ShaderVersion GLSL_130 =>
                 getTexture130()
             case ShaderVersion GLSL_150 =>
-                // FIXME: write a GLSL 1.5 shader for that
-                getTexture130()
+                getTexture150()
             case =>
                 Exception new("No texture shader for your target yet!") throw()
                 null
@@ -210,6 +209,41 @@ ShaderLibrary: class {
             void main()
             {
                 OutColor = texture2D(Texture, TexCoordOut);
+            }
+        "
+
+        getProgram("tex130", vertex, fragment)
+    }
+
+    getTexture150: static func -> ShaderProgram {
+        vertex := "
+            #version 150
+
+            uniform mat4 Projection;
+            uniform mat4 ModelView;
+
+            in vec2 Position;
+            in vec2 TexCoordIn;
+            out vec2 TexCoordOut;
+
+            void main()
+            {
+                TexCoordOut = TexCoordIn;
+                gl_Position = Projection * ModelView * vec4(Position, 0.0, 1.0);
+            }
+        "
+
+        fragment := "
+            #version 150
+
+            uniform sampler2D Texture;
+
+            in vec2 TexCoordOut;
+            out vec4 OutColor;
+
+            void main()
+            {
+                OutColor = texture(Texture, TexCoordOut);
             }
         "
 
