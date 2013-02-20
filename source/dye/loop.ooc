@@ -16,23 +16,23 @@ import dye/[core]
 FixedLoop: class {
 
     dye: DyeContext
-    fpsGoal: Float
-    _computedFps := 0.0
+    fpsGoal: Float { get set }
+
+    // let's start out optimistic
+    _computedFps := 60.0
 
     fps: Float { get { _computedFps } }
 
     running := true
     paused := false
 
-    init: func (=dye, =fpsGoal) {
-        // let's start out optimistic
-        _computedFps = fpsGoal
-    }
+    init: func (=dye, =fpsGoal)
 
     run: func (body: Func) {
         maxFrameDuration := 1000.0 / fpsGoal
 
         t1 := SDL getTicks()
+        count := 0
 
         while (running) {
             t1 = SDL getTicks()
@@ -58,8 +58,13 @@ FixedLoop: class {
                 delay = maxFrameDuration
             }
 
-            current := 1000.0 / delta
-            _computedFps = _computedFps * 0.97 + current * 0.03
+            count += 1
+
+            if (count >= 30) {
+                count = 0
+                current := 1000.0 / delta
+                _computedFps = _computedFps * 0.97 + current * 0.03
+            }
 
             SDL delay(delay)
         }
