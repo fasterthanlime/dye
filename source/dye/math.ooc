@@ -399,10 +399,8 @@ Matrix4: class {
          *
          * Converted by hand to column-major
          */
-        b := -a
-
-        c := b cos()
-        s := b sin()
+        c := a cos()
+        s := a sin()
 
         new([
              c,  s,   0,   0,

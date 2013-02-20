@@ -116,8 +116,6 @@ DyeContext: class {
 	SDL glSetAttribute(SDL_GL_DEPTH_SIZE, 16)
 	SDL glSetAttribute(SDL_GL_DOUBLEBUFFER, 1)
 
-        input = SdlInput new(this)
-
         flags := SDL_WINDOW_OPENGL
         if (fullscreen) {
             version (apple) {
@@ -149,6 +147,7 @@ DyeContext: class {
 
         SDL glMakeCurrent(window, context)
 
+        input = SdlInput new(this)
         input onWindowSizeChange(|x, y|
             windowSize set!(x, y)
         )
