@@ -5,7 +5,7 @@ import dye/[core, math, anim]
 // third-party stuff
 import sdl2/[OpenGL]
 
-use stbi
+use stb-image
 
 use deadlogger
 import deadlogger/[Log, Logger]

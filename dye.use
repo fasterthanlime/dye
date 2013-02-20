@@ -1,6 +1,6 @@
 Name: dye
 Description: a simple graphics library
-Requires: sdl2, stbi
+Requires: sdl2, stb-image
 SourcePath: source
 Imports: dye/core
 
