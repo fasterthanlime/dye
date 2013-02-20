@@ -6,7 +6,7 @@ import dye/gritty/[io]
 // third-party stuff
 import sdl2/[OpenGL]
 
-use stbi
+use stb-image
 
 use deadlogger
 import deadlogger/[Log, Logger]
