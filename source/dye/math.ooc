@@ -434,9 +434,9 @@ Matrix4: class {
      *
      * Somehow similar to glOrtho
      */
-    newOrtho: static func (left, right, bottom, top, near, far: Float) -> This {
+    newOrtho: static func (left, right, bottom, top, _near, _far: Float) -> This {
         (l, r, b, t) := (left, right, bottom, top)
-        (n, f) := (near, far)
+        (n, f) := (_near, _far)
 
         w := r - l // width
         h := t - b // height

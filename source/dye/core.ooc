@@ -147,6 +147,11 @@ DyeContext: class {
 
         SDL glMakeCurrent(window, context)
 
+        version (windows) {
+            // we use glew on Windows
+            glewInit()
+        }
+
         input = SdlInput new(this)
         input onWindowSizeChange(|x, y|
             windowSize set!(x, y)
