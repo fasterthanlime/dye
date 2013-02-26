@@ -39,7 +39,7 @@ App: class {
         // override
     }
 
-    body: func {
+    update: func {
         // override
     }
 
@@ -49,7 +49,7 @@ App: class {
 
         loop := FixedLoop new(dye, fps)
         loop run(||
-            body()
+            update()
         )
     }
 
