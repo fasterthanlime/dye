@@ -31,6 +31,8 @@ GlRectangle: class extends GlDrawable {
 
     size: Vec2
     color := Color green()
+    opacity := 1.0
+
     center := true
     filled := true
     lineWidth := 2.0
@@ -44,8 +46,10 @@ GlRectangle: class extends GlDrawable {
     vbo: FloatVBO 
     vertices: Float[]
 
+    outlineIndices := static [0, 1, 3, 2]
+
     /* Uniforms */
-    projLoc, modelLoc: Int
+    projLoc, modelLoc, colorLoc: Int
 
     init: func (size := vec2(16, 16)) {
         this size = size clone()
@@ -59,6 +63,7 @@ GlRectangle: class extends GlDrawable {
 
         projLoc = program getUniformLocation("Projection")
         modelLoc = program getUniformLocation("ModelView")
+        colorLoc = program getUniformLocation("InColor")
     }
 
     render: func (dye: DyeContext, modelView: Matrix4) {
@@ -77,8 +82,14 @@ GlRectangle: class extends GlDrawable {
 
         glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
+        glUniform4f(colorLoc, color R, color G, color B, opacity)
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+        match filled {
+            case true  =>
+                glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+            case false =>
+                glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, outlineIndices data)
+        }
 
         vao detach()
         program detach()

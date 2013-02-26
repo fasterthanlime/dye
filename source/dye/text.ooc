@@ -38,9 +38,7 @@ GlText: class extends GlDrawable {
     }
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
-        // FIXME: color
-        //dye color(color)
-        font render(dye, value)
+        font render(dye, modelView, value, color)
     }
 
     loadFont: static func (fontPath: String, fontSize: Int) -> Font {

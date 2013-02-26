@@ -86,7 +86,7 @@ GlSprite: class extends GlDrawable {
 
     center := true
 
-    brightness := 1.0
+    color := Color white()
     opacity := 1.0
 
     texture: Texture
@@ -97,7 +97,7 @@ GlSprite: class extends GlDrawable {
     data: Float[]
 
     /* Uniforms */
-    texLoc, projLoc, modelLoc: Int
+    texLoc, projLoc, modelLoc, colorLoc: Int
 
     logger := static Log getLogger(This name)
 
@@ -123,7 +123,9 @@ GlSprite: class extends GlDrawable {
         texLoc = program getUniformLocation("Texture")
         projLoc = program getUniformLocation("Projection")
         modelLoc = program getUniformLocation("ModelView")
-        logger debug("texLoc = %d, projLoc = %d, modelLoc = %d", texLoc, projLoc, modelLoc)
+        colorLoc = program getUniformLocation("InColor")
+        logger debug("texLoc = %d, projLoc = %d, modelLoc = %d, colorLoc = %d",
+            texLoc, projLoc, modelLoc, colorLoc)
     }
 
     render: func (dye: DyeContext, modelView: Matrix4) {
@@ -158,9 +160,6 @@ GlSprite: class extends GlDrawable {
     }
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
-        // FIXME: colors
-        // glColor4f(brightness, brightness, brightness, opacity)
-
         vbo bind()
         program use()
         vao bind()
@@ -171,6 +170,7 @@ GlSprite: class extends GlDrawable {
 
         glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
+        glUniform4f(colorLoc, color R, color G, color B, opacity)
 
         glEnable(GL_BLEND)
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)

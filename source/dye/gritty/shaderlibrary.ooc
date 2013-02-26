@@ -137,10 +137,11 @@ ShaderLibrary: class {
             #version 150
 
             out vec4 OutColor;
+            uniform vec4 InColor;
 
             void main()
             {
-                OutColor = vec4(1.0, 1.0, 1.0, 1.0);
+                OutColor = InColor;
             }
         "
 
@@ -240,10 +241,11 @@ ShaderLibrary: class {
 
             in vec2 TexCoordOut;
             out vec4 OutColor;
+            uniform vec4 InColor;
 
             void main()
             {
-                OutColor = texture(Texture, TexCoordOut);
+                OutColor = texture(Texture, TexCoordOut) * InColor;
             }
         "
 

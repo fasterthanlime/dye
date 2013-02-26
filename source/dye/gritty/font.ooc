@@ -1,7 +1,8 @@
 
 // third-party stuff
 use dye
-import dye/[core, math]
+import dye/[core, math, sprite]
+import dye/gritty/[texture]
 
 use freetype2
 import freetype2
@@ -20,6 +21,8 @@ Font: class {
     fontSize: Float
     fontPath: String
 
+    color := Color white()
+
     init: func (=fontSize, =fontPath) {
         if (!_ftInitialized) {
             _ft init()
@@ -34,16 +37,16 @@ Font: class {
     }
 
     _loadCharset: func {
-        charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVXYZ"
-
-        // TODO: load glyphs here
-        _iterate(charset, |charPoint|
+        // load all printable ASCII characters for now
+        for (i in 32..127) {
+            charPoint := i as ULong
             index := _face getCharIndex(charPoint)
             _face loadGlyph(index, FTLoadFlag default)
 
-            glyph := Glyph new(_face@ glyph)
+            glyph := Glyph new(charPoint, _face@ glyph)
+            glyph sprite color = color // make them all point to the same thing
             glyphs put(charPoint, glyph)
-        )
+        }
     }
 
     getLineHeight: func -> Float {
@@ -59,11 +62,6 @@ Font: class {
         _iterate(str, |charPoint|
             glyph := getGlyph(charPoint)
 
-            if (!glyph) {
-                "Ignored unknown glyph %c" printfln(charPoint)
-                return
-            }
-
             tempAABB set!(glyph aabb)
             tempAABB add!(position)
             aabb expand!(tempAABB)
@@ -76,7 +74,20 @@ Font: class {
         aabb
     }
 
-    render: func (dye: DyeContext, text: String) {
+    render: func (dye: DyeContext, inputModelView: Matrix4, text: String, color: Color) {
+        modelView := inputModelView
+        this color set!(color)
+
+        _iterate(text, |c|
+            glyph := getGlyph(c)
+
+            if (!glyph) {
+                return
+            }
+            glyph sprite render(dye, modelView)
+
+            modelView = Matrix4 newTranslate(glyph advance x, glyph advance y, 0.0) * modelView
+        )
     }
 
     _iterate: func (str: String, f: Func (ULong)) {
@@ -94,6 +105,7 @@ Font: class {
 
 Glyph: class {
 
+    charPoint: ULong
     _glyph: FTGlyph
 
     aabb: AABB2
@@ -103,9 +115,11 @@ Glyph: class {
     top, left: Int
     rows, width: Int
 
-    texSize: Vec2
+    texSize: Vec2i
+    texture: Texture
+    sprite: GlSprite
 
-    init: func (slot: FTGlyphSlot) {
+    init: func (=charPoint, slot: FTGlyphSlot) {
         slot getGlyph(_glyph&)
         _glyph toBitmap(FTRenderMode normal, null, false)
 
@@ -126,12 +140,42 @@ Glyph: class {
         rows  = bitmapGlyph@ bitmap rows
         width = bitmapGlyph@ bitmap width
 
-        texSize = vec2(
+        texSize = vec2i(
              width nextPowerOfTwo(),
              rows  nextPowerOfTwo()
         )
+        _createTexture(bitmapGlyph@ bitmap)
 
-        "Loaded a glyph, aabb = %s, advance = %s, texSize = %s" printfln(aabb _, advance _, texSize _)
+        /*
+        "Loaded glyph %c, aabb = %s, advance = %s, texSize = %s" printfln(
+            charPoint as Char, aabb _, advance _, texSize _)
+        */
+    }
+
+    _createTexture: func (bitmap: FTBitmap) {
+        texture = Texture new(texSize x, texSize y, "<font-glyph>")
+
+        // create an RGBA texture from the shades-of-grey freetype data
+        data := gc_malloc(4 * texture width * texture height) as UInt8*
+
+        for (x in 0..width) {
+            for (y in 0..rows) {
+                srcIndex := x + y * width
+                dstIndex := x + y * texture width
+
+                gray := (bitmap buffer[srcIndex]) as UInt8
+                data[dstIndex * 4 + 0] = gray
+                data[dstIndex * 4 + 1] = gray
+                data[dstIndex * 4 + 2] = gray
+                data[dstIndex * 4 + 3] = gray
+            }
+        }
+
+        TextureLoader _flip(data, texture width, texture height)
+        texture upload(data)
+        sprite = GlSprite new(texture)
+        sprite center = false
+        sprite pos set!(left, top - rows)
     }
 
 }
