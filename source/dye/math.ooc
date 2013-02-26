@@ -595,3 +595,19 @@ AABB2: class {
     height: Float { get { yMax - yMin } }
 }
 
+extend Int {
+
+    nextPowerOfTwo: func -> This {
+        in := this - 1
+
+        in |= in >> 16
+        in |= in >> 8
+        in |= in >> 4
+        in |= in >> 2
+        in |= in >> 1
+
+        in + 1
+    }
+
+}
+

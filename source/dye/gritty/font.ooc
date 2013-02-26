@@ -99,6 +99,12 @@ Glyph: class {
     aabb: AABB2
     advance: Vec2
 
+    // bitmap/texture related stuff
+    top, left: Int
+    rows, width: Int
+
+    texSize: Vec2
+
     init: func (slot: FTGlyphSlot) {
         slot getGlyph(_glyph&)
         _glyph toBitmap(FTRenderMode normal, null, false)
@@ -114,7 +120,18 @@ Glyph: class {
             slot@ advance y toFloat()
         )
 
-        "Loaded a glyph, aabb = %s, advance = %s" printfln(aabb _, advance _)
+        bitmapGlyph := _glyph as FTBitmapGlyph
+        left  = bitmapGlyph@ left
+        top   = bitmapGlyph@ top
+        rows  = bitmapGlyph@ bitmap rows
+        width = bitmapGlyph@ bitmap width
+
+        texSize = vec2(
+             width nextPowerOfTwo(),
+             rows  nextPowerOfTwo()
+        )
+
+        "Loaded a glyph, aabb = %s, advance = %s, texSize = %s" printfln(aabb _, advance _, texSize _)
     }
 
 }
