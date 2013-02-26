@@ -101,8 +101,11 @@ GlSprite: class extends GlDrawable {
 
     logger := static Log getLogger(This name)
 
-    init: func (path: String) {
-        texture = TextureLoader load(path)
+    init: func ~fromPath (path: String) {
+        init(TextureLoader load(path))
+    }
+    
+    init: func ~fromTex (=texture) {
         size = vec2(texture width, texture height)
         texSize = vec2(0, 0)
         texSize set!(size)

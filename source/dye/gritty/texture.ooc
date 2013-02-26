@@ -15,26 +15,52 @@ import deadlogger/[Log, Logger]
 import structs/HashMap
 
 /**
- * This class represents a texture
+ * This class represents an RGBA OpenGL texture
  */
 Texture: class {
 
-  id: Int
-  width, height: Int
-  path: String
+    id: Int
+    width, height: Int
+    path: String
 
-  init: func (=width, =height, =path) {
-    glGenTextures(1, id&)
-    bind()
-  }
+    init: func (=width, =height, =path) {
+        glGenTextures(1, id&)
+        bind()
+        setup()
+    }
 
-  bind: func {
-    glBindTexture(GL_TEXTURE_2D, id)
-  }
+    setup: func {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE)
+    }
 
-  detach: func {
-    glBindTexture(GL_TEXTURE_2D, 0)
-  }
+    upload: func (data: UInt8*) {
+        internalFormat := GL_RGBA
+
+        version (!android) {
+            internalFormat = GL_RGBA8
+        }
+
+        glTexImage2D(GL_TEXTURE_2D,
+                    0,
+                    internalFormat,
+                    width,
+                    height,
+                    0,
+                    GL_RGBA,
+                    GL_UNSIGNED_BYTE,
+                    data)
+    }
+
+    bind: func {
+        glBindTexture(GL_TEXTURE_2D, id)
+    }
+
+    detach: func {
+        glBindTexture(GL_TEXTURE_2D, 0)
+    }
 
 }
 
@@ -75,29 +101,10 @@ TextureLoader: class {
 
         texture := Texture new(width, height, path)
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE)
-
         _flip(data, width, height)
         _premultiply(data, width, height)
+        texture upload(data)
 
-        internalFormat := GL_RGBA
-
-        version (!android) {
-            internalFormat = GL_RGBA8
-        }
-
-        glTexImage2D(GL_TEXTURE_2D,
-                    0,
-                    internalFormat,
-                    width,
-                    height,
-                    0,
-                    GL_RGBA,
-                    GL_UNSIGNED_BYTE,
-                    data)
         cache put(path, texture)
 
         texture
