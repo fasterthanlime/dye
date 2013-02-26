@@ -14,6 +14,8 @@ main: func (argc: Int, argv: CString*) {
   text pos set!(20, 60)
   dye add(text)
 
+  "text size = %s" printfln(text size _)
+
   dye render()
   Time sleepSec(3)
 

@@ -24,7 +24,11 @@ Font: class {
         if (!_ftInitialized) {
             _ft init()
         }
+
         _ft newFace(fontPath, 0, _face&)
+
+        dpi := 72
+        _face setCharSize((fontSize * 64.0) as Int, 0, dpi, dpi)
 
         _loadCharset()
     }
@@ -33,10 +37,17 @@ Font: class {
         charset := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVXYZ"
 
         // TODO: load glyphs here
+        _iterate(charset, |charPoint|
+            index := _face getCharIndex(charPoint)
+            _face loadGlyph(index, FTLoadFlag default)
+
+            glyph := Glyph new(_face@ glyph)
+            glyphs put(charPoint, glyph)
+        )
     }
 
     getLineHeight: func -> Float {
-        _face@ height
+        (_face@ height as Float) / 64.0
     }
 
     getBounds: func (str: String) -> AABB2 {
@@ -99,9 +110,11 @@ Glyph: class {
         aabb set!(cbox)
 
         advance = vec2(
-            _glyph@ advance x toFloat(),
-            _glyph@ advance y toFloat()
+            slot@ advance x toFloat(),
+            slot@ advance y toFloat()
         )
+
+        "Loaded a glyph, aabb = %s, advance = %s" printfln(aabb _, advance _)
     }
 
 }
@@ -109,7 +122,7 @@ Glyph: class {
 // Mix up dye's AABB2 and freetype
 extend AABB2 {
 
-    set!: func (cbox: FTBBox) {
+    set!: func ~freetype (cbox: FTBBox) {
         xMin = cbox xMin toFloat()
         yMin = cbox yMin toFloat()
         xMax = cbox xMax toFloat()
