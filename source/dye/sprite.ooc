@@ -172,11 +172,9 @@ GlSprite: class extends GlDrawable {
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
         glUniform4f(colorLoc, color R, color G, color B, opacity)
 
-        glEnable(GL_BLEND)
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
-        glDisable(GL_BLEND)
 
         vao detach()
         program detach()
