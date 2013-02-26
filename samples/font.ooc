@@ -1,33 +1,33 @@
 
 use dye
-import dye/[core, text, primitives]
-
-import os/Time
+import dye/[core, text, primitives, app]
 
 main: func (argc: Int, argv: CString*) {
+    FontTest new() run(2.0)
+}
 
-    dye := DyeContext new(640, 480, "Dye font example")
-    dye setClearColor(Color black())
+FontTest: class extends App {
 
-    text := GlText new("font.ttf", "Life is short, the art long. - Hippocrates", 42)
-    text color set!(Color white())
-    text pos set!(20, 60)
+    init: func {
+        super("Font test")
+    }
 
-    size := text size
-    "text size = %s" printfln(text size _)
+    setup: func {
+        text := GlText new("font.ttf", "Life is short, the art long. - Hippocrates", 42)
+        text color set!(Color white())
+        text pos set!(20, 60)
 
-    rect := GlRectangle new(text size)
-    rect pos set!(text pos)
-    rect color set!(Color new(20, 20, 20))
-    rect center = false
+        size := text size
+        "text size = %s" printfln(text size _)
 
-    dye add(rect)
-    dye add(text)
+        rect := GlRectangle new(text size)
+        rect pos set!(text pos)
+        rect color set!(Color new(20, 20, 20))
+        rect center = false
 
-    dye render()
-    Time sleepSec(3)
-
-    dye quit()
+        dye add(rect)
+        dye add(text)
+    }
 
 }
 
