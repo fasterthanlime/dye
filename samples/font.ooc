@@ -1,6 +1,6 @@
 
 use dye
-import dye/[core, font]
+import dye/[core, text]
 
 import os/Time
 

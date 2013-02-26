@@ -1,13 +1,11 @@
+
 // libs deps
 import math
 
 EPSILON := 0.001
 
 /**
- * A 2-dimensional vector class with a few
- * utility things.
- *
- * I've never been good at math
+ * A 2-dimensional floating point vector
  */
 Vec2: class {
 
@@ -524,5 +522,76 @@ MatrixException: class extends Exception {
         super(origin, msg)
     }
 
+}
+
+/**
+ * A 2D axis-aligned bounding box.
+ */
+AABB2: class {
+    xMin, yMin, xMax, yMax: Float
+
+    init: func
+    
+    init: func ~values (=xMin, =yMin, =xMax, =yMax)
+
+    set!: func ~aabb (other: AABB2) {
+        xMin = other xMin
+        xMax = other xMax
+        yMin = other yMin
+        yMax = other yMax
+    }
+
+    add!: func ~vector (v: Vec2) {
+        xMin += v x
+        yMin += v y
+        xMax += v x
+        yMax += v y
+    }
+
+    expand!: func ~aabb (other: This) {
+        if (other xMin < xMin) {
+            xMin = other xMin
+        }
+
+        if (other yMin < yMin) {
+            yMin = other yMin
+        }
+
+        if (other xMax > xMax) {
+            xMax = other xMax
+        }
+
+        if (other yMax > yMax) {
+            yMax = other yMax
+        }
+    }
+
+    expand!: func ~vec (other: Vec2) {
+        if (other x < xMin) {
+            xMin = other x
+        }
+
+        if (other y < yMin) {
+            yMin = other y
+        }
+
+        if (other x > xMax) {
+            xMax = other x
+        }
+
+        if (other y > yMax) {
+            yMax = other y
+        }
+    }
+
+    toString: func -> String {
+        "[[%.2f, %.2f], [%.2f, %.2f]]" format(xMin, yMin,
+            xMax, yMax)
+    }
+
+    _: String { get { toString() } }
+
+    width:  Float { get { xMax - xMin } }
+    height: Float { get { yMax - yMin } }
 }
 

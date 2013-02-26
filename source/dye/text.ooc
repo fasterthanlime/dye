@@ -1,62 +1,48 @@
 
-/*
-use ftgl
-import ftgl
-*/
-
-import sdl2/[OpenGL]
-
+// our stuff
 use dye
 import dye/[core, math]
+import dye/gritty/font
+
+// third-party stuff
+import sdl2/[OpenGL]
 
 use deadlogger
 import deadlogger/[Log, Logger]
 
+// sdk stuff
 import structs/HashMap
 
 GlText: class extends GlDrawable {
 
-    // FIXME
-    //cache := static HashMap<String, Font> new()
+    cache := static HashMap<String, Font> new()
     logger := static Log getLogger(This name)
 
     fontPath: String
-    // FIXME
-    //font: Font
+    font: Font
     color := Color white()
     value: String
 
     lineHeight: Float
-    
-    fontWidth, fontHeight: Int
 
     init: func (=fontPath, =value, fontSize := 40) {
-        // FIXME
-        //font = loadFont(fontPath, fontSize)
-        //lineHeight = font getLineHeight()
+        font = loadFont(fontPath, fontSize)
+        lineHeight = font getLineHeight()
     }
 
     size: Vec2 {
         get {
-            /*
             bounds := font getBounds(value)
-            vec2(bounds getWidth(), lineHeight)
-            */
-
-            // FIXME
-            vec(0, 0)
+            vec2(bounds width, lineHeight)
         }
     }
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
-        /*
-        dye color(color)
-        font render(value)
-        */
+        // FIXME: color
+        //dye color(color)
+        font render(dye, value)
     }
 
-    // FIXME
-    /*
     loadFont: static func (fontPath: String, fontSize: Int) -> Font {
         key := "%s-%d" format(fontPath, fontSize)
 
@@ -64,12 +50,11 @@ GlText: class extends GlDrawable {
             cache get(key)
         } else {
             logger debug("Loading font %s at size %d" format(fontPath, fontSize))
-            font := Font new(fontSize, fontSize, fontPath)
+            font := Font new(fontSize, fontPath)
             cache put(key, font)
             font
         }
     }
-    */
 
 }
 
