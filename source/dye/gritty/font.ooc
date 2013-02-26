@@ -175,7 +175,7 @@ Glyph: class {
         texture upload(data)
         sprite = GlSprite new(texture)
         sprite center = false
-        sprite pos set!(left, top - rows)
+        sprite pos set!(left, top)
     }
 
 }
