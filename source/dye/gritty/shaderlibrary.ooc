@@ -249,7 +249,7 @@ ShaderLibrary: class {
             }
         "
 
-        getProgram("tex130", vertex, fragment)
+        getProgram("tex150", vertex, fragment)
     }
 
 }
