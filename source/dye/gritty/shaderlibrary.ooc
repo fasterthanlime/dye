@@ -171,10 +171,11 @@ ShaderLibrary: class {
 
             uniform sampler2D Texture;
             varying mediump vec2 TexCoordOut;
+            uniform vec4 InColor;
 
             void main()
             {
-                gl_FragColor = texture2D(Texture, TexCoordOut);
+                gl_FragColor = texture2D(Texture, TexCoordOut) * InColor;
             }
         "
 
@@ -206,10 +207,11 @@ ShaderLibrary: class {
 
             in vec2 TexCoordOut;
             out vec4 OutColor;
+            uniform vec4 InColor;
 
             void main()
             {
-                OutColor = texture2D(Texture, TexCoordOut);
+                OutColor = texture2D(Texture, TexCoordOut) * InColor;
             }
         "
 
