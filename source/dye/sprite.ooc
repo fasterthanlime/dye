@@ -124,8 +124,6 @@ GlSprite: class extends GlDrawable {
         projLoc = program getUniformLocation("Projection")
         modelLoc = program getUniformLocation("ModelView")
         colorLoc = program getUniformLocation("InColor")
-        logger debug("texLoc = %d, projLoc = %d, modelLoc = %d, colorLoc = %d",
-            texLoc, projLoc, modelLoc, colorLoc)
     }
 
     render: func (dye: DyeContext, modelView: Matrix4) {

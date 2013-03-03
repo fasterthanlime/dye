@@ -92,12 +92,12 @@ TextureLoader: class {
             return _getPlaceholder()
         }
 
-        if (channels != 4) {
-            logger warn("Failed to load %s! - has %d channels, need 4" format(path, channels))
-            return _getPlaceholder()
-        }
-
         logger debug("Loading %s, size %dx%d, %d bpp" format(path, width, height, channels))
+
+        // we used to detect the number of channels here, but
+        // as it turns out stb_image does the right thing and converts
+        // from RGB or Grayscale to RGBA for us, since we requested 4 channels.
+        // Which is great!
 
         texture := Texture new(width, height, path)
 
