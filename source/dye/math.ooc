@@ -31,6 +31,16 @@ Vec2: class {
         v sub(this) norm()
     }
 
+    /**
+     * Unit vector that has a certain angle - in radians
+     */
+    fromAngle: static func (radians: Float) -> This {
+        new(cos(radians), sin(radians))
+    }
+
+    /**
+     * Angle this vector makes with (0, 1) - in radians
+     */
     angle: func -> Double {
         atan2(y, x)
     }
@@ -117,8 +127,8 @@ Vec2: class {
     }
 
     add!: func ~floats (px, py: Float) {
-    x += px
-    y += py
+        x += px
+        y += py
     }
 
     perp: func -> This {
@@ -150,9 +160,17 @@ Vec2: class {
         x = x * (1 - alpha) + target * alpha
     }
 
-    isubnterpolateY!: func (target: Float, alpha: Float) {
+    interpolateY!: func (target: Float, alpha: Float) {
         y = y * (1 - alpha) + target * alpha
     }
+
+    clamp: func (bottomLeft, topRight: Vec2) -> This {
+        vec2(
+            x clamp(bottomLeft x, topRight x),
+            y clamp(bottomLeft y, topRight y)
+        )
+    }
+
     toString: func -> String {
         "(%.2f, %.2f)" format(x, y)
     }
@@ -290,6 +308,39 @@ extend Float {
         this * 180.0 /  PI
     }
 
+    repeat: func (min, max: This) -> This {
+        if (max - min < 0) {
+            Exception new("Float repeat(), invalid range: %.2f..%.2f" format(min, max)) throw()
+        }
+
+        number := this
+        if (number < min) {
+            number += (max - min)
+        }
+
+        if (number >= max) {
+            number -= (max - min)
+        }
+        number
+    }
+
+    clamp: func (min, max: This) -> This {
+        if (max - min < 0) {
+            Exception new("Float clamp(), invalid range: %.2f..%.2f" format(min, max)) throw()
+        }
+
+        number := this
+        if (number < min) {
+            number = min
+        }
+
+        if (number > max) {
+            number = max
+        }
+        number
+    }
+
+
 }
 
 extend Int {
@@ -324,6 +375,18 @@ extend Int {
             number = max
         }
         number
+    }
+
+    nextPowerOfTwo: func -> This {
+        in := this - 1
+
+        in |= in >> 16
+        in |= in >> 8
+        in |= in >> 4
+        in |= in >> 2
+        in |= in >> 1
+
+        in + 1
     }
 
 }
@@ -593,21 +656,5 @@ AABB2: class {
 
     width:  Float { get { xMax - xMin } }
     height: Float { get { yMax - yMin } }
-}
-
-extend Int {
-
-    nextPowerOfTwo: func -> This {
-        in := this - 1
-
-        in |= in >> 16
-        in |= in >> 8
-        in |= in >> 4
-        in |= in >> 2
-        in |= in >> 1
-
-        in + 1
-    }
-
 }
 
