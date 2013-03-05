@@ -286,11 +286,11 @@ Vec2i: class {
         this y += v y
     }
 
-    add: func ~ints (x, y: Int) {
+    add: func ~ints (x, y: Int) -> This {
         new(this x + x, this y + y)
     }
 
-    add: func ~vec2i (v: This) {
+    add: func ~vec2i (v: This) -> This {
         new(this x + v x, this y + v y)
     }
 
