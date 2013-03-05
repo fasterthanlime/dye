@@ -46,7 +46,7 @@ GlRectangle: class extends GlDrawable {
     vbo: FloatVBO 
     vertices: Float[]
 
-    outlineIndices := static [0, 1, 3, 2]
+    outlineIndices := [0, 1, 3, 2]
 
     /* Uniforms */
     projLoc, modelLoc, colorLoc: Int
@@ -88,6 +88,7 @@ GlRectangle: class extends GlDrawable {
             case true  =>
                 glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
             case false =>
+                glLineWidth(lineWidth)
                 glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, outlineIndices data)
         }
 

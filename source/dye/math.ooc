@@ -276,6 +276,24 @@ Vec2i: class {
         new(x / i, y / i)
     }
 
+    add!: func ~ints (x, y: Int) {
+        this x += x
+        this y += y
+    }
+
+    add!: func ~vec2i (v: This) {
+        this x += v x
+        this y += v y
+    }
+
+    add: func ~ints (x, y: Int) {
+        new(this x + x, this y + y)
+    }
+
+    add: func ~vec2i (v: This) {
+        new(this x + v x, this y + v y)
+    }
+
     add: func ~vec2 (v: Vec2) -> Vec2 {
         vec2(v x + x as Float, v y + y as Float)
     }
@@ -303,7 +321,8 @@ operator == (v1, v2: Vec2i) -> Bool {
     v1 equals(v2)
 }
 
-vec2i: func (x, y: Int) -> Vec2i { Vec2i new(x, y) }
+vec2i: func ~ints (x, y: Int) -> Vec2i { Vec2i new(x, y) }
+vec2i: func ~vec2i (v: Vec2i) -> Vec2i { Vec2i new(v x, v y) }
 
 extend Float {
 
@@ -604,7 +623,7 @@ AABB2: class {
     
     init: func ~values (=xMin, =yMin, =xMax, =yMax)
 
-    set!: func ~aabb (other: AABB2) {
+    set!: func ~aabb (other: This) {
         xMin = other xMin
         xMax = other xMax
         yMin = other yMin
@@ -663,5 +682,75 @@ AABB2: class {
 
     width:  Float { get { xMax - xMin } }
     height: Float { get { yMax - yMin } }
+}
+
+/**
+ * A 2D axis-aligned bounding box - with integers
+ */
+AABB2i: class {
+    xMin, yMin, xMax, yMax: Int
+
+    init: func
+    
+    init: func ~values (=xMin, =yMin, =xMax, =yMax)
+
+    set!: func ~aabb (other: This) {
+        xMin = other xMin
+        xMax = other xMax
+        yMin = other yMin
+        yMax = other yMax
+    }
+
+    add!: func ~vector (v: Vec2i) {
+        xMin += v x
+        yMin += v y
+        xMax += v x
+        yMax += v y
+    }
+
+    expand!: func ~aabb (other: This) {
+        if (other xMin < xMin) {
+            xMin = other xMin
+        }
+
+        if (other yMin < yMin) {
+            yMin = other yMin
+        }
+
+        if (other xMax > xMax) {
+            xMax = other xMax
+        }
+
+        if (other yMax > yMax) {
+            yMax = other yMax
+        }
+    }
+
+    expand!: func ~vec (other: Vec2i) {
+        if (other x < xMin) {
+            xMin = other x
+        }
+
+        if (other y < yMin) {
+            yMin = other y
+        }
+
+        if (other x > xMax) {
+            xMax = other x
+        }
+
+        if (other y > yMax) {
+            yMax = other y
+        }
+    }
+
+    toString: func -> String {
+        "[[%d, %d], [%d, %d]]" format(xMin, yMin, xMax, yMax)
+    }
+
+    _: String { get { toString() } }
+
+    width:  Int { get { xMax - xMin } }
+    height: Int { get { yMax - yMin } }
 }
 
