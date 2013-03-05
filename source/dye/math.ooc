@@ -171,6 +171,13 @@ Vec2: class {
         )
     }
 
+    inside?: func (bottomLeft, topRight: Vec2) -> Bool {
+        x > bottomLeft x && \
+        x < topRight x && \
+        y > bottomLeft y && \
+        y < topRight y
+    }
+
     toString: func -> String {
         "(%.2f, %.2f)" format(x, y)
     }

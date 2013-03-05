@@ -363,6 +363,19 @@ GlGroup: class extends GlDrawable {
 
 }
 
+GlSortedGroup: class extends GlGroup {
+
+    init: func {
+        super()
+    }
+
+    drawChildren: func (dye: DyeContext, modelView: Matrix4) {
+        children sort(|a, b| a pos y < b pos y)
+        super(dye, modelView)
+    }
+
+}
+
 /**
  * Regroups a graphic scene (GlGroup) and some event handling (Input)
  */
