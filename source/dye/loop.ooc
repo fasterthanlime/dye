@@ -60,13 +60,15 @@ FixedLoop: class {
 
             count += 1
 
+            SDL delay(delay)
+
             if (count >= 30) {
                 count = 0
-                current := 1000.0 / delta
-                _computedFps = _computedFps * 0.97 + current * 0.03
-            }
 
-            SDL delay(delay)
+                actualDelta := delta + delay
+                current := 1000.0 / actualDelta as Float
+                _computedFps = _computedFps * 0.1 + current * 0.9
+            }
         }
     }
 
