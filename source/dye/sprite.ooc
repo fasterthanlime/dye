@@ -105,14 +105,8 @@ GlSprite: class extends GlDrawable {
         init(TextureLoader load(path))
     }
     
-    init: func ~fromTex (=texture) {
-        size = vec2(texture width, texture height)
-        texSize = vec2(0, 0)
-        texSize set!(size)
-
+    init: func ~fromTex (.texture) {
         vbo = FloatVBO new()
-        rebuild()
-
         program = ShaderLibrary getTexture()
 
         vao = VAO new(program)
@@ -124,6 +118,19 @@ GlSprite: class extends GlDrawable {
         projLoc = program getUniformLocation("Projection")
         modelLoc = program getUniformLocation("ModelView")
         colorLoc = program getUniformLocation("InColor")
+
+        setTexture(texture)
+    }
+
+    setTexture: func ~tex (=texture) {
+        size = vec2(texture width, texture height)
+        texSize = vec2(0, 0)
+        texSize set!(size)
+        rebuild()
+    }
+
+    setTexture: func ~path (path: String) {
+        setTexture(TextureLoader load(path))
     }
 
     render: func (dye: DyeContext, modelView: Matrix4) {
