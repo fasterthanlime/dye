@@ -41,8 +41,8 @@ Vec2: class {
     /**
      * Angle this vector makes with (0, 1) - in radians
      */
-    angle: func -> Double {
-        atan2(y, x)
+    angle: func -> Float {
+        atan2(y, x) as Float
     }
 
     clone: func -> This { new(x, y) }
