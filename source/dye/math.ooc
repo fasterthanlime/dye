@@ -42,7 +42,11 @@ Vec2: class {
      * Angle this vector makes with (0, 1) - in radians
      */
     angle: func -> Float {
-        atan2(y, x) as Float
+        angle := atan2(y, x) as Float
+        if (angle < 0) {
+            angle += 2 * PI
+        }
+        angle
     }
 
     clone: func -> This { new(x, y) }
