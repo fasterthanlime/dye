@@ -317,6 +317,13 @@ Vec2i: class {
         y as Float / x as Float
     }
 
+    clamp: func (bottomLeft, topRight: Vec2i) -> This {
+        vec2i(
+            x clamp(bottomLeft x, topRight x),
+            y clamp(bottomLeft y, topRight y)
+        )
+    }
+
     _: String { get { toString() } }
 
 }
