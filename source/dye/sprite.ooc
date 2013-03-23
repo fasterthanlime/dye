@@ -134,11 +134,13 @@ GlSprite: class extends GlDrawable {
     }
 
     render: func (dye: DyeContext, modelView: Matrix4) {
+        mv := computeModelView(modelView)
+
         if (center) {
-            modelView = Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0) * modelView
+            mv = mv * Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0)
         }
 
-        super(dye, modelView)
+        draw(dye, mv)
     }
 
     rebuild: func {

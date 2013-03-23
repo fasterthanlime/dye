@@ -312,23 +312,24 @@ GlDrawable: abstract class {
         //"input modelView = " println()
         //modelView _ println()
 
-        if (!scale unit?()) {
-            modelView = Matrix4 newScale(scale x, scale y, 1.0) * modelView
-            //"after scale modelView = " println()
+        if (!pos zero?()) {
+            modelView = modelView * Matrix4 newTranslate(pos x, pos y, 0.0)
+            //"after translation modelView = " println()
             //modelView _ println()
         }
 
         if (angle != 0.0) {
-            modelView = Matrix4 newRotateZ(angle toRadians()) * modelView
+            modelView = modelView * Matrix4 newRotateZ(angle toRadians())
             //"after rotation modelView = " println()
             //modelView _ println()
         }
 
-        if (!pos zero?()) {
-            modelView = Matrix4 newTranslate(pos x, pos y, 0.0) * modelView
-            //"after translation modelView = " println()
+        if (!scale unit?()) {
+            modelView = modelView * Matrix4 newScale(scale x, scale y, 1.0)
+            //"after scale modelView = " println()
             //modelView _ println()
         }
+
 
         modelView
     }
