@@ -262,7 +262,7 @@ Vec2i: class {
     init: func (=x, =y) {
     }
 
-    equals: func (v: This) -> Bool {
+    equals?: func (v: This) -> Bool {
         (x == v x && y == v y)
     }
 
@@ -329,7 +329,7 @@ Vec2i: class {
 }
 
 operator == (v1, v2: Vec2i) -> Bool {
-    v1 equals(v2)
+    v1 equals?(v2)
 }
 
 vec2i: func ~ints (x, y: Int) -> Vec2i { Vec2i new(x, y) }
