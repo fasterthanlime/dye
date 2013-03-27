@@ -1,14 +1,17 @@
 
+// third-party stuff
 use deadlogger
 import deadlogger/[Log]
 
 use sdl2
 import sdl2/[Core, OpenGL]
 
+// sdk stuff
 import structs/ArrayList
 
+// our stuff
 use dye
-import dye/[input, math, fbo, sprite]
+import dye/[input, math, sprite, fbo]
 
 Color: class {
 
@@ -86,6 +89,8 @@ DyeContext: class {
     cursorOffset := vec2(0, 0)
     cursorNumStates := 0
 
+    projectionMatrix: Matrix4
+
     init: func (width, height: Int, title: String, fullscreen := false,
             windowWidth := -1, windowHeight := -1) {
         size = vec2i(width, height)
@@ -95,9 +100,14 @@ DyeContext: class {
 	SDL init(SDL_INIT_EVERYTHING)
 
         version (apple) {
-            SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2)
-            SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1)
+            SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
+            SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2)
             SDL glSetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
+        }
+
+        version (android) {
+            SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2)
+            SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0)
         }
 
 	SDL glSetAttribute(SDL_GL_RED_SIZE, 5)
@@ -105,8 +115,6 @@ DyeContext: class {
 	SDL glSetAttribute(SDL_GL_BLUE_SIZE, 5)
 	SDL glSetAttribute(SDL_GL_DEPTH_SIZE, 16)
 	SDL glSetAttribute(SDL_GL_DOUBLEBUFFER, 1)
-
-        input = SdlInput new(this)
 
         flags := SDL_WINDOW_OPENGL
         if (fullscreen) {
@@ -139,6 +147,12 @@ DyeContext: class {
 
         SDL glMakeCurrent(window, context)
 
+        version (windows) {
+            // we use glew on Windows
+            glewInit()
+        }
+
+        input = SdlInput new(this)
         input onWindowSizeChange(|x, y|
             windowSize set!(x, y)
         )
@@ -179,35 +193,42 @@ DyeContext: class {
     render: func {
         SDL glMakeCurrent(window, context)
 
-        fbo bind()
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+
+        //fbo bind()
         glViewport(0, 0, size x, size y)
 	glClearColor(clearColor R, clearColor G, clearColor B, 1.0)
 	glClear(GL_COLOR_BUFFER_BIT)
 	draw()
-        fbo unbind()
+        //fbo unbind()
 
-        glViewport(0, 0, windowSize x, windowSize y)
-        fbo render()
+        glDisable(GL_BLEND)
+
+        //glViewport(0, 0, windowSize x, windowSize y)
+        //fbo render()
 
 	SDL glSwapWindow(window)
     }
 
     draw: func {
-	begin2D(size)
-        currentScene render(this)
+        currentScene render(this, Matrix4 newIdentity())
         renderCursor()
-	end2D()
     }
 
     renderCursor: func {
         if (!cursorSprite) { return }
 
         cursorSprite pos set!(input getMousePos() add(cursorOffset))
-        cursorSprite render(this)
+        cursorSprite render(this, Matrix4 newIdentity())
     }
 
     quit: func {
 	SDL quit()
+        // on Desktop, chances are SDL quit will exit the app.
+        // on mobile, exit(0) is apparently needed.
+        // It can't hurt anyway.
+        exit(0)
     }
 
     setClearColor: func (c: Color) {
@@ -215,76 +236,16 @@ DyeContext: class {
     }
 
     initGL: func {
-	logger info("OpenGL version: %s" format(glGetString (GL_VERSION)))
-	logger info("OpenGL vendor: %s" format(glGetString (GL_VENDOR)))
-	logger info("OpenGL renderer: %s" format(glGetString (GL_RENDERER)))
+	logger info("OpenGL version: %s" format(glGetString(GL_VERSION)))
+	logger info("OpenGL vendor: %s" format(glGetString(GL_VENDOR)))
+	logger info("OpenGL renderer: %s" format(glGetString(GL_RENDERER)))
+	logger info("GLSL version: %s" format(glGetString(GL_SHADING_LANGUAGE_VERSION)))
 
         setClearColor(clearColor)
-	glDisable(GL_DEPTH_TEST)
-	glEnable(GL_BLEND)
 
-        fbo = Fbo new(this, size x, size y)
-    }
+        projectionMatrix = Matrix4 newOrtho(0, size x, 0, size y, -1.0, 1.0)
 
-    begin2D: func (canvasSize: Vec2i) {
-	glDisable(GL_DEPTH_TEST)
-	glEnable(GL_BLEND)
-	glMatrixMode(GL_PROJECTION)
-	glPushMatrix()
-	glLoadIdentity()
-
-        (left, right, bottom, top) := (0, canvasSize x, 0, canvasSize y)
-        (near, far) := (-1, 1)
-	glOrtho(left, right, bottom, top, near, far)
-
-	glMatrixMode(GL_MODELVIEW)
-	glPushMatrix()
-	glLoadIdentity()
-    }
-
-    end2D: func {
-	glMatrixMode(GL_PROJECTION)
-	glPopMatrix()
-	glMatrixMode(GL_MODELVIEW)
-	glPopMatrix()
-
-	glEnable(GL_DEPTH_TEST)
-	glDisable(GL_BLEND)
-    }
-
-    color: func (color: Color) {
-        glColor4f(color R, color G, color B, 1.0)
-    }
-
-    texCoord: func (v: Vec2) {
-        glTexCoord2f(v x, v y)
-    }
-
-    vertex: func (v: Vec2) {
-        glVertex2f(v x, v y)
-    }
-
-    pushMatrix: func (f: Func) {
-        glPushMatrix()
-        f()
-        glPopMatrix()
-    }
-
-    begin: func (type: GLenum, f: Func) {
-        glBegin(type)
-        f()
-        glEnd()
-    }
-
-    withTexture: func (textureType: GLenum, textureID: GLuint, f: Func) {
-	glEnable(textureType)
-        glBindTexture(textureType, textureID)
-	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-
-        f()
-
-        glBindTexture(textureType, 0) // unbind it for later draw operations
-	glDisable(textureType)
+        //fbo = Fbo new(this, size x, size y)
     }
 
     createScene: func -> Scene {
@@ -323,18 +284,10 @@ GlDrawable: abstract class {
     visible := true
 
     // You can use OpenGL calls here
-    render: func (dye: DyeContext) {
+    render: func (dye: DyeContext, modelView: Matrix4) {
         if (!visible) return
 
-        glPushMatrix()
-
-        glTranslatef(pos x, pos y, 0.0)
-        glRotatef(angle, 0.0, 0.0, 1.0) 
-        glScalef(scale x, scale y, 1.0)
-
-        draw(dye)
-
-        glPopMatrix()
+        draw(dye, computeModelView(modelView))
     }
 
     center!: func (dye: DyeContext, size: Vec2) {
@@ -345,7 +298,41 @@ GlDrawable: abstract class {
         pos set!(dye width / 2, dye height / 2)
     }
 
-    draw: abstract func (dye: DyeContext)
+    draw: abstract func (dye: DyeContext, modelView: Matrix4)
+
+    computeModelView: func (input: Matrix4) -> Matrix4 {
+        modelView: Matrix4
+        
+        if (input) {
+            modelView = input
+        } else {
+            modelView = Matrix4 newIdentity()
+        }
+
+        //"input modelView = " println()
+        //modelView _ println()
+
+        if (!pos zero?()) {
+            modelView = modelView * Matrix4 newTranslate(pos x, pos y, 0.0)
+            //"after translation modelView = " println()
+            //modelView _ println()
+        }
+
+        if (angle != 0.0) {
+            modelView = modelView * Matrix4 newRotateZ(angle toRadians())
+            //"after rotation modelView = " println()
+            //modelView _ println()
+        }
+
+        if (!scale unit?()) {
+            modelView = modelView * Matrix4 newScale(scale x, scale y, 1.0)
+            //"after scale modelView = " println()
+            //modelView _ println()
+        }
+
+
+        modelView
+    }
 
 }
 
@@ -353,13 +340,13 @@ GlGroup: class extends GlDrawable {
 
     children := ArrayList<GlDrawable> new()
 
-    draw: func (dye: DyeContext) {
-        drawChildren(dye)
+    draw: func (dye: DyeContext, modelView: Matrix4) {
+        drawChildren(dye, computeModelView(modelView))
     }
     
-    drawChildren: func (dye: DyeContext) {
+    drawChildren: func (dye: DyeContext, modelView: Matrix4) {
         for (c in children) {
-            c render(dye)
+            c render(dye, modelView)
         }
     }
 
@@ -373,6 +360,19 @@ GlGroup: class extends GlDrawable {
 
     clear: func {
         children clear()
+    }
+
+}
+
+GlSortedGroup: class extends GlGroup {
+
+    init: func {
+        super()
+    }
+
+    drawChildren: func (dye: DyeContext, modelView: Matrix4) {
+        children sort(|a, b| a pos y < b pos y)
+        super(dye, modelView)
     }
 
 }

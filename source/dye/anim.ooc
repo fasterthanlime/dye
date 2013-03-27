@@ -28,13 +28,13 @@ GlSet: class extends GlGroup implements GlAnimSource {
         
     }
 
-    drawChildren: func (dye: DyeContext) {
+    drawChildren: func (dye: DyeContext, modelView: Matrix4) {
         if (children empty?()) return
 
         current = current repeat(0, children size)
         child := children get(current)
         if (child) {
-            child render(dye)
+            child render(dye, modelView)
         }
     }
 
@@ -91,8 +91,8 @@ GlAnim: class extends GlDrawable {
         }
     }
 
-    draw: func (dye: DyeContext) {
-        source getDrawable() render(dye)
+    draw: func (dye: DyeContext, modelView: Matrix4) {
+        source getDrawable() render(dye, modelView)
     }
 
 }
@@ -107,9 +107,10 @@ GlAnimSet: class extends GlDrawable {
         if (current) current update(ticks)
     }
 
-    draw: func (dye: DyeContext) {
+    draw: func (dye: DyeContext, modelView: Matrix4) {
+        modelView = computeModelView(modelView)
         if (current) {
-            current render(dye)
+            current render(dye, modelView)
         }
     }
 

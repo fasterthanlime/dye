@@ -1,10 +1,13 @@
 
 // our stuff
 import dye/[core, math, anim]
-import dye/gritty/[texture]
+import dye/gritty/[shader, shaderlibrary, texture, vbo, vao]
 
 // third-party stuff
 import sdl2/[OpenGL]
+
+use deadlogger
+import deadlogger/[Log, Logger]
 
 GlGridSprite: class extends GlDrawable implements GlAnimSource {
 
@@ -28,28 +31,32 @@ GlGridSprite: class extends GlDrawable implements GlAnimSource {
         size = vec2(texture width / xnum, texture height / ynum)
     }
 
-    draw: func (dye: DyeContext) {
-        glColor4f(brightness, brightness, brightness, opacity)
+    draw: func (dye: DyeContext, modelView: Matrix4) {
+        // FIXME: colors
+        //glColor4f(brightness, brightness, brightness, opacity)
 
-        dye withTexture(GL_TEXTURE_RECTANGLE_ARB, texture id, ||
-            self := this
-            dye begin(GL_QUADS, ||
-                rx := x
-                ry := (ynum - 1) - y
+        // FIXME: drawing
+        //dye withTexture(GL_TEXTURE_2D, texture id, ||
+        //    self := this
+        //    dye begin(GL_TRIANGLE_STRIP, ||
+        //        rx := x
+        //        ry := (ynum - 1) - y
+        //        xFactor := x as Float / xnum as Float
+        //        yFactor := y as Float / ynum as Float
 
-                glTexCoord2f(rx * size x, ry * size y)
-                glVertex2f(size x * -0.5, size y * -0.5)
+        //        glTexCoord2f(rx * xFactor, ry * yFactor)
+        //        glVertex2f(xFactor * -0.5, yFactor * -0.5)
 
-                glTexCoord2f((rx + 1) * size x, ry * size y)
-                glVertex2f(size x *  0.5, size y * -0.5)
+        //        glTexCoord2f((rx + 1) * xFactor, ry * yFactor)
+        //        glVertex2f(xFactor *  0.5, yFactor * -0.5)
 
-                glTexCoord2f((rx + 1) * size x, (ry + 1) * size y)
-                glVertex2f(size x *  0.5, size y *  0.5)
+        //        glTexCoord2f(rx * xFactor, (ry + 1) * yFactor)
+        //        glVertex2f(xFactor * -0.5, yFactor *  0.5)
 
-                glTexCoord2f(rx * size x, (ry + 1) * size y)
-                glVertex2f(size x * -0.5, size y *  0.5)
-            )
-        )
+        //        glTexCoord2f((rx + 1) * xFactor, (ry + 1) * yFactor)
+        //        glVertex2f(xFactor *  0.5, yFactor *  0.5)
+        //    )
+        //)
     }
 
     // implement GlAnimSource
@@ -68,7 +75,6 @@ GlGridSprite: class extends GlDrawable implements GlAnimSource {
 
 GlSprite: class extends GlDrawable {
 
-    texture: Texture
     texSize: Vec2
     size: Vec2
 
@@ -80,49 +86,106 @@ GlSprite: class extends GlDrawable {
 
     center := true
 
-    brightness := 1.0
+    color := Color white()
     opacity := 1.0
 
-    init: func (path: String) {
-        texture = TextureLoader load(path)
+    texture: Texture
+    program: ShaderProgram
+    vao: VAO
+
+    vbo: FloatVBO 
+    data: Float[]
+
+    /* Uniforms */
+    texLoc, projLoc, modelLoc, colorLoc: Int
+
+    logger := static Log getLogger(This name)
+
+    init: func ~fromPath (path: String) {
+        init(TextureLoader load(path))
+    }
+    
+    init: func ~fromTex (.texture) {
+        vbo = FloatVBO new()
+        program = ShaderLibrary getTexture()
+
+        vao = VAO new(program)
+        stride := 4 * Float size
+        vao add("TexCoordIn", 2, GL_FLOAT, false, stride, 0 as Pointer)
+        vao add("Position", 2, GL_FLOAT, false, stride, (2 * Float size) as Pointer)
+
+        texLoc = program getUniformLocation("Texture")
+        projLoc = program getUniformLocation("Projection")
+        modelLoc = program getUniformLocation("ModelView")
+        colorLoc = program getUniformLocation("InColor")
+
+        setTexture(texture)
+    }
+
+    setTexture: func ~tex (=texture) {
         size = vec2(texture width, texture height)
         texSize = vec2(0, 0)
         texSize set!(size)
+        rebuild()
     }
 
-    render: func (dye: DyeContext) {
+    setTexture: func ~path (path: String) {
+        setTexture(TextureLoader load(path))
+    }
+
+    render: func (dye: DyeContext, modelView: Matrix4) {
+        mv := computeModelView(modelView)
+
         if (center) {
-            glPushMatrix()
-
-            glTranslatef(width * scale x * -0.5, height * scale y * -0.5, 0.0)
-            super()
-
-            glPopMatrix()
-        } else {
-            super()
+            mv = mv * Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0)
         }
+
+        draw(dye, mv)
     }
 
-    draw: func (dye: DyeContext) {
-        glColor4f(brightness, brightness, brightness, opacity)
+    rebuild: func {
+        /*
+         * vertex x, vertex y,
+         * texcoord x, texcoord y
+         */
+        data = [
+            0.0, 0.0,
+            0.0, 0.0,
 
-        dye withTexture(GL_TEXTURE_RECTANGLE_ARB, texture id, ||
-            self := this
+            1.0, 0.0,
+            width, 0.0,
 
-            dye begin(GL_QUADS, ||
-                glTexCoord2f(0.0, 0.0)
-                glVertex2f(0.0, 0.0)
+            0.0, 1.0,
+            0.0, height,
 
-                glTexCoord2f(texWidth, 0.0)
-                glVertex2f(width, 0.0)
+            1.0, 1.0,
+            width, height
+        ]
 
-                glTexCoord2f(texWidth, texHeight)
-                glVertex2f(width, height)
+        vbo bind()
+        vbo data(data)
+    }
 
-                glTexCoord2f(0.0, texHeight)
-                glVertex2f(0.0, height)
-            )
-        )
+    draw: func (dye: DyeContext, modelView: Matrix4) {
+        vbo bind()
+        program use()
+        vao bind()
+
+        glActiveTexture(GL_TEXTURE0)
+        texture bind()
+        glUniform1f(texLoc, 0)
+
+        glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
+        glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
+        glUniform4f(colorLoc, color R, color G, color B, opacity)
+
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+
+        vao detach()
+        program detach()
+        texture detach()
     }
 
 }

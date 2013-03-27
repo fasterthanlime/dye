@@ -23,7 +23,13 @@ Fbo: class {
         glBindTexture(GL_TEXTURE_2D, textureId)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, null)
+
+        texFormat := GL_RGBA
+        version (!android) {
+            texFormat = GL_RGBA8
+        }
+
+        glTexImage2D(GL_TEXTURE_2D, 0, texFormat, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, null)
         glBindTexture(GL_TEXTURE_2D, 0) 
 
         // create a renderbuffer object to store depth info
@@ -61,13 +67,11 @@ Fbo: class {
     }
 
     render: func {
-        dye begin2D(dye windowSize)
 	glClearColor(0.0, 0.0, 0.0, 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        glEnable(GL_TEXTURE_2D)
-        glBindTexture(GL_TEXTURE_2D, textureId)
-	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+        //glBindTexture(GL_TEXTURE_2D, textureId)
+	//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
         ratio := dye size ratio()
         targetRatio := dye windowSize ratio()
@@ -85,30 +89,32 @@ Fbo: class {
         targetOffset x = dye windowSize x / 2 - targetSize x / 2
         targetOffset y = dye windowSize y / 2 - targetSize y / 2
 
-        glPushMatrix()
-        glTranslatef(targetOffset x, targetOffset y, 0)
+        // FIXME: transformations
+        // glPushMatrix()
+        // glTranslatef(targetOffset x, targetOffset y, 0)
 
-        glColor4f(1, 1, 1, 1)
-        glBegin(GL_QUADS)
-            glTexCoord2f(0.0, 0.0)
-            glVertex2f(0, 0)
+        // FIXME: colors
+        //glColor4f(1, 1, 1, 1)
 
-            glTexCoord2f(1.0, 0.0)
-            glVertex2f(targetSize x, 0)
+        // FIXME: drawing stuff
+        //glBegin(GL_TRIANGLE_STRIP)
+        //    glTexCoord2f(0.0, 0.0)
+        //    glVertex2f(0, 0)
 
-            glTexCoord2f(1.0, 1.0)
-            glVertex2f(targetSize x, targetSize y)
+        //    glTexCoord2f(1.0, 0.0)
+        //    glVertex2f(targetSize x, 0)
 
-            glTexCoord2f(0.0, 1.0)
-            glVertex2f(0, targetSize y)
-        glEnd()
+        //    glTexCoord2f(0.0, 1.0)
+        //    glVertex2f(0, targetSize y)
 
-        glPopMatrix()
+        //    glTexCoord2f(1.0, 1.0)
+        //    glVertex2f(targetSize x, targetSize y)
+        //glEnd()
 
-        glBindTexture(GL_TEXTURE_2D, 0)
-        glDisable(GL_TEXTURE_2D)
+        // FIXME: transformations
+        // glPopMatrix()
 
-        dye end2D()
+        //glBindTexture(GL_TEXTURE_2D, 0)
     }
 
 }

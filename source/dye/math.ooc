@@ -1,13 +1,11 @@
+
 // libs deps
 import math
 
 EPSILON := 0.001
 
 /**
- * A 2-dimensional vector class with a few
- * utility things.
- *
- * I've never been good at math
+ * A 2-dimensional floating point vector
  */
 Vec2: class {
 
@@ -33,8 +31,22 @@ Vec2: class {
         v sub(this) norm()
     }
 
-    angle: func -> Double {
-        atan2(y, x)
+    /**
+     * Unit vector that has a certain angle - in radians
+     */
+    fromAngle: static func (radians: Float) -> This {
+        new(cos(radians), sin(radians))
+    }
+
+    /**
+     * Angle this vector makes with (0, 1) - in radians
+     */
+    angle: func -> Float {
+        angle := atan2(y, x) as Float
+        if (angle < 0) {
+            angle += 2 * PI
+        }
+        angle
     }
 
     clone: func -> This { new(x, y) }
@@ -55,6 +67,14 @@ Vec2: class {
     set!: func ~twofloats (px, py: Float) {
         x = px
         y = py
+    }
+
+    zero?: func -> Bool {
+        x == 0.0 && y == 0.0
+    }
+
+    unit?: func -> Bool {
+        x == 1.0 && y == 1.0
     }
 
     snap: func (size: Int) -> This {
@@ -111,8 +131,8 @@ Vec2: class {
     }
 
     add!: func ~floats (px, py: Float) {
-    x += px
-    y += py
+        x += px
+        y += py
     }
 
     perp: func -> This {
@@ -144,9 +164,24 @@ Vec2: class {
         x = x * (1 - alpha) + target * alpha
     }
 
-    isubnterpolateY!: func (target: Float, alpha: Float) {
+    interpolateY!: func (target: Float, alpha: Float) {
         y = y * (1 - alpha) + target * alpha
     }
+
+    clamp: func (bottomLeft, topRight: Vec2) -> This {
+        vec2(
+            x clamp(bottomLeft x, topRight x),
+            y clamp(bottomLeft y, topRight y)
+        )
+    }
+
+    inside?: func (bottomLeft, topRight: Vec2) -> Bool {
+        x > bottomLeft x && \
+        x < topRight x && \
+        y > bottomLeft y && \
+        y < topRight y
+    }
+
     toString: func -> String {
         "(%.2f, %.2f)" format(x, y)
     }
@@ -227,7 +262,7 @@ Vec2i: class {
     init: func (=x, =y) {
     }
 
-    equals: func (v: This) -> Bool {
+    equals?: func (v: This) -> Bool {
         (x == v x && y == v y)
     }
 
@@ -243,6 +278,24 @@ Vec2i: class {
 
     div: func (i: Int) -> This {
         new(x / i, y / i)
+    }
+
+    add!: func ~ints (x, y: Int) {
+        this x += x
+        this y += y
+    }
+
+    add!: func ~vec2i (v: This) {
+        this x += v x
+        this y += v y
+    }
+
+    add: func ~ints (x, y: Int) -> This {
+        new(this x + x, this y + y)
+    }
+
+    add: func ~vec2i (v: This) -> This {
+        new(this x + v x, this y + v y)
     }
 
     add: func ~vec2 (v: Vec2) -> Vec2 {
@@ -264,15 +317,68 @@ Vec2i: class {
         y as Float / x as Float
     }
 
+    clamp: func (bottomLeft, topRight: Vec2i) -> This {
+        vec2i(
+            x clamp(bottomLeft x, topRight x),
+            y clamp(bottomLeft y, topRight y)
+        )
+    }
+
     _: String { get { toString() } }
 
 }
 
 operator == (v1, v2: Vec2i) -> Bool {
-    v1 equals(v2)
+    v1 equals?(v2)
 }
 
-vec2i: func (x, y: Int) -> Vec2i { Vec2i new(x, y) }
+vec2i: func ~ints (x, y: Int) -> Vec2i { Vec2i new(x, y) }
+vec2i: func ~vec2i (v: Vec2i) -> Vec2i { Vec2i new(v x, v y) }
+
+extend Float {
+
+    toRadians: func -> This {
+        this * PI / 180.0
+    }
+
+    toDegrees: func -> This {
+        this * 180.0 /  PI
+    }
+
+    repeat: func (min, max: This) -> This {
+        if (max - min < 0) {
+            Exception new("Float repeat(), invalid range: %.2f..%.2f" format(min, max)) throw()
+        }
+
+        number := this
+        if (number < min) {
+            number += (max - min)
+        }
+
+        if (number >= max) {
+            number -= (max - min)
+        }
+        number
+    }
+
+    clamp: func (min, max: This) -> This {
+        if (max - min < 0) {
+            Exception new("Float clamp(), invalid range: %.2f..%.2f" format(min, max)) throw()
+        }
+
+        number := this
+        if (number < min) {
+            number = min
+        }
+
+        if (number > max) {
+            number = max
+        }
+        number
+    }
+
+
+}
 
 extend Int {
 
@@ -308,5 +414,354 @@ extend Int {
         number
     }
 
+    nextPowerOfTwo: func -> This {
+        in := this - 1
+
+        in |= in >> 16
+        in |= in >> 8
+        in |= in >> 4
+        in |= in >> 2
+        in |= in >> 1
+
+        in + 1
+    }
+
+}
+
+
+/**
+ * A 4x4 matrix, mostly used for transformations
+ */
+Matrix4: class {
+
+    /** 16 floats, column-major format */
+    values: Float[]
+
+    /**
+     * Initialize from a 16-floats array
+     */
+    init: func (=values) {
+        _checkSize(values)
+    }
+
+    transpose: func -> This {
+        new([
+            values[ 0], values[ 4], values[ 8], values[12]
+            values[ 1], values[ 5], values[ 9], values[13]
+            values[ 2], values[ 6], values[10], values[14]
+            values[ 3], values[ 7], values[11], values[15]
+        ])
+    }
+
+    get: func (column, row: Int) -> Float {
+        values[column * 4 + row]
+    }
+
+    set: func (column, row: Int, value: Float) {
+        values[column * 4 + row] = value
+    }
+
+    /**
+     * Create a new identity matrix
+     */
+    newIdentity: static func -> This {
+        new([
+            1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0
+        ])
+    }
+
+    /**
+     * Create a new translation matrix
+     */
+    newTranslate: static func (x, y, z: Float) -> This {
+        new([
+            1.0,    0.0,    0.0,    0.0,
+            0.0,    1.0,    0.0,    0.0,
+            0.0,    0.0,    1.0,    0.0,
+            x,      y,      z,      1.0 
+        ])
+    }
+
+    /**
+     * Create a new rotation matrix around axis (0.0, 0.0, 1.0)
+     * 
+     * :param: a is the angle in radians
+     */
+    newRotateZ: static func (a: Float) -> This {
+
+        /*
+         * Source: http://stackoverflow.com/questions/3982418
+         *
+         * Converted by hand to column-major
+         */
+        c := a cos()
+        s := a sin()
+
+        new([
+             c,  s,   0,   0,
+            -s,  c,   0,   0,
+            0,   0,   1,   0,
+            0,   0,   0,   1
+        ])
+    }
+
+    /**
+     * Create a new scaling matrix
+     */
+    newScale: static func (x, y, z: Float) -> This {
+        /*
+         * Source: http://en.wikipedia.org/wiki/Transformation_matrix#Scaling
+         * 
+         * Beautiful, it's the same in row-major and column-major :D
+         * ie. m transposed() == m
+         */
+
+        new([
+            x, 0, 0, 0
+            0, y, 0, 0
+            0, 0, z, 0
+            0, 0, 0, 1
+        ])
+    }
+
+    /**
+     * Create a new orthographic projection matrix
+     *
+     * Somehow similar to glOrtho
+     */
+    newOrtho: static func (left, right, bottom, top, _near, _far: Float) -> This {
+        (l, r, b, t) := (left, right, bottom, top)
+        (n, f) := (_near, _far)
+
+        w := r - l // width
+        h := t - b // height
+        d := f - n // depth
+
+        /*
+         * Source: http://www.songho.ca/opengl/gl_projectionmatrix.html
+         *
+         * Converted by hand to column-major
+         */
+        new([
+            2.0 / w,        0.0,             0.0,           0.0,
+            0.0,            2.0 / h,         0.0,           0.0,
+            0.0,            0.0,            -2.0 / d,       0.0,
+            ((r + l) / -w), ((t + b) / -h), ((f + n) / -d), 1.0
+        ])
+    }
+
+    /**
+     * Multiply two matrices.
+     *
+     * This is a naive, unoptimized, O(n^3) function.
+     */
+    mul: func (m2: This) -> This {
+        m1 := this
+        res := Float[16] new()
+
+        for (row in 0..4) {
+            for (col in 0..4) {
+                product := 0.0
+
+                for (inner in 0..4) {
+                    product += m1 values[inner * 4 + row] * m2 values[col * 4 + inner]
+                }
+                res[col * 4 + row] = product
+            }
+        }
+
+        new(res)
+    }
+
+    /**
+     * Return a pointer to the raw data - suitable to be passed
+     * as an OpenGL uniform, for example.
+     */
+    pointer: Float* {
+        get {
+            values data
+        }
+    }
+
+    toString: func -> String {
+"[[%5.5f], [%5.5f], [%5.5f], [%5.5f] 
+ [%5.5f], [%5.5f], [%5.5f], [%5.5f] 
+ [%5.5f], [%5.5f], [%5.5f], [%5.5f] 
+ [%5.5f], [%5.5f], [%5.5f], [%5.5f]]" format(
+         values[0], values[4], values[8],  values[12], 
+         values[1], values[5], values[9],  values[13], 
+         values[2], values[6], values[10], values[14], 
+         values[3], values[7], values[11], values[15])
+    }
+
+    _: String {
+        get {
+            toString()
+        }
+    }
+
+    _checkSize: static func (m: Float[]) {
+        if (m length != 16) {
+            MatrixException new(This name, "Matrix4 initializers should take 16 floats, not %d" \
+                format(m length)) throw()
+        }
+    }
+
+}
+
+operator * (m1, m2: Matrix4) -> Matrix4 {
+    m1 mul(m2) 
+}
+
+MatrixException: class extends Exception {
+
+    init: func (origin: String, msg: String) {
+        super(origin, msg)
+    }
+
+}
+
+/**
+ * A 2D axis-aligned bounding box.
+ */
+AABB2: class {
+    xMin, yMin, xMax, yMax: Float
+
+    init: func
+    
+    init: func ~values (=xMin, =yMin, =xMax, =yMax)
+
+    set!: func ~aabb (other: This) {
+        xMin = other xMin
+        xMax = other xMax
+        yMin = other yMin
+        yMax = other yMax
+    }
+
+    add!: func ~vector (v: Vec2) {
+        xMin += v x
+        yMin += v y
+        xMax += v x
+        yMax += v y
+    }
+
+    expand!: func ~aabb (other: This) {
+        if (other xMin < xMin) {
+            xMin = other xMin
+        }
+
+        if (other yMin < yMin) {
+            yMin = other yMin
+        }
+
+        if (other xMax > xMax) {
+            xMax = other xMax
+        }
+
+        if (other yMax > yMax) {
+            yMax = other yMax
+        }
+    }
+
+    expand!: func ~vec (other: Vec2) {
+        if (other x < xMin) {
+            xMin = other x
+        }
+
+        if (other y < yMin) {
+            yMin = other y
+        }
+
+        if (other x > xMax) {
+            xMax = other x
+        }
+
+        if (other y > yMax) {
+            yMax = other y
+        }
+    }
+
+    toString: func -> String {
+        "[[%.2f, %.2f], [%.2f, %.2f]]" format(xMin, yMin,
+            xMax, yMax)
+    }
+
+    _: String { get { toString() } }
+
+    width:  Float { get { xMax - xMin } }
+    height: Float { get { yMax - yMin } }
+}
+
+/**
+ * A 2D axis-aligned bounding box - with integers
+ */
+AABB2i: class {
+    xMin, yMin, xMax, yMax: Int
+
+    init: func
+    
+    init: func ~values (=xMin, =yMin, =xMax, =yMax)
+
+    set!: func ~aabb (other: This) {
+        xMin = other xMin
+        xMax = other xMax
+        yMin = other yMin
+        yMax = other yMax
+    }
+
+    add!: func ~vector (v: Vec2i) {
+        xMin += v x
+        yMin += v y
+        xMax += v x
+        yMax += v y
+    }
+
+    expand!: func ~aabb (other: This) {
+        if (other xMin < xMin) {
+            xMin = other xMin
+        }
+
+        if (other yMin < yMin) {
+            yMin = other yMin
+        }
+
+        if (other xMax > xMax) {
+            xMax = other xMax
+        }
+
+        if (other yMax > yMax) {
+            yMax = other yMax
+        }
+    }
+
+    expand!: func ~vec (other: Vec2i) {
+        if (other x < xMin) {
+            xMin = other x
+        }
+
+        if (other y < yMin) {
+            yMin = other y
+        }
+
+        if (other x > xMax) {
+            xMax = other x
+        }
+
+        if (other y > yMax) {
+            yMax = other y
+        }
+    }
+
+    toString: func -> String {
+        "[[%d, %d], [%d, %d]]" format(xMin, yMin, xMax, yMax)
+    }
+
+    _: String { get { toString() } }
+
+    width:  Int { get { xMax - xMin } }
+    height: Int { get { yMax - yMin } }
 }
 
