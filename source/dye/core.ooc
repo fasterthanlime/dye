@@ -147,8 +147,8 @@ DyeContext: class {
 
         SDL glMakeCurrent(window, context)
 
-        version (windows) {
-            // we use glew on Windows
+        version (windows || linux) {
+            // we use glew on Windows & Linux
             glewInit()
         }
 
