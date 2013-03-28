@@ -162,6 +162,11 @@ DyeContext: class {
         setScene(createScene())
     }
 
+    setIcon: func (path: String) {
+        surface := SDL loadBMP(path)
+        SDL setWindowIcon(window, surface)
+    }
+
     setShowCursor: func (visible: Bool) {
         SDL showCursor(visible)
     }
