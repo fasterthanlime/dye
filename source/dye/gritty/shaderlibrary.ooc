@@ -80,9 +80,11 @@ ShaderLibrary: class {
         fragment := "
             #version 100
 
+            uniform vec4 InColor;
+
             void main()
             {
-                gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+                gl_FragColor = InColor;
             }
         "
 
@@ -108,10 +110,11 @@ ShaderLibrary: class {
             #version 130
 
             out vec4 OutColor;
+            uniform vec4 InColor;
 
             void main()
             {
-                OutColor = vec4(1.0, 1.0, 1.0, 1.0);
+                OutColor = InColor;
             }
         "
 
