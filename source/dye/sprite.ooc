@@ -177,7 +177,7 @@ GlSprite: class extends GlDrawable {
 
         glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
-        glUniform4f(colorLoc, color R, color G, color B, opacity)
+        glUniform4f(colorLoc, opacity * color R, opacity * color G, opacity * color B, opacity)
 
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
