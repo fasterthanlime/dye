@@ -383,6 +383,17 @@ GlSortedGroup: class extends GlGroup {
 }
 
 /**
+ * Base class for all things sprite - has a color
+ * and an opacity so we can tint and make them transparent.
+ */
+GlSpriteLike: abstract class extends GlDrawable {
+
+    color := Color white()
+    opacity := 1.0
+
+}
+
+/**
  * Regroups a graphic scene (GlGroup) and some event handling (Input)
  */
 Scene: class extends GlGroup {
