@@ -16,16 +16,19 @@ GlAnimSource: interface {
     setFrame: func (frame: Int)
     currentFrame: func -> Int
     frameOffset: func (offset: Int)
-    getDrawable: func -> GlDrawable
+    getDrawable: func -> GlSpriteLike
 
 }
 
-GlSet: class extends GlGroup implements GlAnimSource {
+GlSet: class extends GlSpriteLike implements GlAnimSource {
 
     current := 0
+    children := ArrayList<GlSpriteLike> new()
 
-    init: func {
-        
+    init: func
+
+    draw: func (dye: DyeContext, modelView: Matrix4) {
+        drawChildren(dye, modelView)
     }
 
     drawChildren: func (dye: DyeContext, modelView: Matrix4) {
@@ -34,14 +37,28 @@ GlSet: class extends GlGroup implements GlAnimSource {
         current = current repeat(0, children size)
         child := children get(current)
         if (child) {
+            child color set!(color)
+            child opacity = opacity
             child render(dye, modelView)
         }
+    }
+
+    add: func (d: GlSpriteLike) {
+        children add(d)
+    }
+
+    remove: func (d: GlSpriteLike) {
+        children remove(d)
+    }
+
+    clear: func {
+        children clear()
     }
 
     // implement GlAnimSource
 
     numFrames: func -> Int  { children size }
-    getDrawable: func -> GlDrawable { this }
+    getDrawable: func -> GlSpriteLike { this }
     frameOffset: func (offset: Int) {
         current += offset
     }
@@ -50,7 +67,7 @@ GlSet: class extends GlGroup implements GlAnimSource {
 
 }
 
-GlAnim: class extends GlDrawable {
+GlAnim: class extends GlSpriteLike {
 
     source: GlAnimSource
     frameDuration, counter: Int
@@ -92,12 +109,15 @@ GlAnim: class extends GlDrawable {
     }
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
-        source getDrawable() render(dye, modelView)
+        drawable := source getDrawable()
+        drawable color set!(color)
+        drawable opacity = opacity
+        drawable render(dye, modelView)
     }
 
 }
 
-GlAnimSet: class extends GlDrawable {
+GlAnimSet: class extends GlSpriteLike {
 
     children := HashMap<String, GlAnim> new()
     currentName: String
@@ -109,6 +129,11 @@ GlAnimSet: class extends GlDrawable {
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
         if (current) {
+            match current {
+                case sl: GlSpriteLike =>
+                    sl color set!(color)
+                    sl opacity = opacity
+            }
             current render(dye, modelView)
         }
     }

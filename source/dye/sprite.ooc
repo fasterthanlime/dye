@@ -262,7 +262,7 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
     // implement GlAnimSource
 
     numFrames: func -> Int { xnum }
-    getDrawable: func -> GlDrawable { this }
+    getDrawable: func -> GlSpriteLike { this }
     frameOffset: func (offset: Int) {
         setFrame(x + offset)
     }
