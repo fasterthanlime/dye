@@ -108,7 +108,6 @@ GlAnimSet: class extends GlDrawable {
     }
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
-        modelView = computeModelView(modelView)
         if (current) {
             current render(dye, modelView)
         }

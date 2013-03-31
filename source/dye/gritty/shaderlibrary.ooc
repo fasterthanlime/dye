@@ -306,7 +306,7 @@ ShaderLibrary: class {
             }
         "
 
-        getProgram("tex150", vertex, fragment)
+        getProgram("gridtex150", vertex, fragment)
     }
 
 }

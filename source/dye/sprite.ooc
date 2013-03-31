@@ -8,7 +8,7 @@ import sdl2/[OpenGL]
 
 /**
  * A sprite - ie. a texture displayed on a rectangle,
- * with trannsparency, an opacity value, and a color to
+ * with alpha blending, an opacity value, and a color to
  * tint the texture.
  */
 GlSprite: class extends GlSpriteLike {
@@ -230,15 +230,18 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
         vbo bind()
         program use()
         vao bind()
+
+        glActiveTexture(GL_TEXTURE0)
+        texture bind()
         glUniform1f(texLoc, 0)
 
         glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
 
-        texCellWidth := 1.0 / xnum
-        texCellHeight := 1.0 / ynum
+        texCellWidth :=  1.0 / xnum as Float
+        texCellHeight := 1.0 / ynum as Float
 
-        glUniform4f(gridLoc, x, y, texCellWidth, texCellHeight)
+        glUniform4f(gridLoc, x as Float, y as Float, texCellWidth, texCellHeight)
 
         // premultiply color by opacity
         glUniform4f(colorLoc,

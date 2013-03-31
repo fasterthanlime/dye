@@ -346,7 +346,7 @@ GlGroup: class extends GlDrawable {
     children := ArrayList<GlDrawable> new()
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
-        drawChildren(dye, computeModelView(modelView))
+        drawChildren(dye, modelView)
     }
     
     drawChildren: func (dye: DyeContext, modelView: Matrix4) {
