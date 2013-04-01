@@ -67,6 +67,8 @@ GlSprite: class extends GlSpriteLike {
     }
 
     render: func (dye: DyeContext, modelView: Matrix4) {
+        if (!visible) return
+
         mv := computeModelView(modelView)
 
         if (center) {
