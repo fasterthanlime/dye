@@ -196,6 +196,8 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
     }
 
     render: func (dye: DyeContext, modelView: Matrix4) {
+        if (!visible) return
+
         mv := computeModelView(modelView)
 
         if (center) {
