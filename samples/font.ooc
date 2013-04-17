@@ -13,16 +13,15 @@ FontTest: class extends App {
     }
 
     setup: func {
-        text := GlText new("font.ttf", "Life is short, the art long. - Hippocrates", 42)
+        text := GlText new("fonts/classiq-medium.ttf", "Life is short, the art long. - Hippocrates", 42)
         text color set!(Color white())
         text pos set!(20, 60)
 
         size := text size
-        "text size = %s" printfln(text size _)
 
         rect := GlRectangle new(text size)
         rect pos set!(text pos)
-        rect color set!(Color new(20, 20, 20))
+        rect color set!(Color new(40, 40, 40))
         rect center = false
 
         dye add(rect)
