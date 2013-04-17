@@ -74,7 +74,7 @@ Font: class {
         aabb
     }
 
-    render: func (dye: DyeContext, inputModelView: Matrix4, text: String, color: Color) {
+    render: func (dye: DyeContext, inputModelView: Matrix4, text: String, color: Color, opacity: Float) {
         modelView := inputModelView
         this color set!(color)
 
@@ -84,6 +84,7 @@ Font: class {
             if (!glyph) {
                 return
             }
+            glyph sprite opacity = opacity
             glyph sprite render(dye, modelView)
 
             modelView = Matrix4 newTranslate(glyph advance x, glyph advance y, 0.0) * modelView

@@ -13,14 +13,13 @@ import deadlogger/[Log, Logger]
 // sdk stuff
 import structs/HashMap
 
-GlText: class extends GlDrawable {
+GlText: class extends GlSpriteLike {
 
     cache := static HashMap<String, Font> new()
     logger := static Log getLogger(This name)
 
     fontPath: String
     font: Font
-    color := Color white()
     value: String
 
     lineHeight: Float
@@ -38,7 +37,7 @@ GlText: class extends GlDrawable {
     }
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
-        font render(dye, modelView, value, color)
+        font render(dye, modelView, value, color, opacity)
     }
 
     loadFont: static func (fontPath: String, fontSize: Int) -> Font {
