@@ -1,6 +1,6 @@
 
 use dye
-import dye/[core, text, primitives, app]
+import dye/[core, text, primitives, app, math]
 
 main: func (argc: Int, argv: CString*) {
     FontTest new() run(2.0)
@@ -8,14 +8,33 @@ main: func (argc: Int, argv: CString*) {
 
 FontTest: class extends App {
 
+    testString := "Judge this: b = {0, x^2}. glabilop;"
+
     init: func {
-        super("Font test")
+        super("Font test", 1280, 768)
     }
 
     setup: func {
-        text := GlText new("fonts/classiq-medium.ttf", "Life is short, the art long. - Hippocrates", 42)
+        addColumn(20, "classiq-medium")
+        addColumn(600, "impact")
+    }
+
+    addColumn: func (x: Float, fontName: String) {
+        addText(fontName, vec2(x, 580), 45)
+        addText(fontName, vec2(x, 470), 38)
+        addText(fontName, vec2(x, 380), 29)
+        addText(fontName, vec2(x, 300), 25)
+        addText(fontName, vec2(x, 240), 21)
+        addText(fontName, vec2(x, 180), 18)
+        addText(fontName, vec2(x, 130), 16)
+        addText(fontName, vec2(x, 60), 14)
+    }
+
+    addText: func (fontName: String, pos: Vec2, fontSize: Int) {
+        fontPath := "fonts/%s.ttf" format(fontName)
+        text := GlText new(fontPath, testString, fontSize)
         text color set!(Color white())
-        text pos set!(20, 60)
+        text pos set!(pos)
 
         size := text size
 

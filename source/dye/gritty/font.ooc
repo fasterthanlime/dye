@@ -7,10 +7,15 @@ import dye/gritty/[texture]
 use freetype2
 import freetype2
 
+use deadlogger
+import deadlogger/[Log, Logger]
+
 // sdk stuff
 import structs/[HashMap]
 
 Font: class {
+
+    logger := static Log getLogger(This name)
 
     _ftInitialized := static false
     _ft: static FTLibrary
@@ -147,10 +152,10 @@ Glyph: class {
         )
         _createTexture(bitmapGlyph@ bitmap)
 
-        /*
-        "Loaded glyph %c, aabb = %s, advance = %s, texSize = %s" printfln(
+        Font logger info("Loaded glyph %c, aabb = %s, advance = %s, texSize = %s",
             charPoint as Char, aabb _, advance _, texSize _)
-        */
+        Font logger info("left = %d, top = %d, rows = %d, width = %d",
+            left, top, rows, width)
     }
 
     _createTexture: func (bitmap: FTBitmap) {
