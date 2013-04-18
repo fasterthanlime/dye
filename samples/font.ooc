@@ -8,7 +8,7 @@ main: func (argc: Int, argv: CString*) {
 
 FontTest: class extends App {
 
-    testString := "{apqjkl'a,a; 'ah'}"
+    testString := "{AVAVQAVAVA,;'}"
 
     init: func {
         super("Font test", 1280, 768)
@@ -20,14 +20,14 @@ FontTest: class extends App {
     }
 
     addColumn: func (x: Float, fontName: String) {
-        addText(fontName, vec2(x, 580), 45)
-        addText(fontName, vec2(x, 470), 38)
-        addText(fontName, vec2(x, 380), 29)
-        addText(fontName, vec2(x, 300), 25)
-        addText(fontName, vec2(x, 240), 21)
-        addText(fontName, vec2(x, 180), 18)
+        addText(fontName, vec2(x, 580), 65)
+        addText(fontName, vec2(x, 470), 56)
+        addText(fontName, vec2(x, 380), 47)
+        addText(fontName, vec2(x, 300), 38)
+        addText(fontName, vec2(x, 240), 29)
+        addText(fontName, vec2(x, 180), 20)
         addText(fontName, vec2(x, 130), 16)
-        addText(fontName, vec2(x, 60), 14)
+        addText(fontName, vec2(x, 60), 12)
     }
 
     addText: func (fontName: String, pos: Vec2, fontSize: Int) {
@@ -40,7 +40,7 @@ FontTest: class extends App {
 
         rect := GlRectangle new(text size)
         rect pos set!(text pos)
-        rect color set!(Color new(40, 40, 40))
+        rect color set!(Color new(80, 80, 80))
         rect center = false
 
         dye add(rect)

@@ -55,7 +55,8 @@ Font: class {
     }
 
     getLineHeight: func -> Float {
-        (_face@ height as Float) / 64.0 * (fontSize / 72.0)
+        metrics := _face@ size@ metrics
+        metrics height toFloat()
     }
 
     getBounds: func (str: String) -> AABB2 {
