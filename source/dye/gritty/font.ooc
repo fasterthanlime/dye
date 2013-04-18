@@ -55,7 +55,7 @@ Font: class {
     }
 
     getLineHeight: func -> Float {
-        (_face@ height as Float) / 64.0
+        (_face@ height as Float) / 64.0 * (fontSize / 72.0)
     }
 
     getBounds: func (str: String) -> AABB2 {
@@ -183,7 +183,7 @@ Glyph: class {
         texture upload(data)
         sprite = GlSprite new(texture)
         sprite center = false
-        sprite pos set!(left, 0)
+        sprite pos set!(left, top - rows)
     }
 
 }
