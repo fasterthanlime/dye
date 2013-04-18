@@ -167,7 +167,9 @@ Glyph: class {
         for (x in 0..width) {
             for (y in 0..rows) {
                 srcIndex := x + y * width
-                dstIndex := x + y * texture width
+
+                dstY := y + texSize y - rows
+                dstIndex := x + dstY * texture width
 
                 gray := (bitmap buffer[srcIndex]) as UInt8
                 data[dstIndex * 4 + 0] = gray
@@ -181,7 +183,7 @@ Glyph: class {
         texture upload(data)
         sprite = GlSprite new(texture)
         sprite center = false
-        sprite pos set!(left, top)
+        sprite pos set!(left, 0)
     }
 
 }
