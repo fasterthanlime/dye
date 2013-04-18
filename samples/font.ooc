@@ -8,39 +8,49 @@ main: func (argc: Int, argv: CString*) {
 
 FontTest: class extends App {
 
-    testString := "{AVAVQAVAVA,;'}"
+    testString := "The 'quick' brown fox: jumps over, the lazy dog;"
 
     init: func {
         super("Font test", 1280, 768)
+        dye setClearColor(Color white())
     }
 
     setup: func {
-        addColumn(20, "classiq-medium")
+        addColumn(5, "classiq-medium")
         addColumn(600, "impact")
     }
 
     addColumn: func (x: Float, fontName: String) {
-        addText(fontName, vec2(x, 580), 65)
-        addText(fontName, vec2(x, 470), 56)
-        addText(fontName, vec2(x, 380), 47)
-        addText(fontName, vec2(x, 300), 38)
-        addText(fontName, vec2(x, 240), 29)
-        addText(fontName, vec2(x, 180), 20)
-        addText(fontName, vec2(x, 130), 16)
-        addText(fontName, vec2(x, 60), 12)
+        initialSize := 32
+        getSize := func -> Int {
+            value := initialSize
+            initialSize -= 1
+            value
+        }
+
+        initialHeight := 740
+        getHeight := func -> Int {
+            value := initialHeight
+            initialHeight -= 42
+            value
+        }
+
+        for (i in 0..18) {
+            addText(fontName, vec2(x, getHeight()), getSize())
+        }
     }
 
     addText: func (fontName: String, pos: Vec2, fontSize: Int) {
         fontPath := "fonts/%s.ttf" format(fontName)
         text := GlText new(fontPath, testString, fontSize)
-        text color set!(Color white())
+        text color set!(Color black())
         text pos set!(pos)
 
         size := text size
 
-        rect := GlRectangle new(text size)
-        rect pos set!(text pos)
-        rect color set!(Color new(80, 80, 80))
+        rect := GlRectangle new(vec2(text size x, 2))
+        rect pos set!(text pos sub(0, 2))
+        rect color set!(Color new(150, 40, 40))
         rect center = false
 
         dye add(rect)
