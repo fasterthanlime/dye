@@ -8,7 +8,7 @@ main: func (argc: Int, argv: CString*) {
 
 FontTest: class extends App {
 
-    testString := "Judge this: b = {0, x^2}. glabilop;"
+    testString := "apqjkl'a,a"
 
     init: func {
         super("Font test", 1280, 768)
