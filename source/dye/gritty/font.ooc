@@ -153,10 +153,12 @@ Glyph: class {
         )
         _createTexture(bitmapGlyph@ bitmap)
 
+        /*
         Font logger info("Loaded glyph %c, aabb = %s, advance = %s, texSize = %s",
             charPoint as Char, aabb _, advance _, texSize _)
         Font logger info("left = %d, top = %d, rows = %d, width = %d",
             left, top, rows, width)
+        */
     }
 
     _createTexture: func (bitmap: FTBitmap) {
