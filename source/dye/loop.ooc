@@ -45,9 +45,10 @@ FixedLoop: class {
             }
 
             t2 := SDL getTicks()
-            delta := t2 - t1
+            delta := (t2 - t1) as Float
 
             delay := maxFrameDuration - delta
+
             if (delay < 0) {
                 // never sleep for a negative amount of time - that'll freeze 
                 delay = 0
@@ -58,9 +59,9 @@ FixedLoop: class {
                 delay = maxFrameDuration
             }
 
-            count += 1
+            SDL delay(delay as UInt32)
 
-            SDL delay(delay)
+            count += 1
 
             if (count >= 30) {
                 count = 0
