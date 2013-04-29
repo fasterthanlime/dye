@@ -169,7 +169,13 @@ Vec2: class {
     }
 
     clamp: func (bottomLeft, topRight: Vec2) -> This {
-        vec2(
+        v := vec2(this)
+        v clamp!(bottomLeft, topRight)
+        v
+    }
+
+    clamp!: func (bottomLeft, topRight: Vec2) {
+        set!(
             x clamp(bottomLeft x, topRight x),
             y clamp(bottomLeft y, topRight y)
         )

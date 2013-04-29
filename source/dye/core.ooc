@@ -195,6 +195,18 @@ DyeContext: class {
         }
     }
 
+    setCursorColor: func (color: Color) {
+        if (!cursorSprite) { return }
+
+        cursorSprite color set!(color)
+    }
+
+    setCursorOpacity: func (opacity: Float) {
+        if (!cursorSprite) { return }
+
+        cursorSprite opacity = opacity
+    }
+
     poll: func {
         input _poll()
     }
