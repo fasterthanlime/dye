@@ -130,6 +130,10 @@ DyeContext: class {
             rect: SdlRect
             SDL getDisplayBounds(0, rect&)
             windowSize = vec2i(rect w, rect h)
+
+            if (windowWidth  == -1 && windowHeight == -1) {
+                size set!(windowSize)
+            }
         } else {
             windowSize = vec2i(size x, size y)
 
