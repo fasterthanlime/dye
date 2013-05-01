@@ -65,7 +65,11 @@ ShaderLibrary: class {
             return ShaderVersion GLSL_150
         }
 
-        ShaderVersion GLSL_130
+        if (ver gte(3, 0)) {
+            return ShaderVersion GLSL_130
+        }
+
+        ShaderVersion GLSL_100
     }
 
     getProgram: static func (name: String, vertex, fragment: String) -> ShaderProgram {
