@@ -245,7 +245,7 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
         texCellWidth :=  1.0 / xnum as Float
         texCellHeight := 1.0 / ynum as Float
 
-        glUniform4f(gridLoc, x as Float, y as Float, texCellWidth, texCellHeight)
+        glUniform4f(gridLoc, x as Float, (ynum - 1 - y) as Float, texCellWidth, texCellHeight)
 
         // premultiply color by opacity
         glUniform4f(colorLoc,

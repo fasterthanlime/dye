@@ -60,7 +60,7 @@ App: class {
 
     setupLogging: func {
         console := StdoutHandler new()
-        console setFormatter(NiceFormatter new())
+        console setFormatter(ColoredFormatter new(NiceFormatter new()))
         Log root attachHandler(console)
 
         logger = Log getLogger(title)
