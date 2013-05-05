@@ -153,6 +153,7 @@ DyeContext: class {
 
         version (windows || linux || apple) {
             // we use glew on Desktop
+            glewExperimental = true
             glewValue := glewInit()
             logger debug("glew value = %d", glewValue as Int) 
         }

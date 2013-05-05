@@ -22,9 +22,11 @@ Fbo: class {
     init: func (=dye, =width, =height) {
         // create a texture object
         texture = Texture new(width, height, "<fbo>")
+        texture upload(null)
 
         // create a sprite object
         sprite = GlSprite new(texture)
+        sprite center = false
 
         // create a renderbuffer object to store depth info
         glGenRenderbuffers(1, rboId&)
@@ -82,8 +84,7 @@ Fbo: class {
         targetOffset y = dye windowSize y / 2 - targetSize y / 2
 
         sprite pos set!(targetOffset x, targetOffset y)
-        sprite scale set!(targetSize x / width as Float,
-                          targetSize y / height as Float)
+        //sprite scale set!(scale, scale)
 
         sprite render(dye, Matrix4 newIdentity())
     }

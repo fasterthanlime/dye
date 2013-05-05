@@ -73,4 +73,8 @@ FixedLoop: class {
         }
     }
 
+    stop: func {
+        running = false
+    }
+
 }
