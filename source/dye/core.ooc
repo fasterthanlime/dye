@@ -151,9 +151,10 @@ DyeContext: class {
 
         SDL glMakeCurrent(window, context)
 
-        version (windows || linux) {
-            // we use glew on Windows & Linux
-            glewInit()
+        version (windows || linux || apple) {
+            // we use glew on Desktop
+            glewValue := glewInit()
+            logger debug("glew value = %d", glewValue as Int) 
         }
 
         input = SdlInput new(this)
@@ -221,17 +222,17 @@ DyeContext: class {
         glEnable(GL_BLEND)
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
-        //fbo bind()
+        fbo bind()
         glViewport(0, 0, size x, size y)
 	glClearColor(clearColor R, clearColor G, clearColor B, 1.0)
 	glClear(GL_COLOR_BUFFER_BIT)
 	draw()
-        //fbo unbind()
+        fbo unbind()
 
         glDisable(GL_BLEND)
 
-        //glViewport(0, 0, windowSize x, windowSize y)
-        //fbo render()
+        glViewport(0, 0, windowSize x, windowSize y)
+        fbo render()
 
 	SDL glSwapWindow(window)
     }
@@ -270,7 +271,7 @@ DyeContext: class {
 
         projectionMatrix = Matrix4 newOrtho(0, size x, 0, size y, -1.0, 1.0)
 
-        //fbo = Fbo new(this, size x, size y)
+        fbo = Fbo new(this, size x, size y)
     }
 
     createScene: func -> Scene {

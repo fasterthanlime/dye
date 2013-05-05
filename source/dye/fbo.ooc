@@ -1,6 +1,7 @@
 
 use dye
-import dye/[core, math]
+import dye/[core, math, sprite]
+import dye/gritty/[texture]
 
 import sdl2/[OpenGL]
 
@@ -9,7 +10,8 @@ Fbo: class {
     dye: DyeContext
 
     width, height: Int
-    textureId: Int
+    texture: Texture
+    sprite: GlSprite
     rboId: Int
     fboId: Int
 
@@ -19,18 +21,10 @@ Fbo: class {
 
     init: func (=dye, =width, =height) {
         // create a texture object
-        glGenTextures(1, textureId&)
-        glBindTexture(GL_TEXTURE_2D, textureId)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        texture = Texture new(width, height, "<fbo>")
 
-        texFormat := GL_RGBA
-        version (!android) {
-            texFormat = GL_RGBA8
-        }
-
-        glTexImage2D(GL_TEXTURE_2D, 0, texFormat, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, null)
-        glBindTexture(GL_TEXTURE_2D, 0) 
+        // create a sprite object
+        sprite = GlSprite new(texture)
 
         // create a renderbuffer object to store depth info
         glGenRenderbuffers(1, rboId&)
@@ -43,7 +37,7 @@ Fbo: class {
         bind()
 
         // attach the texture to FBO color attachment point
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureId, 0)
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture id, 0)
 
         // attach the renderbuffer to depth attachment point
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId)
@@ -51,7 +45,8 @@ Fbo: class {
         // check FBO status
         status := glCheckFramebufferStatus(GL_FRAMEBUFFER)
         if(status != GL_FRAMEBUFFER_COMPLETE) {
-            Exception new("FBO (Framebuffer Objects) not supported, cannot continue") throw()
+            "Status = %d" printfln(status as Int)
+            raise("FBO (Framebuffer Objects) not supported, cannot continue")
         }
 
         // switch back to window-system-provided framebuffer
@@ -70,9 +65,6 @@ Fbo: class {
 	glClearColor(0.0, 0.0, 0.0, 1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        //glBindTexture(GL_TEXTURE_2D, textureId)
-	//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-
         ratio := dye size ratio()
         targetRatio := dye windowSize ratio()
 
@@ -89,32 +81,11 @@ Fbo: class {
         targetOffset x = dye windowSize x / 2 - targetSize x / 2
         targetOffset y = dye windowSize y / 2 - targetSize y / 2
 
-        // FIXME: transformations
-        // glPushMatrix()
-        // glTranslatef(targetOffset x, targetOffset y, 0)
+        sprite pos set!(targetOffset x, targetOffset y)
+        sprite scale set!(targetSize x / width as Float,
+                          targetSize y / height as Float)
 
-        // FIXME: colors
-        //glColor4f(1, 1, 1, 1)
-
-        // FIXME: drawing stuff
-        //glBegin(GL_TRIANGLE_STRIP)
-        //    glTexCoord2f(0.0, 0.0)
-        //    glVertex2f(0, 0)
-
-        //    glTexCoord2f(1.0, 0.0)
-        //    glVertex2f(targetSize x, 0)
-
-        //    glTexCoord2f(0.0, 1.0)
-        //    glVertex2f(0, targetSize y)
-
-        //    glTexCoord2f(1.0, 1.0)
-        //    glVertex2f(targetSize x, targetSize y)
-        //glEnd()
-
-        // FIXME: transformations
-        // glPopMatrix()
-
-        //glBindTexture(GL_TEXTURE_2D, 0)
+        sprite render(dye, Matrix4 newIdentity())
     }
 
 }
