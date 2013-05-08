@@ -51,7 +51,36 @@ Texture: class {
                     0,
                     GL_RGBA,
                     GL_UNSIGNED_BYTE,
-                    data)
+                    data
+        )
+    }
+
+    update: func (data: UInt8*, xOffset := 0, yOffset := 0, updateWidth := 0, updateHeight := 0) {
+        bind()
+        internalFormat := GL_RGBA
+
+        version (!android) {
+            internalFormat = GL_RGBA8
+        }
+
+        if (updateWidth == 0) {
+            updateWidth = width
+        }
+
+        if (updateHeight == 0) {
+            updateHeight = height
+        }
+
+        glTexSubImage2D(GL_TEXTURE_2D, // target
+                    0,                  // level
+                    xOffset,            // xoffset
+                    yOffset,            // yoffset
+                    updateWidth,        // width
+                    updateHeight,       // height
+                    GL_RGBA,            // format
+                    GL_UNSIGNED_BYTE,   // type
+                    data                // data
+        )
     }
 
     bind: func {

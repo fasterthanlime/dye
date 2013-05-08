@@ -44,7 +44,7 @@ App: class {
     }
 
     run: func (fps: Float) {
-        logger info("Welcome to %s, running at 2FPS", title)
+        logger info("Welcome to %s, running at %.2fFPS", title, fps)
         logger info("Press ESC or close the window to exit")
 
         loop := FixedLoop new(dye, fps)
