@@ -14,6 +14,11 @@ import deadlogger/[Log, Logger]
 // sdk stuff
 import structs/HashMap
 
+TextureFilter: enum {
+    NEAREST
+    LINEAR
+}
+
 /**
  * This class represents an RGBA OpenGL texture
  */
@@ -23,15 +28,25 @@ Texture: class {
     width, height: Int
     path: String
 
-    init: func (=width, =height, =path) {
+    filter: TextureFilter
+
+    init: func (=width, =height, =path, filter := TextureFilter LINEAR) {
         glGenTextures(1, id&)
         bind()
         setup()
+        this filter = filter
     }
 
     setup: func {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        filterValue := match filter {
+            case TextureFilter LINEAR =>
+                GL_LINEAR
+            case =>
+                GL_NEAREST
+        }
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterValue)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterValue)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE)
     }
