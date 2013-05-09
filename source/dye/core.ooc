@@ -13,55 +13,11 @@ import structs/ArrayList
 use dye
 import dye/[input, math, sprite, fbo]
 
-Color: class {
-
-    /* r, g, b = [0, 255] UInt8 */
-    r, g, b: UInt8
-    init: func (=r, =g, =b)
-
-    toSDL: func (format: SdlPixelFormat*) -> UInt {
-	SDL mapRgb(format, r, g, b)
-    }
-
-    /* R, G, B = [0.0, 1.0] Float */
-    R: Float { get { r / 255.0 } }
-    G: Float { get { g / 255.0 } }
-    B: Float { get { b / 255.0 } }
-
-    set!: func (c: This) {
-        r = c r
-        g = c g
-        b = c b
-    }
-
-    set!: func ~floats (r, g, b: Float) {
-        this r = r
-        this g = g
-        this b = b
-    }
-
-    black: static func -> This { new(0, 0, 0) }
-    white: static func -> This { new(255, 255, 255) }
-    red: static func -> This { new(255, 0, 0) }
-    green: static func -> This { new(0, 255, 0) }
-    blue: static func -> This { new(0, 0, 255) }
-
-    toString: func -> String {
-        "(%d, %d, %d)" format(r, g, b)
-    }
-
-    _: String { get { toString() } }
-
-    lighten: func (factor: Float) -> This {
-        new(r as Float / factor, g as Float / factor, b as Float / factor)
-    }
-
-    mul: func (factor: Float) -> This {
-        new(r * factor, g * factor, b * factor)
-    }
-
-}
-
+/**
+ * A dye context - ie. a window bound to an OpenGL context,
+ * with an associated Input, can has a custom cursor, a list of
+ * scenes that can be swapped for one another
+ */
 DyeContext: class {
 
     window: SdlWindow
@@ -302,6 +258,9 @@ DyeContext: class {
 
 }
 
+/**
+ * Anything that can be drawn on a context
+ */
 GlDrawable: abstract class {
 
     scale := vec2(1, 1)
@@ -363,6 +322,9 @@ GlDrawable: abstract class {
 
 }
 
+/**
+ * A group of drawables, that has its own position, scale, and rotation
+ */
 GlGroup: class extends GlDrawable {
 
     children := ArrayList<GlDrawable> new()
@@ -391,6 +353,9 @@ GlGroup: class extends GlDrawable {
 
 }
 
+/**
+ * A group of drawables, sorted by y coordinate
+ */
 GlSortedGroup: class extends GlGroup {
 
     init: func {
@@ -437,5 +402,85 @@ Scene: class extends GlGroup {
         new(dye, input sub())
     }
 
+}
+
+/**
+ * An RGB color
+ */
+Color: class {
+
+    /* r, g, b = [0, 255] UInt8 */
+    r, g, b: UInt8
+    init: func (=r, =g, =b)
+
+    toSDL: func (format: SdlPixelFormat*) -> UInt {
+	SDL mapRgb(format, r, g, b)
+    }
+
+    /* R, G, B = [0.0, 1.0] Float */
+    R: Float { get { r / 255.0 } }
+    G: Float { get { g / 255.0 } }
+    B: Float { get { b / 255.0 } }
+
+    set!: func (c: This) {
+        r = c r
+        g = c g
+        b = c b
+    }
+
+    set!: func ~floats (r, g, b: UInt8) {
+        this r = r
+        this g = g
+        this b = b
+    }
+
+    black: static func -> This { new(0, 0, 0) }
+    white: static func -> This { new(255, 255, 255) }
+    red: static func -> This { new(255, 0, 0) }
+    green: static func -> This { new(0, 255, 0) }
+    blue: static func -> This { new(0, 0, 255) }
+
+    toString: func -> String {
+        "(%d, %d, %d)" format(r, g, b)
+    }
+
+    _: String { get { toString() } }
+
+    lighten: func (factor: Float) -> This {
+        new(r as Float / factor, g as Float / factor, b as Float / factor)
+    }
+
+    mul: func (factor: Float) -> This {
+        new(r * factor, g * factor, b * factor)
+    }
+
+}
+
+/**
+ * An RGBA color
+ */
+Color4: class extends Color {
+    a: UInt8
+
+    init: func (.r, .g, .b, =a) {
+        super(r, g, b)
+    }
+
+    /* A = [0.0, 1.0] Float */
+    A: Float { get { a / 255.0 } }
+
+    set!: func ~four (c: This) {
+        r = c r
+        g = c g
+        b = c b
+        a = c a
+    }
+
+    set!: func ~floatsFour (r, g, b, a: Float) {
+    }
+
+    toString: func -> String {
+        "(%d, %d, %d, %d)" format(r, g, b, a)
+    }
 }
 
