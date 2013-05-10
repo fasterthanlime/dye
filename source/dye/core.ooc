@@ -244,6 +244,10 @@ DyeContext: class {
         currentScene input enabled = true
     }
 
+    getScene: func -> Scene {
+        currentScene
+    }
+
     add: func (d: GlDrawable) {
         currentScene add(d)
     }

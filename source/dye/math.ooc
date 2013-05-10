@@ -99,6 +99,10 @@ Vec2: class {
         vec2i(col, row)
     }
 
+    round: func -> Vec2i {
+        Vec2i new(x as Int, y as Int)
+    }
+
     sub: func (v: This) -> This {
         new(x - v x, y - v y)
     }
