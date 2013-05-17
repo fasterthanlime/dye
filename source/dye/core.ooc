@@ -432,11 +432,7 @@ Color: class {
         b = c b
     }
 
-    set!: func ~floats (r, g, b: UInt8) {
-        this r = r
-        this g = g
-        this b = b
-    }
+    set!: func ~ints (=r, =g, =b)
 
     black: static func -> This { new(0, 0, 0) }
     white: static func -> This { new(255, 255, 255) }
@@ -480,8 +476,7 @@ Color4: class extends Color {
         a = c a
     }
 
-    set!: func ~floatsFour (r, g, b, a: Float) {
-    }
+    set!: func ~intsFour (=r, =g, =b, =a)
 
     toString: func -> String {
         "(%d, %d, %d, %d)" format(r, g, b, a)
