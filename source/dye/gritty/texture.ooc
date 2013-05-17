@@ -33,8 +33,9 @@ Texture: class {
     init: func (=width, =height, =path, filter := TextureFilter LINEAR) {
         glGenTextures(1, id&)
         bind()
-        setup()
+
         this filter = filter
+        setup()
     }
 
     setup: func {

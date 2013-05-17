@@ -47,6 +47,8 @@ DyeContext: class {
 
     projectionMatrix: Matrix4
 
+    fullscreen := false
+
     init: func (width, height: Int, title: String, fullscreen := false,
             windowWidth := -1, windowHeight := -1) {
         size = vec2i(width, height)
@@ -73,6 +75,7 @@ DyeContext: class {
 	SDL glSetAttribute(SDL_GL_DOUBLEBUFFER, 1)
 
         flags := SDL_WINDOW_OPENGL
+        this fullscreen = fullscreen
         if (fullscreen) {
             version (apple) {
                 flags |= SDL_WINDOW_FULLSCREEN
@@ -102,7 +105,8 @@ DyeContext: class {
             windowSize x, windowSize y, flags)
         context = SDL glCreateContext(window) 
         if (!context) {
-            Exception new("Couldn't initialize OpenGL Context: %s" format(SDL getError())) throw()
+            logger error("Couldn't initialize OpenGL Context: %s" format(SDL getError()))
+            raise("opengl failure")
         }
 
         SDL glMakeCurrent(window, context)
@@ -111,7 +115,10 @@ DyeContext: class {
             // we use glew on Desktop
             glewExperimental = true
             glewValue := glewInit()
-            logger debug("glew value = %d", glewValue as Int) 
+            if (glewValue != 0) {
+                logger error("Failed to initialize glew!", glewValue)
+                raise("glew failure")
+            }
         }
 
         input = SdlInput new(this)
@@ -122,6 +129,10 @@ DyeContext: class {
 	initGL()
 
         setScene(createScene())
+    }
+
+    setFullscreen: func (=fullscreen) {
+        SDL setWindowFullscreen(window, fullscreen)
     }
 
     setTitle: func (title: String) {
@@ -142,11 +153,15 @@ DyeContext: class {
     }
 
     setCursorSprite: func (path: String, numStates: Int) {
-        SDL setRelativeMouseMode(true)
+        setRelativeMouse(true)
 
         cursorSprite = GlGridSprite new(path, numStates, 1)
         cursorNumStates = numStates
         setShowCursor(false)
+    }
+
+    setRelativeMouse: func (enabled: Bool) {
+        SDL setRelativeMouseMode(enabled)
     }
 
     setCursorState: func (state: Int) {
@@ -299,25 +314,16 @@ GlDrawable: abstract class {
             modelView = Matrix4 newIdentity()
         }
 
-        //"input modelView = " println()
-        //modelView _ println()
-
         if (!pos zero?()) {
             modelView = modelView * Matrix4 newTranslate(pos x, pos y, 0.0)
-            //"after translation modelView = " println()
-            //modelView _ println()
         }
 
         if (angle != 0.0) {
             modelView = modelView * Matrix4 newRotateZ(angle toRadians())
-            //"after rotation modelView = " println()
-            //modelView _ println()
         }
 
         if (!scale unit?()) {
             modelView = modelView * Matrix4 newScale(scale x, scale y, 1.0)
-            //"after scale modelView = " println()
-            //modelView _ println()
         }
 
 
