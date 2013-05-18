@@ -30,6 +30,10 @@ GlSegment: class extends GlDrawable {
 GlRectangle: class extends GlDrawable {
 
     size: Vec2
+    oldSize := vec2(0, 0)
+
+    EPSILON := 0.1
+
     color := Color green()
     opacity := 1.0
 
@@ -75,6 +79,9 @@ GlRectangle: class extends GlDrawable {
     }
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
+        if (!size equals?(oldSize, EPSILON)) {
+            rebuild()
+        }
 
         vbo bind()
         program use()
@@ -104,6 +111,7 @@ GlRectangle: class extends GlDrawable {
             0.0, size y,
             size x, size y
         ]
+        oldSize set!(size)
 
         vbo bind()
         vbo data(vertices)

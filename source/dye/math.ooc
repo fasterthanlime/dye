@@ -198,6 +198,11 @@ Vec2: class {
 
     _: String { get { toString() } }
 
+    equals?: func (v: This, epsilon: Float) -> Bool {
+        abs(v x - x) < epsilon && \
+        abs(v y - y) < epsilon
+    }
+
 }
 
 // cuz I'm lazy
@@ -259,6 +264,12 @@ Vec3: class {
     }
 
     _: String { get { toString() } }
+
+    equals?: func (v: This, epsilon: Float) -> Bool {
+        abs(v x - x) < epsilon && \
+        abs(v y - y) < epsilon && \
+        abs(v z - z) < epsilon
+    }
 
 }
 
