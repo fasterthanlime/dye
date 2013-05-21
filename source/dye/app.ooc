@@ -6,6 +6,8 @@ use deadlogger
 import deadlogger/[Log, Logger, Handler, Formatter, Filter, Level]
 
 /**
+ * Class: App
+ *
  * A simple app that sets up logging, a simple fixed loop and
  * exit events. Use that for short tests, not for serious applications.
  */

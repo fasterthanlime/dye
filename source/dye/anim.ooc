@@ -7,12 +7,23 @@ import sdl2/OpenGL
 import structs/[List, ArrayList, HashMap]
 
 /**
+ * Class: GlAnimSource
  * An anim source has a certain number of frames and it can switch
  * from one frame to another.
  */
 GlAnimSource: interface {
 
+    /**
+     * Function: numFrames
+     *
+     * Gets the number of frames in that animation source
+     *
+     * Returns:
+     *
+     * the number of frames as an Int
+     */
     numFrames: func -> Int
+
     setFrame: func (frame: Int)
     currentFrame: func -> Int
     frameOffset: func (offset: Int)

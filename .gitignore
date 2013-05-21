@@ -1,2 +1,10 @@
+# ooc stuff
 .libs
 rock_tmp
+
+# Doc stuff
+doc/html
+doc/nd-project/Data/
+
+# OSX stuff
+.DS_store
