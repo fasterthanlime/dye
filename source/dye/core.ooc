@@ -111,7 +111,7 @@ DyeContext: class {
 
         SDL glMakeCurrent(window, context)
 
-        version (windows || linux || apple) {
+        version ((windows || linux || apple) && !android) {
             // we use glew on Desktop
             glewExperimental = true
             glewValue := glewInit()
