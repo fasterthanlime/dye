@@ -3,6 +3,7 @@
 use deadlogger
 import deadlogger/Log
 
+// our stuff
 use sdl2
 import sdl2/[Core, Event]
 
