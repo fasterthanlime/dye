@@ -33,6 +33,8 @@ DyeContext: class {
     center: Vec2
 
     logger := static Log getLogger("dye")
+
+    useFbo := true
     fbo: Fbo
 
     input: SdlInput
@@ -66,6 +68,9 @@ DyeContext: class {
         version (android) {
             SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2)
             SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0)
+
+            // FIXME: can't figure out how to make FBO work on Android for now.
+            useFbo = false
         }
 
 	SDL glSetAttribute(SDL_GL_RED_SIZE, 5)
@@ -205,22 +210,34 @@ DyeContext: class {
     render: func {
         SDL glMakeCurrent(window, context)
 
+        if (useFbo) {
+            // render to fbo
+            fbo bind()
+            clearAndDraw()
+            fbo unbind()
+
+            // render fbo to scene
+            glViewport(0, 0, windowSize x, windowSize y)
+            fbo render()
+        } else {
+            // only render to scene
+            clearAndDraw()
+            glDisable(GL_BLEND)
+        }
+
+        SDL glSwapWindow(window)
+    }
+
+    clearAndDraw: func {
         glEnable(GL_BLEND)
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
-        fbo bind()
         glViewport(0, 0, size x, size y)
         glClearColor(clearColor R, clearColor G, clearColor B, 1.0)
         glClear(GL_COLOR_BUFFER_BIT)
         draw()
-        fbo unbind()
 
         glDisable(GL_BLEND)
-
-        glViewport(0, 0, windowSize x, windowSize y)
-        fbo render()
-
-        SDL glSwapWindow(window)
     }
 
     draw: func {
@@ -257,7 +274,9 @@ DyeContext: class {
 
         projectionMatrix = Matrix4 newOrtho(0, size x, 0, size y, -1.0, 1.0)
 
-        fbo = Fbo new(this, size x, size y)
+        if (useFbo) {
+            fbo = Fbo new(this, size x, size y)
+        }
     }
 
     createScene: func -> Scene {
