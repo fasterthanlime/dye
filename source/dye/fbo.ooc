@@ -1,9 +1,14 @@
 
+// third-party stuff
+use deadlogger
+import deadlogger/Log
+
+import sdl2/[OpenGL]
+
+// our stuff
 use dye
 import dye/[core, math, sprite]
 import dye/gritty/[texture]
-
-import sdl2/[OpenGL]
 
 Fbo: class {
 
@@ -18,6 +23,8 @@ Fbo: class {
     targetSize := vec2(-1, -1)
     targetOffset := vec2(0, 0)
     scale := 1.0
+
+    logger := static Log getLogger(This name)
 
     init: func (=dye, =width, =height) {
         // create a texture object
@@ -47,8 +54,9 @@ Fbo: class {
         // check FBO status
         status := glCheckFramebufferStatus(GL_FRAMEBUFFER)
         if(status != GL_FRAMEBUFFER_COMPLETE) {
-            "Status = %d" printfln(status as Int)
-            raise("FBO (Framebuffer Objects) not supported, cannot continue")
+            logger warn("FBO status = %d" format(status as Int))
+            logger error("FBO (Frame Buffer Objects) not supported, cannot continue")
+            raise("fbo problem")
         }
 
         // switch back to window-system-provided framebuffer
