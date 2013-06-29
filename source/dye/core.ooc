@@ -100,16 +100,30 @@ DyeContext: class {
             if (windowHeight != -1) windowSize y = windowHeight
         }
 
-	window = SDL createWindow(title,
-            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-            windowSize x, windowSize y, flags)
+        window = SDL createWindow(
+                    title,
+                    SDL_WINDOWPOS_CENTERED,
+                    SDL_WINDOWPOS_CENTERED,
+                    windowSize x,
+                    windowSize y,
+                    flags
+                )
+        if (!window) {
+            logger error("Couldn't create SDL window: %s" format(SDL getError()))
+            raise("sdl failure")
+        }
+                
         context = SDL glCreateContext(window) 
         if (!context) {
             logger error("Couldn't initialize OpenGL Context: %s" format(SDL getError()))
-            raise("opengl failure")
+            raise("opengl initialization failure")
         }
 
-        SDL glMakeCurrent(window, context)
+        makeCurrentStatus := SDL glMakeCurrent(window, context)
+        if (makeCurrentStatus != 0) {
+            logger error("Invalid OpenGL context created: %s" format(SDL getError()))
+            raise("opengl context failure")
+        }
 
         version ((windows || linux || apple) && !android) {
             // we use glew on Desktop
@@ -125,8 +139,8 @@ DyeContext: class {
         input onWindowSizeChange(|x, y|
             windowSize set!(x, y)
         )
-
-	initGL()
+        
+        initGL()
 
         setScene(createScene())
     }
@@ -196,9 +210,9 @@ DyeContext: class {
 
         fbo bind()
         glViewport(0, 0, size x, size y)
-	glClearColor(clearColor R, clearColor G, clearColor B, 1.0)
-	glClear(GL_COLOR_BUFFER_BIT)
-	draw()
+        glClearColor(clearColor R, clearColor G, clearColor B, 1.0)
+        glClear(GL_COLOR_BUFFER_BIT)
+        draw()
         fbo unbind()
 
         glDisable(GL_BLEND)
@@ -206,7 +220,7 @@ DyeContext: class {
         glViewport(0, 0, windowSize x, windowSize y)
         fbo render()
 
-	SDL glSwapWindow(window)
+        SDL glSwapWindow(window)
     }
 
     draw: func {
@@ -222,7 +236,7 @@ DyeContext: class {
     }
 
     quit: func {
-	SDL quit()
+	    SDL quit()
         // on Desktop, chances are SDL quit will exit the app.
         // on mobile, exit(0) is apparently needed.
         // It can't hurt anyway.
@@ -234,10 +248,10 @@ DyeContext: class {
     }
 
     initGL: func {
-	logger info("OpenGL version: %s" format(glGetString(GL_VERSION)))
-	logger info("OpenGL vendor: %s" format(glGetString(GL_VENDOR)))
-	logger info("OpenGL renderer: %s" format(glGetString(GL_RENDERER)))
-	logger info("GLSL version: %s" format(glGetString(GL_SHADING_LANGUAGE_VERSION)))
+        logger info("OpenGL version: %s" format(glGetString(GL_VERSION)))
+        logger info("OpenGL vendor: %s" format(glGetString(GL_VENDOR)))
+        logger info("OpenGL renderer: %s" format(glGetString(GL_RENDERER)))
+        logger info("GLSL version: %s" format(glGetString(GL_SHADING_LANGUAGE_VERSION)))
 
         setClearColor(clearColor)
 
