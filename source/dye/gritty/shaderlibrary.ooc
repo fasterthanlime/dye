@@ -194,7 +194,7 @@ ShaderLibrary: class {
 
             uniform sampler2D Texture;
             varying mediump vec2 TexCoordOut;
-            uniform vec4 InColor;
+            uniform lowp vec4 InColor;
 
             void main()
             {
