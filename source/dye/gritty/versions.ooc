@@ -77,8 +77,12 @@ OpenGLVersion: class {
         // the major and minor versions, but those are only
         // for OpenGL 3.0+ so.. no luck here.
         ver: CString = glGetString(GL_VERSION)
-        cached = This new(ver toString())
+        if (!ver) {
+            logger error("Got null version, the GL context is probably garbage.")
+            raise("opengl version detection problem")
+        }
 
+        cached = This new(ver toString())
         cached
     }
 
