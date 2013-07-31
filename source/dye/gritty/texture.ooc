@@ -126,7 +126,14 @@ TextureLoader: class {
 
         width, height, channels: Int
 
-        reader := RWopsReader new(path)
+        reader: RWopsReader
+
+        try {
+            reader = RWopsReader new(path)
+        } catch (rwe: RWException) {
+            logger warn("Failed to read %s. Reason: %s", path, rwe message)
+            return _getPlaceholder()
+        }
         cb := StbIo callbacks()
 
         data := StbImage fromCb(cb&, reader, width&, height&, channels&, 4)

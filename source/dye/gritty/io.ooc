@@ -26,7 +26,7 @@ RWopsReader: class extends Reader {
         ops = RWops new(path, "rb")   
 
         if (!ops) {
-            Exception new(This, "Couldn't open " + path + " for reading.") throw()
+            RWException new(This, "Couldn't open for reading.") throw()
         }
     }
 
@@ -64,6 +64,18 @@ RWopsReader: class extends Reader {
 
     close: func {
         ops close()
+    }
+
+}
+
+RWException: class extends Exception {
+
+    init: func ~justMessage (.message) {
+        super(message)
+    }
+
+    init: func ~withOrigin (.origin, .message) {
+        super(origin, message)
     }
 
 }
