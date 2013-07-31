@@ -133,7 +133,8 @@ TextureLoader: class {
         reader close()
 
         if (width == 0 || height == 0 || channels == 0) {
-            logger warn("Failed to load %s!" format(path))
+            failureReason := StbImage failureReason() toString()
+            logger warn("Failed to load %s! Failure reason: %s" format(path, failureReason))
             return _getPlaceholder()
         }
 
