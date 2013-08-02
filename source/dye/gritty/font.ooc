@@ -63,37 +63,51 @@ Font: class {
         aabb := AABB2 new()
         tempAABB := AABB2 new()
 
-        position := vec2(0, 0)
+        pen := vec2(0, 0)
 
         _iterate(str, |charPoint|
-            glyph := getGlyph(charPoint)
+            match charPoint {
+                case '\n' =>
+                    pen x = 0
+                    pen y -= getLineHeight()
+                case =>
+                    glyph := getGlyph(charPoint)
 
-            tempAABB set!(glyph aabb)
-            tempAABB add!(position)
-            aabb expand!(tempAABB)
+                    tempAABB set!(glyph aabb)
+                    tempAABB add!(pen)
+                    aabb expand!(tempAABB)
 
-            position add!(glyph advance)
+                    pen add!(glyph advance)
+            }
         )
-
-        aabb expand!(position)
+        aabb expand!(pen)
 
         aabb
     }
 
-    render: func (dye: DyeContext, inputModelView: Matrix4, text: String, color: Color, opacity: Float) {
+    render: func (dye: DyeContext, inputModelView: Matrix4, text: String,
+        color: Color, opacity: Float) {
         modelView := inputModelView
         this color set!(color)
 
-        _iterate(text, |c|
-            glyph := getGlyph(c)
+        pen := vec2(0, 0)
 
-            if (!glyph) {
-                return
+        _iterate(text, |charPoint|
+            match charPoint {
+                case '\n' =>
+                    pen x = 0
+                    pen y -= getLineHeight()
+                case =>
+                    glyph := getGlyph(charPoint)
+
+                    if (!glyph) {
+                        return
+                    }
+                    glyph sprite opacity = opacity
+                    glyph sprite render(dye, modelView)
+                    pen add!(glyph advance x, glyph advance y)
             }
-            glyph sprite opacity = opacity
-            glyph sprite render(dye, modelView)
-
-            modelView = Matrix4 newTranslate(glyph advance x, glyph advance y, 0.0) * modelView
+            modelView = Matrix4 newTranslate(pen x, pen y, 0.0) * inputModelView
         )
     }
 
