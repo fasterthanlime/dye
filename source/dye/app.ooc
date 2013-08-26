@@ -17,6 +17,9 @@ App: class {
     logger: Logger
     title: String
 
+    // adjustable things
+    escQuits? := true
+
     init: func (=title, width := 800, height := 600) {
         setupLogging()
 
@@ -33,7 +36,9 @@ App: class {
         )
 
         dye input onKeyPress(KeyCode ESC, |kp|
-            quit()
+            if (escQuits?) {
+                quit()
+            }
         )
     }
 
