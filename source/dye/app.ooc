@@ -1,9 +1,14 @@
 
+// ours
 use dye
 import dye/[core, input, loop]
 
+// third party
 use deadlogger
 import deadlogger/[Log, Logger, Handler, Formatter, Filter, Level]
+
+// sdk
+import io/File
 
 /**
  * Class: App
@@ -69,6 +74,13 @@ App: class {
         console := StdoutHandler new()
         console setFormatter(ColoredFormatter new(NiceFormatter new()))
         Log root attachHandler(console)
+
+        file := File new("app.log")
+        file write("")
+
+        fileHandler := FileHandler new(file path)
+        fileHandler setFormatter(NiceFormatter new())
+        Log root attachHandler(fileHandler)
 
         logger = Log getLogger(title)
     }
