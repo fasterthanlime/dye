@@ -1,6 +1,6 @@
 
 // our stuff
-import dye/gritty/[shader]
+import dye/gritty/[shader, vbo]
 
 // third-party stuff
 import sdl2/[OpenGL]
@@ -23,15 +23,16 @@ VAO: abstract class {
         return SoftVAO new(program)
     }
 
-    add: func ~friendly (name: String, numComponents: Int, type: GLenum,
+    add: func ~friendly (vbo: VBO, name: String, numComponents: Int, type: GLenum,
         normalized: Bool, stride: Int, pointer: Pointer) {
 
-        add(VertexAttribInfo new(program, name, numComponents, type, normalized, stride, pointer))
+        add(VertexAttribInfo new(program, vbo, name, numComponents, type, normalized, stride, pointer))
     }
 
     add: abstract func (vai: VertexAttribInfo)
     bind: abstract func
     detach: abstract func
+    delete: abstract func
 
 }
 
@@ -62,6 +63,10 @@ version (!android) {
             glBindVertexArray(0)
         }
 
+        delete: func {
+            glDeleteVertexArrays(1, id&)
+        }
+
     }
 }
 
@@ -77,9 +82,7 @@ SoftVAO: class extends VAO {
 
     vertexAttribs := ArrayList<VertexAttribInfo> new()
 
-    init: func (=program) {
-
-    }
+    init: func (=program)
 
     add: func (vai: VertexAttribInfo) {
         vertexAttribs add(vai)
@@ -97,6 +100,10 @@ SoftVAO: class extends VAO {
         }
     }
 
+    delete: func {
+        vertexAttribs clear()
+    }
+
 }
 
 /**
@@ -108,6 +115,8 @@ SoftVAO: class extends VAO {
 VertexAttribInfo: class {
 
     program: ShaderProgram
+    vbo: VBO
+
     name: String
     id: Int
     numComponents: Int
@@ -116,12 +125,13 @@ VertexAttribInfo: class {
     stride: Int
     pointer: Pointer
 
-    init: func (=program, =name, =numComponents, =type, =normalized, =stride, =pointer) {
+    init: func (=program, =vbo, =name, =numComponents, =type, =normalized, =stride, =pointer) {
         id = glGetAttribLocation(program id, name toCString())
         bind()
     }
 
     bind: func {
+        vbo bind()
         glEnableVertexAttribArray(id)
         glVertexAttribPointer(id, numComponents, type, normalized, stride, pointer)
     }

@@ -1,5 +1,6 @@
 
 // our stuff
+import dye/[math]
 
 // third-party stuff
 import sdl2/[OpenGL]
@@ -128,6 +129,12 @@ ShaderProgram: class {
 
     getUniformLocation: func (name: String) -> Int {
         glGetUniformLocation(id, name toCString())
+    }
+
+    // uniforms
+
+    uniform: func ~vec2 (location: Int, v: Vec2) {
+        glUniform2f(location, v x, v y)
     }
 
 }

@@ -63,7 +63,7 @@ GlRectangle: class extends GlDrawable {
         program = ShaderLibrary getSolidColor()
 
         vao = VAO new(program)
-        vao add("Position", 2, GL_FLOAT, false, 0, 0 as Pointer)
+        vao add(vbo, "Position", 2, GL_FLOAT, false, 0, 0 as Pointer)
 
         projLoc = program getUniformLocation("Projection")
         modelLoc = program getUniformLocation("ModelView")

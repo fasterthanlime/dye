@@ -416,8 +416,32 @@ GlSpriteLike: abstract class extends GlDrawable {
 
     color := Color white()
     opacity := 1.0
+    effects: ArrayList<GlEffect> = null
+
+    addEffect: func (e: GlEffect) {
+        if (!effects) effects = ArrayList<GlEffect> new()
+        effects add(e)
+    }
+
+    applyEffects: func (dye: DyeContext, modelView: Matrix4) {
+        if (!effects) return
+        for (e in effects) {
+            e apply(this, dye, modelView)
+        }
+    }
 
 }
+
+/**
+ * Create your own effects and stuff
+ */
+GlEffect: abstract class {
+
+    // here you get a chance to set uniforms
+    apply: abstract func (sprite: GlSpriteLike, dye: DyeContext, modelView: Matrix4)
+
+}
+
 
 /**
  * Regroups a graphic scene (GlGroup) and some event handling (Input)

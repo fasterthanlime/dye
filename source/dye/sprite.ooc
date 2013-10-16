@@ -3,6 +3,9 @@
 import dye/[core, math, anim]
 import dye/gritty/[shader, shaderlibrary, texture, vbo, vao]
 
+// sdk
+import structs/[ArrayList]
+
 // third-party stuff
 import sdl2/[OpenGL]
 
@@ -40,19 +43,33 @@ GlSprite: class extends GlSpriteLike {
     
     init: func ~fromTex (.texture) {
         vbo = FloatVBO new()
-        program = ShaderLibrary getTexture()
+        setTexture(texture)
+        setProgram(ShaderLibrary getTexture())
+    }
+
+    setProgram: func (.program) {
+        if (this program) {
+            this program detach()
+        }
+        this program = program
+        program use()
+
+        if (vao) {
+            vao delete()
+            vao = null
+        }
 
         vao = VAO new(program)
         stride := 4 * Float size
-        vao add("TexCoordIn", 2, GL_FLOAT, false, stride, 0 as Pointer)
-        vao add("Position", 2, GL_FLOAT, false, stride, (2 * Float size) as Pointer)
+        vao add(vbo, "TexCoordIn", 2, GL_FLOAT, false,
+            stride, 0 as Pointer)
+        vao add(vbo, "Position", 2, GL_FLOAT, false,
+            stride,(2 * Float size) as Pointer)
 
         texLoc = program getUniformLocation("Texture")
         projLoc = program getUniformLocation("Projection")
         modelLoc = program getUniformLocation("ModelView")
         colorLoc = program getUniformLocation("InColor")
-
-        setTexture(texture)
     }
 
     setTexture: func ~tex (=texture) {
@@ -122,11 +139,13 @@ GlSprite: class extends GlSpriteLike {
 
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
+        applyEffects(dye, modelView)
+
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 
+        texture detach()
         vao detach()
         program detach()
-        texture detach()
     }
 
 }
@@ -173,8 +192,10 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
 
         vao = VAO new(program)
         stride := 4 * Float size
-        vao add("TexCoordIn", 2, GL_FLOAT, false, stride, 0 as Pointer)
-        vao add("Position", 2, GL_FLOAT, false, stride, (2 * Float size) as Pointer)
+        vao add(vbo, "TexCoordIn", 2, GL_FLOAT, false,
+            stride, 0 as Pointer)
+        vao add(vbo, "Position", 2, GL_FLOAT, false,
+            stride, (2 * Float size) as Pointer)
 
         texLoc = program getUniformLocation("Texture")
         projLoc = program getUniformLocation("Projection")
@@ -255,6 +276,8 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
             opacity)
 
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+
+        applyEffects(dye, modelView)
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 
