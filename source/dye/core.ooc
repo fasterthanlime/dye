@@ -54,6 +54,8 @@ DyeContext: class {
     init: func (width, height: Int, title: String, fullscreen := false,
             windowWidth := -1, windowHeight := -1) {
         size = vec2i(width, height)
+        if (windowWidth == -1)  windowWidth  = size x
+        if (windowHeight == -1) windowHeight = size y
 
         center = vec2(width / 2, height / 2)
 
@@ -94,15 +96,8 @@ DyeContext: class {
             rect: SdlRect
             SDL getDisplayBounds(0, rect&)
             windowSize = vec2i(rect w, rect h)
-
-            if (windowWidth  == -1 && windowHeight == -1) {
-                size set!(windowSize)
-            }
         } else {
-            windowSize = vec2i(size x, size y)
-
-            if (windowWidth  != -1) windowSize x = windowWidth
-            if (windowHeight != -1) windowSize y = windowHeight
+            windowSize = vec2i(windowWidth, windowHeight)
         }
 
         window = SDL createWindow(
@@ -275,6 +270,7 @@ DyeContext: class {
         projectionMatrix = Matrix4 newOrtho(0, size x, 0, size y, -1.0, 1.0)
 
         if (useFbo) {
+            logger info("Size = %s, Window size = %s", size _, windowSize _)
             fbo = Fbo new(this, size x, size y)
         }
     }

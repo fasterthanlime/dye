@@ -29,6 +29,7 @@ Fbo: class {
     init: func (=dye, =width, =height) {
         // create a texture object
         texture = Texture new(width, height, "<fbo>")
+        texture setMagFilter(TextureFilter NEAREST)
         texture upload(null)
 
         // create a sprite object

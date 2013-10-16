@@ -17,6 +17,15 @@ import structs/HashMap
 TextureFilter: enum {
     NEAREST
     LINEAR
+
+    toGL: func -> Int {
+        match this {
+            case This LINEAR =>
+                GL_LINEAR
+            case =>
+                GL_NEAREST
+        }
+    }
 }
 
 /**
@@ -39,17 +48,19 @@ Texture: class {
     }
 
     setup: func {
-        filterValue := match filter {
-            case TextureFilter LINEAR =>
-                GL_LINEAR
-            case =>
-                GL_NEAREST
-        }
-
+        filterValue := filter toGL()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterValue)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterValue)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE)
+    }
+
+    setMinFilter: func (filter: TextureFilter) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter toGL())
+    }
+
+    setMagFilter: func (filter: TextureFilter) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter toGL())
     }
 
     upload: func (data: UInt8*) {

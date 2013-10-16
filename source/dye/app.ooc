@@ -25,10 +25,10 @@ App: class {
     // adjustable things
     escQuits? := true
 
-    init: func (=title, width := 800, height := 600) {
+    init: func (=title, width := 800, height := 600, fullscreen := false, windowWidth := -1, windowHeight := -1) {
         setupLogging()
 
-        dye = DyeContext new(width, height, title)
+        dye = DyeContext new(width, height, title, fullscreen, windowWidth, windowHeight)
         dye setClearColor(Color black())
 
         initEvents()
