@@ -13,6 +13,15 @@ ShaderVersion: enum {
     GLSL_100
     GLSL_130
     GLSL_150
+
+    toString: func -> String {
+        match this {
+            case This GLSL_100 => "100"
+            case This GLSL_130 => "130"
+            case This GLSL_150 => "150"
+            case => "unknown"
+        }
+    }
 }
 
 OpenGLProfile: enum {
@@ -25,6 +34,7 @@ OpenGLVersion: class {
     string: String
     major, minor: Int
     profile: OpenGLProfile
+    shader := ShaderVersion GLSL_100
 
     cached: static This
     logger := static Log getLogger(This name)
@@ -32,7 +42,16 @@ OpenGLVersion: class {
     ES_PREFIX := "OpenGL ES "
 
     init: func ~direct (=major, =minor, =profile) {
-        logger info("Parsed OpenGL version: " + toString()) 
+        logger info("Detected OpenGL version: " + toString()) 
+
+        if (es?() && eq(2, 0)) {
+            shader = ShaderVersion GLSL_100
+        } else if (gte(3, 2)) {
+            shader = ShaderVersion GLSL_150
+        } else if (gte(3, 0)) {
+            shader = ShaderVersion GLSL_130
+        }
+        logger info("Detected GLSL version: " + shader toString())
     }
 
     init: func ~fromString (ver: String) {

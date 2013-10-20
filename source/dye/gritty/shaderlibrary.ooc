@@ -9,6 +9,21 @@ ShaderLibrary: class {
 
     cache := static HashMap<String, ShaderProgram> new()
 
+    getTarget: static func -> ShaderVersion {
+        OpenGLVersion get() shader
+    }
+
+    getProgram: static func (name: String, vertex, fragment: String) -> ShaderProgram {
+        if (cache contains?(name)) {
+            return cache get(name)
+        }
+
+        program := ShaderLoader load(vertex, fragment)
+        cache put(name, program)
+        program
+    }
+
+
     getSolidColor: static func -> ShaderProgram { 
         target := getTarget()
 
@@ -52,34 +67,6 @@ ShaderLibrary: class {
                 Exception new("No texture shader for your target yet!") throw()
                 null
         }
-    }
-
-    getTarget: static func -> ShaderVersion {
-        ver := OpenGLVersion get()
-
-        if (ver es?() && ver eq(2, 0)) {
-            return ShaderVersion GLSL_100
-        }
-
-        if (ver gte(3, 2)) {
-            return ShaderVersion GLSL_150
-        }
-
-        if (ver gte(3, 0)) {
-            return ShaderVersion GLSL_130
-        }
-
-        ShaderVersion GLSL_100
-    }
-
-    getProgram: static func (name: String, vertex, fragment: String) -> ShaderProgram {
-        if (cache contains?(name)) {
-            return cache get(name)
-        }
-
-        program := ShaderLoader load(vertex, fragment)
-        cache put(name, program)
-        program
     }
 
     getSolidColor100: static func -> ShaderProgram {

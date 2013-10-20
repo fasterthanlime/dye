@@ -252,7 +252,6 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
     }
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
-        vbo bind()
         program use()
         vao bind()
 
