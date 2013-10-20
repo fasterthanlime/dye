@@ -269,6 +269,9 @@ DyeContext: class {
 
         projectionMatrix = Matrix4 newOrtho(0, size x, 0, size y, -1.0, 1.0)
 
+        // enable vsync
+        SDL glSetSwapInterval(1)
+
         if (useFbo) {
             logger info("Size = %s, Window size = %s", size _, windowSize _)
             fbo = Fbo new(this, size x, size y)
