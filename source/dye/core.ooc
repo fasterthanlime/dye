@@ -13,6 +13,11 @@ import structs/ArrayList
 use dye
 import dye/[input, math, sprite, fbo]
 
+ProjectionModel: enum {
+    ORTHO
+    PERSPECTIVE
+}
+
 /**
  * A dye context - ie. a window bound to an OpenGL context,
  * with an associated Input, can has a custom cursor, a list of
@@ -47,6 +52,7 @@ DyeContext: class {
     cursorOffset := vec2(0, 0)
     cursorNumStates := 0
 
+    projectionModel := ProjectionModel ORTHO
     projectionMatrix: Matrix4
 
     fullscreen := false
@@ -266,8 +272,7 @@ DyeContext: class {
         logger info("GLSL version: %s" format(glGetString(GL_SHADING_LANGUAGE_VERSION)))
 
         setClearColor(clearColor)
-
-        projectionMatrix = Matrix4 newOrtho(0, size x, 0, size y, -1.0, 1.0)
+        setProjectionModel(ProjectionModel ORTHO)
 
         // enable vsync
         SDL glSetSwapInterval(1)
@@ -275,6 +280,15 @@ DyeContext: class {
         if (useFbo) {
             logger info("Size = %s, Window size = %s", size _, windowSize _)
             fbo = Fbo new(this, size x, size y)
+        }
+    }
+
+    setProjectionModel: func (=projectionModel) {
+        match projectionModel {
+            case ProjectionModel ORTHO =>
+                projectionMatrix = Matrix4 newOrtho(0, size x, 0, size y, -1.0, 1.0)
+            case ProjectionModel PERSPECTIVE =>
+                raise("Perspective projeciton model not supported for now...")
         }
     }
 

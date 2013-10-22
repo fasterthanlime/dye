@@ -276,7 +276,7 @@ SdlInput: class extends Input {
                 case SDL_MOUSEBUTTONDOWN =>
                     _mousePressed (event button button)
                 case SDL_MOUSEMOTION =>
-                    _mouseMoved (event motion x, event motion y)
+                    _mouseMoved (event motion x, event motion y, event motion xrel, event motion yrel)
                 case SDL_QUIT =>
                     _quit()
                 case SDL_WINDOWEVENT =>
@@ -316,9 +316,9 @@ SdlInput: class extends Input {
         }
     }
 
-    _mouseMoved: func (x, y: Int) {
+    _mouseMoved: func (x, y, xrel, yrel: Int) {
         _mousepos set!(x, dye windowSize y - y)
-        _notifyListeners(MouseMotion new(_mousepos))
+        _notifyListeners(MouseMotion new(_mousepos, vec2(xrel, yrel)))
     }
 
     _mousePressed: func (button: Int) {
@@ -409,7 +409,11 @@ MouseEvent: class extends LEvent {
 
 MouseMotion: class extends MouseEvent {
 
-    init: super func
+    rel: Vec2
+
+    init: func (.pos, =rel) {
+        super(pos)
+    }
 
 }
 

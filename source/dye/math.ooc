@@ -199,8 +199,13 @@ Vec2: class {
     _: String { get { toString() } }
 
     equals?: func (v: This, epsilon: Float) -> Bool {
-        abs(v x - x) < epsilon && \
-        abs(v y - y) < epsilon
+        dx := v x - x
+        if (dx < -epsilon || dx > epsilon) return false
+
+        dy := v y - y
+        if (dy < -epsilon || dy > epsilon) return false
+
+        true
     }
 
 }
@@ -266,9 +271,16 @@ Vec3: class {
     _: String { get { toString() } }
 
     equals?: func (v: This, epsilon: Float) -> Bool {
-        abs(v x - x) < epsilon && \
-        abs(v y - y) < epsilon && \
-        abs(v z - z) < epsilon
+        dx := v x - x
+        if (dx < -epsilon || dx > epsilon) return false
+
+        dy := v y - y
+        if (dy < -epsilon || dy > epsilon) return false
+
+        dz := v z - z
+        if (dz < -epsilon || dz > epsilon) return false
+
+        true
     }
 
 }
@@ -507,6 +519,52 @@ Matrix4: class {
     }
 
     /**
+     * Create a new rotation matrix around axis (1.0, 0.0, 0.0)
+     * 
+     * :param: a is the angle in radians
+     */
+    newRotateX: static func (a: Float) -> This {
+
+        /*
+         * Source: http://stackoverflow.com/questions/3982418
+         *
+         * Converted by hand to column-major
+         */
+        c := a cos()
+        s := a sin()
+
+        new([
+            1,   0,   0,   0,
+            0,   c,   s,   0,
+            0,  -s,   c,   0,
+            0,   0,   0,   1
+        ])
+    }
+
+    /**
+     * Create a new rotation matrix around axis (0.0, 1.0, 0.0)
+     * 
+     * :param: a is the angle in radians
+     */
+    newRotateY: static func (a: Float) -> This {
+
+        /*
+         * Source: http://stackoverflow.com/questions/3982418
+         *
+         * Converted by hand to column-major
+         */
+        c := a cos()
+        s := a sin()
+
+        new([
+            c,   0,  -s,   0,
+            0,   1,   0,   0,
+            s,   0,   c,   0,
+            0,   0,   0,   1
+        ])
+    }
+
+    /**
      * Create a new rotation matrix around axis (0.0, 0.0, 1.0)
      * 
      * :param: a is the angle in radians
@@ -575,6 +633,30 @@ Matrix4: class {
     }
 
     /**
+     * Create a new perspective projection matrix
+     *
+     * Somehow similar to glOrtho
+     */
+    newPerspective: static func (left, right, bottom, top, _near, _far: Float) -> This {
+        (l, r, b, t) := (left, right, bottom, top)
+        (n, f) := (_near, _far)
+
+        d := f - n // depth
+
+        /*
+         * Source: http://www.songho.ca/opengl/gl_projectionmatrix.html
+         *
+         * Converted by hand to column-major
+         */
+        new([
+            n / r,          0.0,               0.0,           0.0,
+            0.0,          n / t,               0.0,           0.0,
+            0.0,            0.0,      (f + n) / -d,          -1.0,
+            0.0,            0.0,  -2.0 * f * n / d,           0.0
+        ])
+    }
+
+    /**
      * Multiply two matrices.
      *
      * This is a naive, unoptimized, O(n^3) function.
@@ -608,10 +690,10 @@ Matrix4: class {
     }
 
     toString: func -> String {
-"[[%5.5f], [%5.5f], [%5.5f], [%5.5f] 
- [%5.5f], [%5.5f], [%5.5f], [%5.5f] 
- [%5.5f], [%5.5f], [%5.5f], [%5.5f] 
- [%5.5f], [%5.5f], [%5.5f], [%5.5f]]" format(
+"[%5.5f, %5.5f, %5.5f, %5.5f] 
+[%5.5f, %5.5f, %5.5f, %5.5f] 
+[%5.5f, %5.5f, %5.5f, %5.5f] 
+[%5.5f, %5.5f, %5.5f, %5.5f]" format(
          values[0], values[4], values[8],  values[12], 
          values[1], values[5], values[9],  values[13], 
          values[2], values[6], values[10], values[14], 

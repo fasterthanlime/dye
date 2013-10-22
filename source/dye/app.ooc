@@ -21,6 +21,7 @@ App: class {
     dye: DyeContext
     logger: Logger
     title: String
+    loop: FixedLoop
 
     // adjustable things
     escQuits? := true
@@ -59,7 +60,7 @@ App: class {
         logger info("Welcome to %s, running at %.2fFPS", title, fps)
         logger info("Press ESC or close the window to exit")
 
-        loop := FixedLoop new(dye, fps)
+        loop = FixedLoop new(dye, fps)
         loop run(||
             update()
         )
