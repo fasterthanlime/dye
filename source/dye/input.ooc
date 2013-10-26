@@ -66,6 +66,22 @@ Input: abstract class {
         )
     }
 
+    onWindowFocusGained: func (cb: Func) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case wfl: WindowFocusGained => cb()
+            }
+        )
+    }
+
+    onWindowFocusLost: func (cb: Func) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case wfl: WindowFocusLost => cb()
+            }
+        )
+    }
+
     onExit: func (cb: Func) -> Listener {
         onEvent(|ev|
             match (ev) {
@@ -87,7 +103,7 @@ Input: abstract class {
         onEvent(|ev|
             match (ev) {
                 case kp: KeyPress => 
-                    if(kp scancode == scancode) cb(kp)
+                    if (kp scancode == scancode) cb(kp)
             }
         )
     }
@@ -105,7 +121,7 @@ Input: abstract class {
         onEvent(|ev|
             match (ev) {
                 case kr: KeyRelease => 
-                    if(kr scancode == scancode) cb(kr)
+                    if (kr scancode == scancode) cb(kr)
             }
         )
     }
@@ -114,7 +130,7 @@ Input: abstract class {
         onEvent(|ev|
             match (ev) {
                 case mp: MousePress =>
-                    if(mp button == which) cb(mp)
+                    if (mp button == which) cb(mp)
             }
         )
     }
@@ -123,7 +139,7 @@ Input: abstract class {
         onEvent(|ev|
             match (ev) {
                 case mr: MouseRelease =>
-                    if(mr button == which) cb(mr)
+                    if (mr button == which) cb(mr)
             }
         )
     }
@@ -141,7 +157,7 @@ Input: abstract class {
         onEvent(|ev|
             match (ev) {
                 case mm: MouseMotion =>
-                    if(isButtonPressed(which)) {
+                    if (isButtonPressed(which)) {
                         // it's a drag!
                         cb(mm)
                     }
@@ -287,20 +303,24 @@ SdlInput: class extends Input {
                             _windowRestored()
                         case SDL_WINDOWEVENT_SIZE_CHANGED =>
                             _windowSizeChanged(event window data1, event window data2)
+                        case SDL_WINDOWEVENT_FOCUS_LOST =>
+                            _windowFocusLost()
+                        case SDL_WINDOWEVENT_FOCUS_GAINED =>
+                            _windowFocusGained()
                     }
             }
         }
     }
 
     _quit: func () {
-        if(debug) {
+        if (debug) {
             logger debug("Requested exit")
         }
         _notifyListeners(ExitEvent new())
     }
 
     _keyPressed: func (keycode, scancode: Int) {
-        if(debug) {
+        if (debug) {
             logger debug("Key pressed! code %d", scancode)
         }
         if (scancode < MAX_KEY) {
@@ -322,7 +342,7 @@ SdlInput: class extends Input {
     }
 
     _mousePressed: func (button: Int) {
-        if(debug) {
+        if (debug) {
             logger debug("Mouse pressed at %s", _mousepos _)
         }
         buttonState[button] = true
@@ -330,7 +350,7 @@ SdlInput: class extends Input {
     }
 
     _mouseReleased: func (button: Int) {
-        if(debug) {
+        if (debug) {
             logger debug("Mouse released at %s", _mousepos _)
         }
         buttonState[button] = false
@@ -338,21 +358,35 @@ SdlInput: class extends Input {
     }
 
     _windowSizeChanged: func (x, y: Int) {
-        if(debug) {
+        if (debug) {
             logger debug("Window size changed to %dx%d", x, y)
         }
         _notifyListeners(WindowSizeChanged new(x, y))
     }
 
+    _windowFocusLost: func {
+        if (debug) {
+            logger debug("Focus lost!")
+        }
+        _notifyListeners(WindowFocusLost new())
+    }
+
+    _windowFocusGained: func {
+        if (debug) {
+            logger debug("Focus lost!")
+        }
+        _notifyListeners(WindowFocusGained new())
+    }
+
     _windowMinimized: func {
-        if(debug) {
+        if (debug) {
             logger debug("Window minimized")
         }
         _notifyListeners(WindowMinimized new())
     }
 
     _windowRestored: func {
-        if(debug) {
+        if (debug) {
             logger debug("Window restored")
         }
         _notifyListeners(WindowRestored new())
@@ -394,6 +428,14 @@ WindowRestored: class extends LEvent {
 }
 
 WindowMinimized: class extends LEvent {
+    init: func
+}
+
+WindowFocusLost: class extends LEvent {
+    init: func
+}
+
+WindowFocusGained: class extends LEvent {
     init: func
 }
 
