@@ -52,11 +52,25 @@ Vec2: class {
     clone: func -> This { new(x, y) }
 
     mul: func (f: Float) -> This {
-        new(x * f, y * f)
+        c := clone()
+        c mul!(f)
+        c
     }
 
-    mul!: func (f: Float) -> This {
-        set!(mul(f))
+    mul!: func (f: Float) {
+        x *= f
+        y *= f
+    }
+
+    mul: func ~vec (v: This) -> This {
+        c := clone()
+        c mul!(v)
+        c
+    }
+
+    mul!: func ~vec (v: This) {
+        x *= v x
+        y *= v y
     }
 
     set!: func (v: This) {
@@ -292,8 +306,9 @@ Vec2i: class {
 
     x, y: Int
 
-    init: func (=x, =y) {
-    }
+    init: func (=x, =y)
+
+    clone: func -> This { new(x, y) }
 
     equals?: func (v: This) -> Bool {
         (x == v x && y == v y)
@@ -333,6 +348,28 @@ Vec2i: class {
 
     add: func ~vec2 (v: Vec2) -> Vec2 {
         vec2(v x + x as Float, v y + y as Float)
+    }
+
+    mul: func (f: Int) -> This {
+        c := clone()
+        c mul!(f)
+        c
+    }
+
+    mul!: func (f: Int) {
+        x *= f
+        y *= f
+    }
+
+    mul: func ~vec (v: This) -> This {
+        c := clone()
+        c mul!(v)
+        c
+    }
+
+    mul!: func ~vec (v: This) {
+        x *= v x
+        y *= v y
     }
 
     toString: func -> String {

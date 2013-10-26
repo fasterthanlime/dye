@@ -119,7 +119,6 @@ GlSprite: class extends GlSpriteLike {
     }
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
-        vbo bind()
         program use()
         vao bind()
 
