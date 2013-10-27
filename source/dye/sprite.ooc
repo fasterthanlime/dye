@@ -25,10 +25,7 @@ GlSprite: class extends GlSpriteLike {
     texWidth: Float { get { texSize x } }
     texHeight: Float { get { texSize y } }
 
-    center := true
-
     texture: Texture
-    program: ShaderProgram
     vao: VAO
 
     vbo: FloatVBO 
@@ -169,10 +166,7 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
     width: Float { get { size x } }
     height: Float { get { size y } }
 
-    center := true
-
     texture: Texture
-    program: ShaderProgram
     vao: VAO
 
     vbo: FloatVBO
@@ -187,7 +181,21 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
 
     init: func ~fromTex (.texture, =xnum, =ynum) {
         vbo = FloatVBO new()
-        program = ShaderLibrary getGridTexture()
+        setTexture(texture)
+        setProgram(ShaderLibrary getGridTexture())
+    }
+
+    setProgram: func (.program) {
+        if (this program) {
+            this program detach()
+        }
+        this program = program
+        program use()
+
+        if (vao) {
+            vao delete()
+            vao = null
+        }
 
         vao = VAO new(program)
         stride := 4 * Float size
@@ -201,8 +209,6 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
         modelLoc = program getUniformLocation("ModelView")
         colorLoc = program getUniformLocation("InColor")
         gridLoc = program getUniformLocation("InGrid")
-
-        setTexture(texture)
     }
 
     setTexture: func ~tex (=texture) {
@@ -279,9 +285,9 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 
+        texture detach()
         vao detach()
         program detach()
-        texture detach()
     }
 
     // implement GlAnimSource

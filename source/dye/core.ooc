@@ -12,6 +12,7 @@ import structs/ArrayList
 // our stuff
 use dye
 import dye/[input, math, sprite, fbo]
+import dye/gritty/[shader]
 
 ProjectionModel: enum {
     ORTHO
@@ -432,8 +433,10 @@ GlSortedGroup: class extends GlGroup {
 GlSpriteLike: abstract class extends GlDrawable {
 
     color := Color white()
+    program: ShaderProgram
     opacity := 1.0
     effects: ArrayList<GlEffect> = null
+    center := true
 
     addEffect: func (e: GlEffect) {
         if (!effects) effects = ArrayList<GlEffect> new()
@@ -446,6 +449,8 @@ GlSpriteLike: abstract class extends GlDrawable {
             e apply(this, dye, modelView)
         }
     }
+
+    setProgram: func (=program)
 
 }
 
