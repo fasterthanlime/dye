@@ -21,10 +21,16 @@ Vec2: class {
         x * x + y * y
     }
 
-    normalized: func -> This {
+    normalize!: func {
         n := norm()
-        if (n == 0) return this // better 0 than NaN...
-        mul(1.0 / n)
+        if (n == 0.0) return // better 0 than NaN
+        mul!(1.0 / n)
+    }
+
+    normalized: func -> This {
+        v := clone()
+        v normalize!()
+        v
     }
 
     dist: func (v: This) -> Float {
@@ -447,6 +453,24 @@ extend Float {
         number
     }
 
+    interpolate!: func@ (target, alpha: This) {
+        this = this * (1.0 - alpha) + target * alpha
+    }
+
+    interpolateAngle!: func@ (target, alpha: This) {
+        a: Float = this
+        b: Float = target
+
+        diff := a - b
+        if (diff > 180.0 || diff < -180.0) {
+            match {
+                case (b > a) => a += 360.0
+                case         => b += 360.0
+            }
+        }
+        this = a + ((b - a) as Float) * (alpha as Float)
+    }
+
 
 }
 
@@ -772,7 +796,14 @@ AABB2: class {
 
     init: func
     
-    init: func ~values (=xMin, =yMin, =xMax, =yMax)
+    init: func ~floats (=xMin, =yMin, =xMax, =yMax)
+
+    init: func ~size (width, height: Float) {
+        xMin = width * -0.5
+        xMax = width * 0.5
+        yMin = height * -0.5
+        yMax = height * 0.5
+    }
 
     set!: func ~aabb (other: This) {
         xMin = other xMin
@@ -780,6 +811,8 @@ AABB2: class {
         yMin = other yMin
         yMax = other yMax
     }
+
+    set!: func ~floats (=xMin, =yMin, =xMax, =yMax)
 
     add!: func ~vector (v: Vec2) {
         xMin += v x
