@@ -179,16 +179,16 @@ Vec2: class {
         x * v x + y * v y
     }
 
-    interpolate!: func (target: This, alpha: Float) {
+    lerp!: func (target: This, alpha: Float) {
         (x, y) = (x * (1 - alpha) + target x * alpha,
                   y * (1 - alpha) + target y * alpha)
     }
 
-    interpolateX!: func (target: Float, alpha: Float) {
+    lerpX!: func (target: Float, alpha: Float) {
         x = x * (1 - alpha) + target * alpha
     }
 
-    interpolateY!: func (target: Float, alpha: Float) {
+    lerpY!: func (target: Float, alpha: Float) {
         y = y * (1 - alpha) + target * alpha
     }
 
@@ -278,7 +278,7 @@ Vec3: class {
         y = py
     }
 
-    interpolate: func (target: This, alpha: Float) {
+    lerp: func (target: This, alpha: Float) {
         (x, y, z) = (x * (1 - alpha) + target x * alpha,
                      y * (1 - alpha) + target y * alpha,
                      z * (1 - alpha) + target z * alpha)
@@ -453,13 +453,13 @@ extend Float {
         number
     }
 
-    interpolate!: func@ (target, alpha: This) {
+    lerp!: func@ (target, alpha: This) {
         this = this * (1.0 - alpha) + target * alpha
     }
 
-    interpolateAngle!: func@ (target, alpha: This) {
+    lerpDegrees!: func@ (target, alpha: This) {
         a: Float = this
-        b: Float = target
+        b: Float = target repeat(0, 360)
 
         diff := a - b
         if (diff > 180.0 || diff < -180.0) {
@@ -468,7 +468,7 @@ extend Float {
                 case         => b += 360.0
             }
         }
-        this = a + ((b - a) as Float) * (alpha as Float)
+        this = (a + ((b - a) as Float) * (alpha as Float)) repeat(0, 360)
     }
 
 
