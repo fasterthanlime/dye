@@ -107,7 +107,7 @@ Font: class {
                     glyph sprite render(dye, modelView)
                     pen add!(glyph advance x, glyph advance y)
             }
-            modelView = Matrix4 newTranslate(pen x, pen y, 0.0) * inputModelView
+            modelView = inputModelView * Matrix4 newTranslate(pen x, pen y, 0.0)
         )
     }
 
