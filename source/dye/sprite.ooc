@@ -121,7 +121,7 @@ GlSprite: class extends GlSpriteLike {
 
         glActiveTexture(GL_TEXTURE0)
         texture bind()
-        glUniform1f(texLoc, 0)
+        glUniform1i(texLoc, 0)
 
         glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
@@ -262,7 +262,7 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
 
         glActiveTexture(GL_TEXTURE0)
         texture bind()
-        glUniform1f(texLoc, 0)
+        glUniform1i(texLoc, 0)
 
         glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
