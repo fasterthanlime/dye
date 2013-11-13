@@ -423,7 +423,7 @@ extend Float {
 
     repeat: func (min, max: This) -> This {
         if (max - min < 0) {
-            Exception new("Float repeat(), invalid range: %.2f..%.2f" format(min, max)) throw()
+            raise("Float repeat(), invalid range: %.2f..%.2f" format(min, max))
         }
 
         number := this
@@ -439,7 +439,7 @@ extend Float {
 
     clamp: func (min, max: This) -> This {
         if (max - min < 0) {
-            Exception new("Float clamp(), invalid range: %.2f..%.2f" format(min, max)) throw()
+            raise("Float clamp(), invalid range: %.2f..%.2f" format(min, max))
         }
 
         number := this
@@ -492,6 +492,10 @@ extend Int {
         number
     }
 
+    repeat!: func@ (min, max: This) {
+        this = repeat(min, max)
+    }
+
     clamp: func (min, max: This) -> This {
         if (max - min < 0) {
             Exception new("Int clamp(), invalid range: %d..%d" format(min, max)) throw()
@@ -506,6 +510,10 @@ extend Int {
             number = max
         }
         number
+    }
+
+    clamp!: func@ (min, max: This) {
+        this = clamp(min, max)
     }
 
     nextPowerOfTwo: func -> This {
