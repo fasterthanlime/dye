@@ -11,6 +11,7 @@ GlSegment: class extends GlDrawable {
     color := Color red()
 
     init: func (=p1, =p2) {
+        raise("GlSegment not quite implemented again yet!")
     }
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
@@ -59,8 +60,20 @@ GlRectangle: class extends GlDrawable {
         this size = size clone()
         vbo = FloatVBO new()
         rebuild()
+        setProgram(ShaderLibrary getSolidColor())
+    }
 
-        program = ShaderLibrary getSolidColor()
+    setProgram: func (.program) {
+        if (this program) {
+            this program detach()
+        }
+        this program = program
+        program use()
+
+        if (vao) {
+            vao delete()
+            vao = null
+        }
 
         vao = VAO new(program)
         vao add(vbo, "Position", 2, GL_FLOAT, false, 0, 0 as Pointer)
@@ -83,7 +96,6 @@ GlRectangle: class extends GlDrawable {
             rebuild()
         }
 
-        vbo bind()
         program use()
         vao bind()
 
@@ -113,8 +125,7 @@ GlRectangle: class extends GlDrawable {
         ]
         oldSize set!(size)
 
-        vbo bind()
-        vbo data(vertices)
+        vbo upload(vertices)
     }
 
 }

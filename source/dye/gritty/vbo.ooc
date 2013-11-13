@@ -2,9 +2,11 @@
 // third-party stuff
 import sdl2/[OpenGL]
 
-VBO: class {
+VBO: abstract class {
 
     id: Int
+    target := GL_ARRAY_BUFFER // most common VBO type
+    usage := GL_STATIC_DRAW
 
     init: func {
         glGenBuffers(1, id&)
@@ -12,11 +14,16 @@ VBO: class {
     }
     
     bind: func {
-        glBindBuffer(GL_ARRAY_BUFFER, id)
+        glBindBuffer(target, id)
     }
 
     detach: func {
-        glBindBuffer(GL_ARRAY_BUFFER, 0)
+        glBindBuffer(target, 0)
+    }
+
+    _data: func ~raw (numBytes: GLsizeiptr, data: Pointer) {
+        bind()
+        glBufferData(target, numBytes, data, usage)
     }
 
 }
@@ -27,14 +34,53 @@ FloatVBO: class extends VBO {
         super()
     }
 
-    data: func ~array (array: Float[], type := GL_STATIC_DRAW) {
-        data(array length, array data, type)
+    upload: func ~array (array: Float[]) {
+        upload(array length, array data)
     }
 
-    data: func ~pointer (numElements: Int, data: Float*, type := GL_STATIC_DRAW) {
-        numBytes := (numElements * Float size)
+    upload: func ~pointer (numElements: Int, data: Float*) {
+        numBytes := (numElements * Float size) as GLsizeiptr
+        _data(numBytes, data)
+    }
 
-        glBufferData(GL_ARRAY_BUFFER, numBytes as GLsizeiptr, data, type)
+}
+
+UShortVBO: class extends VBO {
+
+    init: func {
+        super()
+
+        // UShortVBOs are usually used for indices
+        target = GL_ELEMENT_ARRAY_BUFFER
+    }
+
+    upload: func ~array (array: Short[]) {
+        upload(array length, array data)
+    }
+
+    upload: func ~pointer (numElements: Int, data: Short*) {
+        numBytes := (numElements * Short size) as GLsizeiptr
+        _data(numBytes, data)
+    }
+
+}
+
+UIntVBO: class extends VBO {
+
+    init: func {
+        super()
+
+        // UIntVBOs are usually used for indices
+        target = GL_ELEMENT_ARRAY_BUFFER
+    }
+
+    upload: func ~array (array: Int[]) {
+        upload(array length, array data)
+    }
+
+    upload: func ~pointer (numElements: Int, data: Int*) {
+        numBytes := (numElements * Int size) as GLsizeiptr
+        _data(numBytes, data)
     }
 
 }

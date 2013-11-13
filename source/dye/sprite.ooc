@@ -111,8 +111,7 @@ GlSprite: class extends GlSpriteLike {
             width, height
         ]
 
-        vbo bind()
-        vbo data(data)
+        vbo upload(data)
     }
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
@@ -252,8 +251,7 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
             width, height
         ]
 
-        vbo bind()
-        vbo data(data)
+        vbo upload(data)
     }
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
