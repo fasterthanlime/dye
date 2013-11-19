@@ -109,7 +109,7 @@ Vec2: class {
     }
 
     snap: func ~rect (size: This, gridSize: Int) -> This {
-        halfSize := vec2(size x * 0.5, size y * -0.5)
+        halfSize := vec2(size x * 0.5, - size y * 0.5)
         vec2(this sub(halfSize) snap(gridSize) add(halfSize))
     }
 
