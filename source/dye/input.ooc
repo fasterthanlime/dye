@@ -439,7 +439,9 @@ WindowFocusGained: class extends LEvent {
     init: func
 }
 
-ExitEvent: class extends LEvent { }
+ExitEvent: class extends LEvent {
+    init: func
+}
 
 MouseEvent: class extends LEvent {
 
