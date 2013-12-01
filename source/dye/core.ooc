@@ -385,6 +385,8 @@ GlDrawable: abstract class {
  */
 GlGroup: class extends GlDrawable {
 
+    init: func
+
     children := ArrayList<GlDrawable> new()
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
