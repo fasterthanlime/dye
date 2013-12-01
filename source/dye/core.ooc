@@ -441,6 +441,8 @@ GlSpriteLike: abstract class extends GlDrawable {
     effects: ArrayList<GlEffect> = null
     center := true
 
+    init: func
+
     addEffect: func (e: GlEffect) {
         if (!effects) effects = ArrayList<GlEffect> new()
         effects add(e)
