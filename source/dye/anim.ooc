@@ -134,6 +134,8 @@ GlAnimSet: class extends GlSpriteLike {
     currentName: String
     current: GlAnim
 
+    init: func
+
     update: func (ticks := 1) {
         if (current) current update(ticks)
     }
