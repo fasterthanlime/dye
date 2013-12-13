@@ -1,6 +1,7 @@
 # ooc stuff
 .libs
 rock_tmp
+.sam-cache
 
 # Doc stuff
 doc/html
