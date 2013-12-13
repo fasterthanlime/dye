@@ -568,10 +568,10 @@ Matrix4: class {
      */
     newIdentity: static func -> This {
         new([
-            1.0, 0.0, 0.0, 0.0,
-            0.0, 1.0, 0.0, 0.0,
-            0.0, 0.0, 1.0, 0.0,
-            0.0, 0.0, 0.0, 1.0
+            1.0f, 0.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f
         ])
     }
 
@@ -580,10 +580,10 @@ Matrix4: class {
      */
     newTranslate: static func (x, y, z: Float) -> This {
         new([
-            1.0,    0.0,    0.0,    0.0,
-            0.0,    1.0,    0.0,    0.0,
-            0.0,    0.0,    1.0,    0.0,
-            x,      y,      z,      1.0 
+            1.0f,   0.0f,   0.0f,   0.0f,
+            0.0f,   1.0f,   0.0f,   0.0f,
+            0.0f,   0.0f,   1.0f,   0.0f,
+            x,      y,      z,      1.0f 
         ])
     }
 
@@ -603,10 +603,10 @@ Matrix4: class {
         s := a sin()
 
         new([
-            1,   0,   0,   0,
-            0,   c,   s,   0,
-            0,  -s,   c,   0,
-            0,   0,   0,   1
+            1.0f,   0.0f,   0.0f,   0.0f,
+            0.0f,   c,      s,      0.0f,
+            0.0f,  -s,      c,      0.0f,
+            0.0f,   0.0f,   0.0f,   1.0f
         ])
     }
 
@@ -626,10 +626,10 @@ Matrix4: class {
         s := a sin()
 
         new([
-            c,   0,  -s,   0,
-            0,   1,   0,   0,
-            s,   0,   c,   0,
-            0,   0,   0,   1
+            c,      0.0f,  -s,      0.0f,
+            0.0f,   1.0f,   0.0f,   0.0f,
+            s,      0.0f,   c,      0.0f,
+            0.0f,   0.0f,   0.0f,   1.0f
         ])
     }
 
@@ -649,10 +649,10 @@ Matrix4: class {
         s := a sin()
 
         new([
-             c,  s,   0,   0,
-            -s,  c,   0,   0,
-            0,   0,   1,   0,
-            0,   0,   0,   1
+             c,     s,      0.0f,   0.0f,
+            -s,     c,      0.0f,   0.0f,
+            0.0f,   0.0f,   1.0f,   0.0f,
+            0.0f,   0.0f,   0.0f,   1.0f
         ])
     }
 
@@ -668,10 +668,10 @@ Matrix4: class {
          */
 
         new([
-            x, 0, 0, 0
-            0, y, 0, 0
-            0, 0, z, 0
-            0, 0, 0, 1
+            x,    0.0f, 0.0f, 0.0f
+            0.0f, y,    0.0f, 0.0f
+            0.0f, 0.0f, z,    0.0f
+            0.0f, 0.0f, 0.0f, 1.0f
         ])
     }
 
@@ -694,10 +694,10 @@ Matrix4: class {
          * Converted by hand to column-major
          */
         new([
-            2.0 / w,        0.0,             0.0,           0.0,
-            0.0,            2.0 / h,         0.0,           0.0,
-            0.0,            0.0,            -2.0 / d,       0.0,
-            ((r + l) / -w), ((t + b) / -h), ((f + n) / -d), 1.0
+            2.0f / w,       0.0f,            0.0f,          0.0f,
+            0.0f,           2.0f / h,        0.0f,          0.0f,
+            0.0f,           0.0f,           -2.0f / d,      0.0f,
+            ((r + l) / -w), ((t + b) / -h), ((f + n) / -d), 1.0f
         ])
     }
 
@@ -718,10 +718,10 @@ Matrix4: class {
          * Converted by hand to column-major
          */
         new([
-            n / r,          0.0,               0.0,           0.0,
-            0.0,          n / t,               0.0,           0.0,
-            0.0,            0.0,      (f + n) / -d,          -1.0,
-            0.0,            0.0,  -2.0 * f * n / d,           0.0
+            n / r,         0.0f,               0.0f,           0.0f,
+            0.0f,          n / t,              0.0f,           0.0f,
+            0.0f,          0.0f,       (f + n) / -d,          -1.0f,
+            0.0f,          0.0f,  -2.0f * f * n / d,           0.0f
         ])
     }
 
@@ -736,7 +736,7 @@ Matrix4: class {
 
         for (row in 0..4) {
             for (col in 0..4) {
-                product := 0.0
+                product := 0.0f
 
                 for (inner in 0..4) {
                     product += m1 values[inner * 4 + row] * m2 values[col * 4 + inner]
@@ -807,10 +807,10 @@ AABB2: class {
     init: func ~floats (=xMin, =yMin, =xMax, =yMax)
 
     init: func ~size (width, height: Float) {
-        xMin = width * -0.5
-        xMax = width * 0.5
-        yMin = height * -0.5
-        yMax = height * 0.5
+        xMin = width * -0.5f
+        xMax = width * 0.5f
+        yMin = height * -0.5f
+        yMax = height * 0.5f
     }
 
     set!: func ~aabb (other: This) {
