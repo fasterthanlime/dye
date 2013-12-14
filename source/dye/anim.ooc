@@ -82,6 +82,8 @@ GlAnim: class extends GlSpriteLike {
 
     source: GlAnimSource
     frameDuration, counter: Int
+    playing := false
+    looping := true
 
     init: func (=source, frameDuration := 4) {
         super()
@@ -100,18 +102,28 @@ GlAnim: class extends GlSpriteLike {
     }
 
     rewind: func {
+        playing = true
         source setFrame(0)
     }
 
     update: func (ticks := 1) {
+        if (!playing) return
         counter -= ticks
 
         if (ticks > 0) {
             if (counter <= 0) {
+                if (!looping && source currentFrame() + 1 >= source numFrames()) {
+                    playing = false
+                    return
+                }
                 source frameOffset(1)
                 counter += frameDuration
             }
         } else {
+            if (!looping && source currentFrame() - 1 < 0) {
+                playing = false
+                return
+            }
             if (counter > frameDuration) {
                 source frameOffset(-1)
                 counter -= frameDuration
@@ -134,6 +146,11 @@ GlAnimSet: class extends GlSpriteLike {
     currentName: String
     current: GlAnim
 
+    playing: Bool { get {
+        if (!current) return false
+        current playing
+    } }
+
     init: func
 
     update: func (ticks := 1) {
@@ -155,7 +172,7 @@ GlAnimSet: class extends GlSpriteLike {
         children put(name, anim)
     }
 
-    play: func (name: String) {
+    play: func (name: String, looping := true) {
         if (name != currentName) {
             kiddo := children get(name)
 
@@ -163,6 +180,7 @@ GlAnimSet: class extends GlSpriteLike {
                 currentName = name
                 current = kiddo
                 current rewind()
+                current looping = looping
             }
         }
     }

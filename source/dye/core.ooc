@@ -437,7 +437,7 @@ GlSpriteLike: abstract class extends GlDrawable {
 
     color := Color white()
     program: ShaderProgram
-    opacity := 1.0
+    opacity := 1.0f
     effects: ArrayList<GlEffect> = null
     center := true
 
