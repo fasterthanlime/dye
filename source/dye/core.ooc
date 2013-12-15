@@ -66,7 +66,7 @@ DyeContext: class {
 
         center = vec2(width / 2, height / 2)
 
-	SDL init(SDL_INIT_EVERYTHING)
+        SDL init(SDL_INIT_EVERYTHING)
 
         version (apple) {
             SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
@@ -82,11 +82,11 @@ DyeContext: class {
             useFbo = false
         }
 
-	SDL glSetAttribute(SDL_GL_RED_SIZE, 5)
-	SDL glSetAttribute(SDL_GL_GREEN_SIZE, 6)
-	SDL glSetAttribute(SDL_GL_BLUE_SIZE, 5)
-	SDL glSetAttribute(SDL_GL_DEPTH_SIZE, 16)
-	SDL glSetAttribute(SDL_GL_DOUBLEBUFFER, 1)
+        SDL glSetAttribute(SDL_GL_RED_SIZE, 5)
+        SDL glSetAttribute(SDL_GL_GREEN_SIZE, 6)
+        SDL glSetAttribute(SDL_GL_BLUE_SIZE, 5)
+        SDL glSetAttribute(SDL_GL_DEPTH_SIZE, 16)
+        SDL glSetAttribute(SDL_GL_DOUBLEBUFFER, 1)
 
         flags := SDL_WINDOW_OPENGL
         this fullscreen = fullscreen
@@ -94,7 +94,7 @@ DyeContext: class {
             version (apple) {
                 flags |= SDL_WINDOW_FULLSCREEN
             }
-            
+
             version (!apple) {
                 flags |= SDL_WINDOW_BORDERLESS
                 flags |= SDL_WINDOW_MAXIMIZED
@@ -119,8 +119,8 @@ DyeContext: class {
             logger error("Couldn't create SDL window: %s" format(SDL getError()))
             raise("sdl failure")
         }
-                
-        context = SDL glCreateContext(window) 
+
+        context = SDL glCreateContext(window)
         if (!context) {
             logger error("Couldn't initialize OpenGL Context: %s" format(SDL getError()))
             raise("opengl initialization failure")
@@ -146,7 +146,7 @@ DyeContext: class {
         input onWindowSizeChange(|x, y|
             windowSize set!(x, y)
         )
-        
+
         initGL()
 
         setScene(createScene())
@@ -355,7 +355,7 @@ GlDrawable: abstract class {
 
     computeModelView: func (input: Matrix4) -> Matrix4 {
         modelView: Matrix4
-        
+
         if (input) {
             modelView = input
         } else {
@@ -392,7 +392,7 @@ GlGroup: class extends GlDrawable {
     draw: func (dye: DyeContext, modelView: Matrix4) {
         drawChildren(dye, modelView)
     }
-    
+
     drawChildren: func (dye: DyeContext, modelView: Matrix4) {
         for (c in children) {
             c render(dye, modelView)
@@ -504,13 +504,13 @@ Color: class {
     init: func (=r, =g, =b)
 
     toSDL: func (format: SdlPixelFormat*) -> UInt {
-	SDL mapRgb(format, r, g, b)
+        SDL mapRgb(format, r, g, b)
     }
 
     /* R, G, B = [0.0, 1.0] Float */
-    R: Float { get { r / 255.0 } }
-    G: Float { get { g / 255.0 } }
-    B: Float { get { b / 255.0 } }
+    R: Float { get { r / 255.0f } }
+    G: Float { get { g / 255.0f } }
+    B: Float { get { b / 255.0f } }
 
     set!: func (c: This) {
         r = c r
