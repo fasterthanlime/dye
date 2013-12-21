@@ -17,6 +17,10 @@ Vec2: class {
         sqrt(squaredNorm())
     }
 
+    neg: func -> This {
+        new(-x, -y)
+    }
+
     squaredNorm: func -> Float {
         x * x + y * y
     }
@@ -179,6 +183,16 @@ Vec2: class {
         x * v x + y * v y
     }
 
+    cross: func (v: This) -> Float {
+        x * v y - y * v x
+    }
+
+    lerp: func (target: This, alpha: Float) -> Vec2 {
+        c := clone()
+        c lerp!(target, alpha)
+        c
+    }
+
     lerp!: func (target: This, alpha: Float) {
         (x, y) = (x * (1 - alpha) + target x * alpha,
                   y * (1 - alpha) + target y * alpha)
@@ -278,7 +292,7 @@ Vec3: class {
         y = py
     }
 
-    lerp: func (target: This, alpha: Float) {
+    lerp!: func (target: This, alpha: Float) {
         (x, y, z) = (x * (1 - alpha) + target x * alpha,
                      y * (1 - alpha) + target y * alpha,
                      z * (1 - alpha) + target z * alpha)
@@ -827,6 +841,19 @@ AABB2: class {
         yMin += v y
         xMax += v x
         yMax += v y
+    }
+
+    add: func ~vectorCopy (v: Vec2) -> This {
+        new(
+            xMin + v x,
+            yMin + v y,
+            xMax + v x,
+            yMax + v y
+        )
+    }
+
+    center: func -> Vec2 {
+        vec2(xMin + (xMax - xMin) * 0.5f, yMin + (yMax - yMin) * 0.5f)
     }
 
     expand!: func ~aabb (other: This) {
