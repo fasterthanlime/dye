@@ -105,7 +105,15 @@ GlRectangle: class extends GlDrawable {
 
         glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
-        glUniform4f(colorLoc, color R, color G, color B, opacity)
+        
+        // premultiply color by opacity
+        glUniform4f(colorLoc,
+            opacity * color R,
+            opacity * color G,
+            opacity * color B,
+            opacity)
+
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
         match filled {
             case true  =>
@@ -128,6 +136,116 @@ GlRectangle: class extends GlDrawable {
             size x, size y
         ]
         oldSize set!(size)
+
+        vbo upload(vertices)
+    }
+
+}
+
+GlPoly: class extends GlDrawable {
+
+    points: Vec2*
+    count: Int
+
+    EPSILON := 0.1
+
+    color := Color green()
+    opacity := 1.0
+
+    program: ShaderProgram
+    vao: VAO
+
+    vbo: FloatVBO 
+    vertices: Float[]
+
+    /* Uniforms */
+    projLoc, modelLoc, colorLoc: Int
+
+    init: func (=points, =count) {
+        vbo = FloatVBO new()
+        rebuild()
+        setProgram(ShaderLibrary getSolidColor())
+    }
+
+    setProgram: func (.program) {
+        if (this program) {
+            this program detach()
+        }
+        this program = program
+        program use()
+
+        if (vao) {
+            vao delete()
+            vao = null
+        }
+
+        vao = VAO new(program)
+        vao add(vbo, "Position", 2, GL_FLOAT, false, 0, 0 as Pointer)
+
+        projLoc = program getUniformLocation("Projection")
+        modelLoc = program getUniformLocation("ModelView")
+        colorLoc = program getUniformLocation("InColor")
+    }
+
+    render: func (dye: DyeContext, modelView: Matrix4) {
+        if (!visible) return
+
+        mv := computeModelView(modelView)
+        draw(dye, mv)
+    }
+
+    draw: func (dye: DyeContext, modelView: Matrix4) {
+        "draw / Stub!" println(); return
+        program use()
+        vao bind()
+
+        glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
+        glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
+        
+        // premultiply color by opacity
+        glUniform4f(colorLoc,
+            opacity * color R,
+            opacity * color G,
+            opacity * color B,
+            opacity)
+
+
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+
+        glDrawArrays(GL_TRIANGLES, 0, vertices length / 2)
+
+        vao detach()
+        program detach()
+
+    }
+
+    rebuild: func {
+        "rebuild / Stub!" println(); return
+
+        numTris := count - 2
+        numVerts := numTris * 3
+        numFloats := numVerts * 2
+
+        vertices = Float[numFloats] new()
+        vi := 0
+
+        p0 := points[0]
+        for (i in 2..count) {
+            p1 := points[i - 1]
+            p2 := points[i]
+            "p0 = #{p0}, p2 = #{p1}, p2 = #{p2}" println()
+
+            vertices[vi] = p0 x; vi += 1
+            vertices[vi] = p0 y; vi += 1
+
+            vertices[vi] = p1 x; vi += 1
+            vertices[vi] = p1 y; vi += 1
+
+            vertices[vi] = p2 x; vi += 1
+            vertices[vi] = p2 y; vi += 1
+        }
+
+        "numFloats = #{numFloats}, vi = #{vi}, vertices length = #{vertices length}" println()
 
         vbo upload(vertices)
     }
