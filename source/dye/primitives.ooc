@@ -48,7 +48,7 @@ GlRectangle: class extends GlDrawable {
     program: ShaderProgram
     vao: VAO
 
-    vbo: FloatVBO 
+    vbo: FloatVBO
     vertices: Float[]
 
     outlineIndices := [0, 1, 3, 2]
@@ -105,7 +105,7 @@ GlRectangle: class extends GlDrawable {
 
         glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
-        
+
         // premultiply color by opacity
         glUniform4f(colorLoc,
             opacity * color R,
@@ -155,7 +155,7 @@ GlPoly: class extends GlDrawable {
     program: ShaderProgram
     vao: VAO
 
-    vbo: FloatVBO 
+    vbo: FloatVBO
     vertices: Float[]
 
     /* Uniforms */
@@ -195,13 +195,12 @@ GlPoly: class extends GlDrawable {
     }
 
     draw: func (dye: DyeContext, modelView: Matrix4) {
-        "draw / Stub!" println(); return
         program use()
         vao bind()
 
         glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
-        
+
         // premultiply color by opacity
         glUniform4f(colorLoc,
             opacity * color R,
@@ -220,8 +219,6 @@ GlPoly: class extends GlDrawable {
     }
 
     rebuild: func {
-        "rebuild / Stub!" println(); return
-
         numTris := count - 2
         numVerts := numTris * 3
         numFloats := numVerts * 2

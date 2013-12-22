@@ -28,7 +28,7 @@ GlSprite: class extends GlSpriteLike {
     texture: Texture
     vao: VAO
 
-    vbo: FloatVBO 
+    vbo: FloatVBO
     data: Float[]
 
     /* Uniforms */
@@ -37,7 +37,7 @@ GlSprite: class extends GlSpriteLike {
     init: func ~fromPath (path: String) {
         init(TextureLoader load(path))
     }
-    
+
     init: func ~fromTex (.texture) {
         vbo = FloatVBO new()
         setTexture(texture)
