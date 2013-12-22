@@ -163,8 +163,14 @@ Vec2: class {
         y += py
     }
 
+    /// Returns a perpendicular vector. (90 degree rotation)
     perp: func -> This {
-        new(y, -x)
+        new(-y, x)
+    }
+
+    /// Returns a perpendicular vector. (-90 degree rotation)
+    rperp: func -> This {
+        new(-y, x)
     }
 
     projected: func (v: This) -> This {
@@ -240,6 +246,11 @@ Vec2: class {
         if (dy < -epsilon || dy > epsilon) return false
 
         true
+    }
+
+    /// Check if two vectors are equal. (Be careful when comparing floating point numbers!)
+    equals?: func ~exact (v: This) -> Bool {
+        x == v x && y == v y
     }
 
 }
