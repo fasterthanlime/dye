@@ -26,6 +26,10 @@ VBO: abstract class {
         glBufferData(target, numBytes, data, usage)
     }
 
+    delete: func {
+        glDeleteBuffers(1, id&)
+    }
+
 }
 
 FloatVBO: class extends VBO {

@@ -143,6 +143,11 @@ GlSprite: class extends GlSpriteLike {
         program detach()
     }
 
+    free: func {
+        vbo delete()
+        vao delete()
+    }
+
 }
 
 /**

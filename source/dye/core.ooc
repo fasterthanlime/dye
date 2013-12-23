@@ -378,6 +378,10 @@ GlDrawable: abstract class {
         modelView
     }
 
+    free: func {
+        // muffin so far
+    }
+
 }
 
 /**
@@ -409,6 +413,15 @@ GlGroup: class extends GlDrawable {
 
     clear: func {
         children clear()
+    }
+
+    clearHard: func {
+        iter := children iterator()
+        while (iter hasNext?()) {
+            node := iter next()
+            iter remove()
+            node free()
+        }
     }
 
 }
