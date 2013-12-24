@@ -482,6 +482,10 @@ extend Float {
         this = this * (1.0 - alpha) + target * alpha
     }
 
+    lerp: func (target, alpha: This) -> This {
+        this * (1.0 - alpha) + target * alpha
+    }
+
     lerpDegrees!: func@ (target, alpha: This) {
         a: Float = this
         b: Float = target repeat(0, 360)
