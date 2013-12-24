@@ -178,7 +178,7 @@ Vec2: class {
         p project!(v)
         p
     }
-   
+
     project!: func (v: This) {
         v = v normalized()
         d := dot(v)
@@ -608,13 +608,13 @@ Matrix4: class {
             1.0f,   0.0f,   0.0f,   0.0f,
             0.0f,   1.0f,   0.0f,   0.0f,
             0.0f,   0.0f,   1.0f,   0.0f,
-            x,      y,      z,      1.0f 
+            x,      y,      z,      1.0f
         ])
     }
 
     /**
      * Create a new rotation matrix around axis (1.0, 0.0, 0.0)
-     * 
+     *
      * :param: a is the angle in radians
      */
     newRotateX: static func (a: Float) -> This {
@@ -637,7 +637,7 @@ Matrix4: class {
 
     /**
      * Create a new rotation matrix around axis (0.0, 1.0, 0.0)
-     * 
+     *
      * :param: a is the angle in radians
      */
     newRotateY: static func (a: Float) -> This {
@@ -660,7 +660,7 @@ Matrix4: class {
 
     /**
      * Create a new rotation matrix around axis (0.0, 0.0, 1.0)
-     * 
+     *
      * :param: a is the angle in radians
      */
     newRotateZ: static func (a: Float) -> This {
@@ -687,7 +687,7 @@ Matrix4: class {
     newScale: static func (x, y, z: Float) -> This {
         /*
          * Source: http://en.wikipedia.org/wiki/Transformation_matrix#Scaling
-         * 
+         *
          * Beautiful, it's the same in row-major and column-major :D
          * ie. m transposed() == m
          */
@@ -784,13 +784,13 @@ Matrix4: class {
     }
 
     toString: func -> String {
-"[%5.5f, %5.5f, %5.5f, %5.5f] 
-[%5.5f, %5.5f, %5.5f, %5.5f] 
-[%5.5f, %5.5f, %5.5f, %5.5f] 
+"[%5.5f, %5.5f, %5.5f, %5.5f]
+[%5.5f, %5.5f, %5.5f, %5.5f]
+[%5.5f, %5.5f, %5.5f, %5.5f]
 [%5.5f, %5.5f, %5.5f, %5.5f]" format(
-         values[0], values[4], values[8],  values[12], 
-         values[1], values[5], values[9],  values[13], 
-         values[2], values[6], values[10], values[14], 
+         values[0], values[4], values[8],  values[12],
+         values[1], values[5], values[9],  values[13],
+         values[2], values[6], values[10], values[14],
          values[3], values[7], values[11], values[15])
     }
 
@@ -810,7 +810,7 @@ Matrix4: class {
 }
 
 operator * (m1, m2: Matrix4) -> Matrix4 {
-    m1 mul(m2) 
+    m1 mul(m2)
 }
 
 MatrixException: class extends Exception {
@@ -828,7 +828,7 @@ AABB2: class {
     xMin, yMin, xMax, yMax: Float
 
     init: func
-    
+
     init: func ~floats (=xMin, =yMin, =xMax, =yMax)
 
     init: func ~size (width, height: Float) {
@@ -912,6 +912,10 @@ AABB2: class {
 
     width:  Float { get { xMax - xMin } }
     height: Float { get { yMax - yMin } }
+
+    size: Vec2 { get {
+        vec2(width, height)
+    } }
 }
 
 /**
@@ -921,7 +925,7 @@ AABB2i: class {
     xMin, yMin, xMax, yMax: Int
 
     init: func
-    
+
     init: func ~values (=xMin, =yMin, =xMax, =yMax)
 
     set!: func ~aabb (other: This) {
