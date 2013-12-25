@@ -812,9 +812,9 @@ Matrix4: class {
     }
 
     round!: func {
-        values[12] = values[12] ceil()
-        values[13] = values[13] ceil()
-        values[14] = values[14] ceil()
+        values[12] = values[12] as Int
+        values[13] = values[13] as Int
+        values[14] = values[14] as Int
     }
 
 }
