@@ -329,6 +329,9 @@ DyeContext: class {
  */
 GlDrawable: abstract class {
 
+    // round to nearest pixel for transformation matrices
+    round := static false
+
     scale := vec2(1, 1)
     pos := vec2(0, 0)
     angle := 0.0f

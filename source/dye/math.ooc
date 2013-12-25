@@ -811,6 +811,12 @@ Matrix4: class {
         }
     }
 
+    round!: func {
+        values[12] = values[12] ceil()
+        values[13] = values[13] ceil()
+        values[14] = values[14] ceil()
+    }
+
 }
 
 operator * (m1, m2: Matrix4) -> Matrix4 {

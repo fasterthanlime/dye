@@ -89,6 +89,9 @@ GlSprite: class extends GlSpriteLike {
             mv = mv * Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0)
         }
 
+        if (round) {
+            mv round!()
+        }
         draw(dye, mv)
     }
 
@@ -234,6 +237,9 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
             mv = mv * Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0)
         }
 
+        if (round) {
+            mv round!()
+        }
         draw(dye, mv)
     }
 
