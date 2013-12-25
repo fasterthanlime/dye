@@ -812,9 +812,10 @@ Matrix4: class {
     }
 
     round!: func {
-        values[12] = values[12] as Int
-        values[13] = values[13] as Int
-        values[14] = values[14] as Int
+        raw := values data as Float*
+        raw[12] = raw[12] as Int
+        raw[13] = raw[13] as Int
+        raw[14] = raw[14] as Int
     }
 
 }
