@@ -91,14 +91,7 @@ DyeContext: class {
         flags := SDL_WINDOW_OPENGL
         this fullscreen = fullscreen
         if (fullscreen) {
-            version (apple) {
-                flags |= SDL_WINDOW_FULLSCREEN
-            }
-
-            version (!apple) {
-                flags |= SDL_WINDOW_BORDERLESS
-                flags |= SDL_WINDOW_MAXIMIZED
-            }
+            flags |= SDL_WINDOW_FULLSCREEN_DESKTOP
 
             rect: SdlRect
             SDL getDisplayBounds(0, rect&)
@@ -152,8 +145,24 @@ DyeContext: class {
         setScene(createScene())
     }
 
+    hideWindow: func {
+        SDL hideWindow(window)
+    }
+
+    showWindow: func {
+        SDL showWindow(window)
+    }
+
+    minimizeWindow: func {
+        SDL minimizeWindow(window)
+    }
+
+    maximizeWindow: func {
+        SDL maximizeWindow(window)
+    }
+
     setFullscreen: func (=fullscreen) {
-        SDL setWindowFullscreen(window, fullscreen)
+        SDL setWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)
     }
 
     setTitle: func (title: String) {
