@@ -175,6 +175,7 @@ DyeContext: class {
     render: func {
         SDL glMakeCurrent(window, context)
 
+        mainPass group = currentScene
         mainPass render()
 
         if (!passes empty?()) for (p in passes) {
@@ -332,6 +333,12 @@ GlGroup: class extends GlDrawable {
 
     children := ArrayList<GlDrawable> new()
 
+    render: func (pass: Pass, modelView: Matrix4) {
+        if (!visible) return
+
+        draw(pass, computeModelView(modelView))
+    }
+
     draw: func (pass: Pass, modelView: Matrix4) {
         drawChildren(pass, modelView)
     }
@@ -483,6 +490,7 @@ Pass: class {
                 sprite = GlSprite new(fbo texture)
                 sprite pass = this
                 sprite center = false
+                group add(sprite)
         }
         projectionMatrix = Matrix4 newOrtho(0, size x, 0, size y, -1.0, 1.0)
     }
