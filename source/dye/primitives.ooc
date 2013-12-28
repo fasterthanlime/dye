@@ -5,6 +5,9 @@ use dye
 import dye/[core, math]
 import dye/gritty/[shader, shaderlibrary, texture, vbo, vao]
 
+/**
+ * Plain, monochrome, non-textured rectangle
+ */
 GlRectangle: class extends GlDrawable {
 
     size: Vec2
@@ -60,8 +63,8 @@ GlRectangle: class extends GlDrawable {
         colorLoc = program getUniformLocation("InColor")
     }
 
-    render: func (dye: DyeContext, modelView: Matrix4) {
-        if (!visible) return
+    render: func (pass: Pass, modelView: Matrix4) {
+        if (!shouldDraw?(pass)) return
 
         mv := computeModelView(modelView)
 
@@ -69,10 +72,10 @@ GlRectangle: class extends GlDrawable {
             mv = mv * Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0)
         }
 
-        draw(dye, mv)
+        draw(pass, mv)
     }
 
-    draw: func (dye: DyeContext, modelView: Matrix4) {
+    draw: func (pass: Pass, modelView: Matrix4) {
         if (!size equals?(oldSize, EPSILON)) {
             rebuild()
         }
@@ -80,7 +83,7 @@ GlRectangle: class extends GlDrawable {
         program use()
         vao bind()
 
-        glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
+        glUniformMatrix4fv(projLoc, 1, false, pass projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
 
         // premultiply color by opacity
@@ -124,6 +127,9 @@ GlRectangle: class extends GlDrawable {
 
 }
 
+/**
+ * Plain, monochrome, non-textured convex polygon
+ */
 GlPoly: class extends GlDrawable {
 
     points: Vec2*
@@ -169,18 +175,18 @@ GlPoly: class extends GlDrawable {
         colorLoc = program getUniformLocation("InColor")
     }
 
-    render: func (dye: DyeContext, modelView: Matrix4) {
-        if (!visible) return
+    render: func (pass: Pass, modelView: Matrix4) {
+        if (!shouldDraw?(pass)) return
 
         mv := computeModelView(modelView)
-        draw(dye, mv)
+        draw(pass, mv)
     }
 
-    draw: func (dye: DyeContext, modelView: Matrix4) {
+    draw: func (pass: Pass, modelView: Matrix4) {
         program use()
         vao bind()
 
-        glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
+        glUniformMatrix4fv(projLoc, 1, false, pass projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
 
         // premultiply color by opacity

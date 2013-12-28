@@ -7,7 +7,7 @@ import deadlogger/Log
 use sdl2
 import sdl2/[Core, Event]
 
-import dye/[math, core, fbo]
+import dye/[math, core]
 
 // sdk stuff
 import structs/[ArrayList]
@@ -393,7 +393,7 @@ SdlInput: class extends Input {
     }
 
     getMousePos: func -> Vec2 {
-        if (dye size == dye windowSize || (!dye fbo)) {
+        if (dye size == dye windowSize) {
             // all good, no transformation to make
             _mousepos
         } else {
@@ -401,7 +401,8 @@ SdlInput: class extends Input {
             // we have two things to account for: 1) scaling
             // 2) offset (there might be black bars on top/bottom
             // or left/right)
-            _mousepos sub(dye fbo targetOffset) mul(1.0 / dye fbo scale)
+            offset := dye windowPass targetOffset
+            _mousepos sub(offset x, offset y) mul(1.0f / dye windowPass scale)
         }
     }
 

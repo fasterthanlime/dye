@@ -1,7 +1,7 @@
 
 // ours
 use dye
-import dye/[core, input, loop]
+import dye/[core, math, input, loop]
 
 // third party
 use deadlogger

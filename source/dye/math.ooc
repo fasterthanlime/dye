@@ -999,3 +999,74 @@ AABB2i: class {
     height: Int { get { yMax - yMin } }
 }
 
+/**
+ * An RGB color
+ */
+Color: class {
+
+    /* r, g, b = [0, 255] UInt8 */
+    r, g, b: UInt8
+    init: func (=r, =g, =b)
+
+    /* R, G, B = [0.0, 1.0] Float */
+    R: Float { get { r / 255.0f } }
+    G: Float { get { g / 255.0f } }
+    B: Float { get { b / 255.0f } }
+
+    set!: func (c: This) {
+        r = c r
+        g = c g
+        b = c b
+    }
+
+    set!: func ~ints (=r, =g, =b)
+
+    black: static func -> This { new(0, 0, 0) }
+    white: static func -> This { new(255, 255, 255) }
+    red: static func -> This { new(255, 0, 0) }
+    green: static func -> This { new(0, 255, 0) }
+    blue: static func -> This { new(0, 0, 255) }
+
+    toString: func -> String {
+        "(%d, %d, %d)" format(r, g, b)
+    }
+
+    _: String { get { toString() } }
+
+    lighten: func (factor: Float) -> This {
+        new(r as Float / factor, g as Float / factor, b as Float / factor)
+    }
+
+    mul: func (factor: Float) -> This {
+        new(r * factor, g * factor, b * factor)
+    }
+
+}
+
+/**
+ * An RGBA color
+ */
+Color4: class extends Color {
+    a: UInt8
+
+    init: func (.r, .g, .b, =a) {
+        super(r, g, b)
+    }
+
+    /* A = [0.0, 1.0] Float */
+    A: Float { get { a / 255.0 } }
+
+    set!: func ~four (c: This) {
+        r = c r
+        g = c g
+        b = c b
+        a = c a
+    }
+
+    set!: func ~intsFour (=r, =g, =b, =a)
+
+    toString: func -> String {
+        "(%d, %d, %d, %d)" format(r, g, b, a)
+    }
+}
+

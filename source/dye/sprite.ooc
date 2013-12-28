@@ -80,8 +80,8 @@ GlSprite: class extends GlSpriteLike {
         setTexture(TextureLoader load(path))
     }
 
-    render: func (dye: DyeContext, modelView: Matrix4) {
-        if (!visible) return
+    render: func (pass: Pass, modelView: Matrix4) {
+        if (!shouldDraw?(pass)) return
 
         mv := computeModelView(modelView)
 
@@ -92,7 +92,7 @@ GlSprite: class extends GlSpriteLike {
         if (round) {
             mv round!()
         }
-        draw(dye, mv)
+        draw(pass, mv)
     }
 
     rebuild: func {
@@ -117,7 +117,7 @@ GlSprite: class extends GlSpriteLike {
         vbo upload(data)
     }
 
-    draw: func (dye: DyeContext, modelView: Matrix4) {
+    draw: func (pass: Pass, modelView: Matrix4) {
         program use()
         vao bind()
 
@@ -125,7 +125,7 @@ GlSprite: class extends GlSpriteLike {
         texture bind()
         glUniform1i(texLoc, 0)
 
-        glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
+        glUniformMatrix4fv(projLoc, 1, false, pass projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
 
         // premultiply color by opacity
@@ -137,7 +137,7 @@ GlSprite: class extends GlSpriteLike {
 
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
-        applyEffects(dye, modelView)
+        applyEffects(pass, modelView)
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 
@@ -228,8 +228,8 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
         setTexture(TextureLoader load(path))
     }
 
-    render: func (dye: DyeContext, modelView: Matrix4) {
-        if (!visible) return
+    render: func (pass: Pass, modelView: Matrix4) {
+        if (!shouldDraw?(pass)) return
 
         mv := computeModelView(modelView)
 
@@ -240,7 +240,7 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
         if (round) {
             mv round!()
         }
-        draw(dye, mv)
+        draw(pass, mv)
     }
 
     rebuild: func {
@@ -265,7 +265,7 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
         vbo upload(data)
     }
 
-    draw: func (dye: DyeContext, modelView: Matrix4) {
+    draw: func (pass: Pass, modelView: Matrix4) {
         program use()
         vao bind()
 
@@ -273,7 +273,7 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
         texture bind()
         glUniform1i(texLoc, 0)
 
-        glUniformMatrix4fv(projLoc, 1, false, dye projectionMatrix pointer)
+        glUniformMatrix4fv(projLoc, 1, false, pass projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
 
         texCellWidth :=  1.0 / xnum as Float
@@ -290,7 +290,7 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
 
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
-        applyEffects(dye, modelView)
+        applyEffects(pass, modelView)
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 

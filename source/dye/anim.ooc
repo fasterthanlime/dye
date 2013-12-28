@@ -7,20 +7,13 @@ import sdl2/OpenGL
 import structs/[List, ArrayList, HashMap]
 
 /**
- * Class: GlAnimSource
  * An anim source has a certain number of frames and it can switch
  * from one frame to another.
  */
 GlAnimSource: interface {
 
     /**
-     * Function: numFrames
-     *
-     * Gets the number of frames in that animation source
-     *
-     * Returns:
-     *
-     * the number of frames as an Int
+     * @return the number of frames in that animation source
      */
     numFrames: func -> Int
 
@@ -31,6 +24,10 @@ GlAnimSource: interface {
 
 }
 
+/**
+ * An anim source based on a set of spritelikes that can be switched
+ * at will
+ */
 GlSet: class extends GlSpriteLike implements GlAnimSource {
 
     current := 0
@@ -38,11 +35,11 @@ GlSet: class extends GlSpriteLike implements GlAnimSource {
 
     init: func
 
-    draw: func (dye: DyeContext, modelView: Matrix4) {
-        drawChildren(dye, modelView)
+    draw: func (pass: Pass, modelView: Matrix4) {
+        drawChildren(pass, modelView)
     }
 
-    drawChildren: func (dye: DyeContext, modelView: Matrix4) {
+    drawChildren: func (pass: Pass, modelView: Matrix4) {
         if (children empty?()) return
 
         current = current repeat(0, children size)
@@ -50,7 +47,7 @@ GlSet: class extends GlSpriteLike implements GlAnimSource {
         if (child) {
             child color set!(color)
             child opacity = opacity
-            child render(dye, modelView)
+            child render(pass, modelView)
         }
     }
 
@@ -131,11 +128,11 @@ GlAnim: class extends GlSpriteLike {
         }
     }
 
-    draw: func (dye: DyeContext, modelView: Matrix4) {
+    draw: func (pass: Pass, modelView: Matrix4) {
         drawable := source getDrawable()
         drawable color set!(color)
         drawable opacity = opacity
-        drawable render(dye, modelView)
+        drawable render(pass, modelView)
     }
 
 }
@@ -157,14 +154,14 @@ GlAnimSet: class extends GlSpriteLike {
         if (current) current update(ticks)
     }
 
-    draw: func (dye: DyeContext, modelView: Matrix4) {
+    draw: func (pass: Pass, modelView: Matrix4) {
         if (current) {
             match current {
                 case sl: GlSpriteLike =>
                     sl color set!(color)
                     sl opacity = opacity
             }
-            current render(dye, modelView)
+            current render(pass, modelView)
         }
     }
 

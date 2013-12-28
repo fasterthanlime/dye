@@ -36,8 +36,8 @@ GlText: class extends GlSpriteLike {
         }
     }
 
-    draw: func (dye: DyeContext, modelView: Matrix4) {
-        font render(dye, modelView, value, color, opacity)
+    draw: func (pass: Pass, modelView: Matrix4) {
+        font render(pass, modelView, value, color, opacity)
     }
 
     loadFont: static func (fontPath: String, fontSize: Int) -> Font {
