@@ -67,6 +67,9 @@ OpenGLVersion: class {
         // Windows, nVidia
         // 4.2.0
 
+        // Virtualbox, Ubuntu 12.04
+        // 2.1 Chromium 1.9
+
         profile := OpenGLProfile DESKTOP
         //logger debug("ver string = %s", ver)
 

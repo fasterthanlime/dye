@@ -137,6 +137,10 @@ ShaderProgram: class {
         glUniform2f(location, v x, v y)
     }
 
+    uniform: func ~int (location: Int, i: Int) {
+        glUniform1i(location, i)
+    }
+
 }
 
 ShaderException: class extends Exception {

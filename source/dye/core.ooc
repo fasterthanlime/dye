@@ -149,6 +149,9 @@ DyeContext: class {
 
     setFullscreen: func (=fullscreen) {
         SDL setWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)
+        x, y: Int
+        SDL getWindowSize(window, x&, y&)
+        windowSize set!(x, y)
     }
 
     setTitle: func (title: String) {
@@ -521,13 +524,11 @@ Pass: class {
             targetSize y = targetSize x * ratio
         }
 
-        scale = targetSize x as Float / dye size x as Float
-
         targetOffset x = dye windowSize x / 2 - targetSize x / 2
         targetOffset y = dye windowSize y / 2 - targetSize y / 2
 
         sprite pos set!(targetOffset x, targetOffset y)
-        //sprite scale set!(scale, scale)
+        sprite scale set!(1.0f, dye size x as Float / targetSize x as Float)
     }
 
     doRender: func {

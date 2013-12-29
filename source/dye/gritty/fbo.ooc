@@ -30,6 +30,10 @@ Fbo: class {
         texture upload(null)
 
         // create a renderbuffer object to store depth info
+        if (!glGenRenderbuffers) {
+            raise("your graphics card doesn't support FBOs. Get a better one!")
+        }
+
         glGenRenderbuffers(1, rboId&)
         glBindRenderbuffer(GL_RENDERBUFFER, rboId)
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, size x, size y)
