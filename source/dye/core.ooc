@@ -75,6 +75,7 @@ DyeContext: class {
         SDL glSetAttribute(SDL_GL_DOUBLEBUFFER, 1)
 
         flags := SDL_WINDOW_OPENGL
+        flags |= SDL_WINDOW_RESIZABLE
         this fullscreen = fullscreen
         if (fullscreen) {
             flags |= SDL_WINDOW_FULLSCREEN_DESKTOP
@@ -149,9 +150,14 @@ DyeContext: class {
 
     setFullscreen: func (=fullscreen) {
         SDL setWindowFullscreen(window, fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0)
-        x, y: Int
-        SDL getWindowSize(window, x&, y&)
-        windowSize set!(x, y)
+
+        if (fullscreen) {
+            x, y: Int
+            SDL getWindowSize(window, x&, y&)
+            windowSize set!(x, y)
+        } else {
+            SDL setWindowSize(window, size x, size y)
+        }
     }
 
     setTitle: func (title: String) {
@@ -519,16 +525,17 @@ Pass: class {
         if (targetRatio < ratio) {
             targetSize y = dye windowSize y
             targetSize x = targetSize y / ratio
+            sprite scale set!(targetRatio / ratio, 1.0f)
         } else {
             targetSize x = dye windowSize x
             targetSize y = targetSize x * ratio
+            sprite scale set!(1.0f, ratio / targetRatio)
         }
 
         targetOffset x = dye windowSize x / 2 - targetSize x / 2
         targetOffset y = dye windowSize y / 2 - targetSize y / 2
 
         sprite pos set!(targetOffset x, targetOffset y)
-        sprite scale set!(1.0f, dye size x as Float / targetSize x as Float)
     }
 
     doRender: func {
