@@ -155,8 +155,10 @@ DyeContext: class {
             x, y: Int
             SDL getWindowSize(window, x&, y&)
             windowSize set!(x, y)
+            setShowCursor(false)
         } else {
             SDL setWindowSize(window, size x, size y)
+            setShowCursor(true)
         }
     }
 
