@@ -112,6 +112,11 @@ DyeContext: class {
             raise("opengl context failure")
         }
 
+        input = SdlInput new(this)
+        input onWindowSizeChange(|x, y|
+            windowSize set!(x, y)
+        )
+
         version ((windows || linux || apple) && !android) {
             // we use glew on Desktop
             glewExperimental = true
@@ -121,11 +126,6 @@ DyeContext: class {
                 raise("glew failure")
             }
         }
-
-        input = SdlInput new(this)
-        input onWindowSizeChange(|x, y|
-            windowSize set!(x, y)
-        )
 
         initGL()
 
@@ -266,6 +266,8 @@ GlDrawable: abstract class {
 
     // round to nearest pixel for transformation matrices
     round := static false
+    // prefix to add to all asset requests
+    prefix := static ""
 
     scale := vec2(1, 1)
     pos := vec2(0, 0)

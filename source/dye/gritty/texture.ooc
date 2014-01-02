@@ -1,9 +1,9 @@
 
-// our stuff
+// ours
 import dye/[core, math, anim]
 import dye/gritty/[io]
 
-// third-party stuff
+// third
 import sdl2/[OpenGL]
 
 use stb-image
@@ -11,8 +11,9 @@ use stb-image
 use deadlogger
 import deadlogger/[Log, Logger]
 
-// sdk stuff
+// sdk
 import structs/HashMap
+import io/File
 
 TextureFilter: enum {
     NEAREST
@@ -130,7 +131,11 @@ TextureLoader: class {
 
     _placeholder: static Texture
 
-    load: static func (path: String) -> Texture {
+    load: static func (pathBase: String) -> Texture {
+        path := pathBase
+        if (!File new(pathBase) exists?()) {
+            path = GlDrawable prefix + pathBase
+        }
         if (cache contains?(path)) {
             return cache get(path)
         }

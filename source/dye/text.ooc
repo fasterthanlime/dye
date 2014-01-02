@@ -24,7 +24,8 @@ GlText: class extends GlSpriteLike {
 
     lineHeight: Float
 
-    init: func (=fontPath, =value, fontSize := 40) {
+    init: func (fontPathBase: String, =value, fontSize := 40) {
+        fontPath = prefix + fontPathBase
         font = loadFont(fontPath, fontSize)
         lineHeight = font getLineHeight()
     }

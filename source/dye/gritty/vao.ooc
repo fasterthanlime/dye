@@ -1,6 +1,6 @@
 
 // our stuff
-import dye/gritty/[shader, vbo]
+import dye/gritty/[shader, vbo, versions]
 
 // third-party stuff
 import sdl2/[OpenGL]
@@ -17,7 +17,10 @@ VAO: abstract class {
 
     new: static func (program: ShaderProgram) -> This {
         version (!android) {
-            return HardVAO new(program)
+            ver := OpenGLVersion get()
+            if (ver gte(3, 0)) {
+                return HardVAO new(program)
+            }
         }
 
         return SoftVAO new(program)

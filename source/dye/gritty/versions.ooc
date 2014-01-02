@@ -48,7 +48,7 @@ OpenGLVersion: class {
             shader = ShaderVersion GLSL_100
         } else if (gte(3, 2)) {
             shader = ShaderVersion GLSL_150
-        } else if (gte(3, 0)) {
+        } else if (gte(2, 1)) {
             shader = ShaderVersion GLSL_130
         }
         logger info("Detected GLSL version: " + shader toString())
