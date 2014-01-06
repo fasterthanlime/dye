@@ -487,8 +487,8 @@ Pass: class {
 
     // only for target: window
     sprite: GlSprite
-    targetSize := vec2i(-1, -1)
-    targetOffset := vec2i(0, 0)
+    targetSize := vec2(-1, -1)
+    targetOffset := vec2(0, 0)
     scale := 1.0
 
     // is it the main pass?
@@ -525,19 +525,25 @@ Pass: class {
     adjustSprite: func {
         ratio := fbo size ratio()
         targetRatio := dye windowSize ratio()
+        windowSize := vec2(dye windowSize x, dye windowSize y)
 
         if (targetRatio < ratio) {
-            targetSize y = dye windowSize y
-            targetSize x = targetSize y / ratio
+            // target thinner than window (pillarbox)
+            targetSize x = windowSize y / ratio
+            targetSize y = windowSize y
             sprite scale set!(targetRatio / ratio, 1.0f)
-        } else {
-            targetSize x = dye windowSize x
-            targetSize y = targetSize x * ratio
-            sprite scale set!(1.0f, ratio / targetRatio)
-        }
 
-        targetOffset x = dye windowSize x / 2 - targetSize x / 2
-        targetOffset y = dye windowSize y / 2 - targetSize y / 2
+            targetOffset x = ((size y / targetRatio) - size x) * 0.5 * sprite scale x
+            targetOffset y = 0.0f
+        } else {
+            // target wider than window (letterbox)
+            targetSize x = windowSize x
+            targetSize y = windowSize x * ratio
+            sprite scale set!(1.0f, ratio / targetRatio)
+
+            targetOffset x = 0.0f
+            targetOffset y = ((size x * targetRatio) - size y) * 0.5 * sprite scale y
+        }
 
         sprite pos set!(targetOffset x, targetOffset y)
     }

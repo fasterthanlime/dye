@@ -337,24 +337,24 @@ SdlInput: class extends Input {
     }
 
     _mouseMoved: func (x, y, xrel, yrel: Int) {
-        _mousepos set!(x, dye windowSize y - y)
-        _notifyListeners(MouseMotion new(_mousepos, vec2(xrel, yrel)))
+        _mousepos set!(x, y)
+        _notifyListeners(MouseMotion new(getMousePos(), vec2(xrel, yrel)))
     }
 
     _mousePressed: func (button: Int) {
         if (debug) {
-            logger debug("Mouse pressed at %s", _mousepos _)
+            logger debug("Mouse pressed at %s", getMousePos() _)
         }
         buttonState[button] = true
-        _notifyListeners(MousePress new(_mousepos, button))
+        _notifyListeners(MousePress new(getMousePos(), button))
     }
 
     _mouseReleased: func (button: Int) {
         if (debug) {
-            logger debug("Mouse released at %s", _mousepos _)
+            logger debug("Mouse released at %s", getMousePos() _)
         }
         buttonState[button] = false
-        _notifyListeners(MouseRelease new(_mousepos, button))
+        _notifyListeners(MouseRelease new(getMousePos(), button))
     }
 
     _windowSizeChanged: func (x, y: Int) {
@@ -393,16 +393,24 @@ SdlInput: class extends Input {
     }
 
     getMousePos: func -> Vec2 {
+        result := vec2(_mousepos)
+        result y = dye windowSize y - result y
+
         if (dye size == dye windowSize) {
             // all good, no transformation to make
-            _mousepos
+            result
         } else {
-            // in this case, windowSize is bigger than size
-            // we have two things to account for: 1) scaling
-            // 2) offset (there might be black bars on top/bottom
-            // or left/right)
+            // We have two things to account for:
+            // 1) offset (there might be black bars on top/bottom or left/right)
+            // 2) scaling (windowSize is different from dye canvas size)
             offset := dye windowPass targetOffset
-            _mousepos sub(offset x, offset y) mul(1.0f / dye windowPass scale)
+            result add!(
+                (dye windowPass targetSize x - dye windowSize x) / 2,
+                (dye windowPass targetSize y - dye windowSize y) / 2
+            )
+            result x *= (dye windowPass size x / dye windowPass targetSize x)
+            result y *= (dye windowPass size y / dye windowPass targetSize y)
+            result
         }
     }
 
