@@ -19,9 +19,13 @@ import io/File
 App: class {
 
     dye: DyeContext
-    logger: Logger
     title: String
     loop: FixedLoop
+
+    // just logger things (TM)
+    logger: Logger
+    console: StdoutHandler
+    fileHandler: FileHandler
 
     // adjustable things
     escQuits? := true
@@ -72,18 +76,22 @@ App: class {
     }
 
     setupLogging: func {
-        console := StdoutHandler new()
+        console = StdoutHandler new()
         console setFormatter(ColoredFormatter new(NiceFormatter new()))
         Log root attachHandler(console)
 
         file := File new("app.log")
         file write("")
 
-        fileHandler := FileHandler new(file path)
+        fileHandler = FileHandler new(file path)
         fileHandler setFormatter(NiceFormatter new())
         Log root attachHandler(fileHandler)
 
         logger = Log getLogger(title)
+    }
+
+    silence: func {
+        Log root detachHandler(console)
     }
 
 }
