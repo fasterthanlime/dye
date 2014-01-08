@@ -25,20 +25,32 @@ Font: class {
 
     fontSize: Float
     fontPath: String
+    lineHeight: Float
 
     color := Color white()
 
     init: func (=fontSize, =fontPath) {
         if (!_ftInitialized) {
+            _ftInitialized = true
             _ft init()
         }
 
+        // load font
         _ft newFace(fontPath, 0, _face&)
 
+        // set the right size
         dpi := 72
         _face setCharSize((fontSize * 64.0) as Int, 0, dpi, dpi)
 
+        // render the chars we need
         _loadCharset()
+        
+        // store metrics
+        metrics := _face@ size@ metrics
+        lineHeight = metrics height toFloat()
+
+        // free it!
+        _face done()
     }
 
     _loadCharset: func {
@@ -55,8 +67,7 @@ Font: class {
     }
 
     getLineHeight: func -> Float {
-        metrics := _face@ size@ metrics
-        metrics height toFloat()
+        lineHeight
     }
 
     getBounds: func (str: String) -> AABB2 {

@@ -52,7 +52,6 @@ GlSprite: class extends GlSpriteLike {
         program use()
 
         if (vao) {
-            vao delete()
             vao = null
         }
 
@@ -146,11 +145,6 @@ GlSprite: class extends GlSpriteLike {
         program detach()
     }
 
-    free: func {
-        vbo delete()
-        vao delete()
-    }
-
 }
 
 /**
@@ -200,7 +194,6 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
         program use()
 
         if (vao) {
-            vao delete()
             vao = null
         }
 

@@ -11,6 +11,12 @@ VBO: abstract class {
     init: func {
         glGenBuffers(1, id&)
         bind()
+        gc_register_finalizer(this, finalize as Pointer, null, null, null)
+    }
+
+    finalize: func {
+        "[VBO] Dang it we're finalizing a %s %p" printfln(class name, this)
+        glDeleteBuffers(1, id&)
     }
     
     bind: func {
@@ -24,10 +30,6 @@ VBO: abstract class {
     _data: func ~raw (numBytes: GLsizeiptr, data: Pointer) {
         bind()
         glBufferData(target, numBytes, data, usage)
-    }
-
-    delete: func {
-        glDeleteBuffers(1, id&)
     }
 
 }

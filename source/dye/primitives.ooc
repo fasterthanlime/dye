@@ -51,7 +51,6 @@ GlRectangle: class extends GlDrawable {
         program use()
 
         if (vao) {
-            vao delete()
             vao = null
         }
 
@@ -120,11 +119,6 @@ GlRectangle: class extends GlDrawable {
         vbo upload(vertices)
     }
 
-    free: func {
-        vbo delete()
-        vao delete()
-    }
-
 }
 
 /**
@@ -163,7 +157,6 @@ GlPoly: class extends GlDrawable {
         program use()
 
         if (vao) {
-            vao delete()
             vao = null
         }
 
@@ -218,7 +211,6 @@ GlPoly: class extends GlDrawable {
         for (i in 2..count) {
             p1 := points[i - 1]
             p2 := points[i]
-            "p0 = #{p0}, p2 = #{p1}, p2 = #{p2}" println()
 
             vertices[vi] = p0 x; vi += 1
             vertices[vi] = p0 y; vi += 1
@@ -230,14 +222,7 @@ GlPoly: class extends GlDrawable {
             vertices[vi] = p2 y; vi += 1
         }
 
-        "numFloats = #{numFloats}, vi = #{vi}, vertices length = #{vertices length}" println()
-
         vbo upload(vertices)
-    }
-
-    free: func {
-        vbo delete()
-        vao delete()
     }
 
 }

@@ -35,7 +35,6 @@ VAO: abstract class {
     add: abstract func (vai: VertexAttribInfo)
     bind: abstract func
     detach: abstract func
-    delete: abstract func
 
 }
 
@@ -51,6 +50,12 @@ version (!android) {
         init: func (=program) {
             glGenVertexArrays(1, id&)
             bind()
+            gc_register_finalizer(this, finalize as Pointer, null, null, null)
+        }
+
+        finalize: func {
+            "[VAO] Holy shit we're finalizing a %s %p" printfln(class name, this)
+            glDeleteVertexArrays(1, id&)
         }
 
         bind: func {
@@ -64,10 +69,6 @@ version (!android) {
 
         detach: func {
             glBindVertexArray(0)
-        }
-
-        delete: func {
-            glDeleteVertexArrays(1, id&)
         }
 
     }
@@ -101,10 +102,6 @@ SoftVAO: class extends VAO {
         for (vai in vertexAttribs) {
             vai detach()
         }
-    }
-
-    delete: func {
-        vertexAttribs clear()
     }
 
 }
