@@ -4,7 +4,7 @@ import sdl2/[OpenGL]
 
 VBO: abstract class {
 
-    id: Int
+    id: UInt
     target := GL_ARRAY_BUFFER // most common VBO type
     usage := GL_STATIC_DRAW
 

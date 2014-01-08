@@ -55,9 +55,10 @@ RWopsReader: class extends Reader {
 
     seek: func (offset: Long, mode: SeekMode) -> Bool {
         ops seek(offset, match mode {
-            case SeekMode SET => SDL_SeekMode SET
             case SeekMode CUR => SDL_SeekMode CUR
             case SeekMode END => SDL_SeekMode END
+            // set by default - although something other than SeekMode SET should not happen here
+            case => SDL_SeekMode SET
         })
         true
     }

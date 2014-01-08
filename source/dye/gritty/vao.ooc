@@ -46,7 +46,7 @@ version (!android) {
      */
     HardVAO: class extends VAO {
 
-        id: Int
+        id: UInt
 
         init: func (=program) {
             glGenVertexArrays(1, id&)
@@ -121,7 +121,7 @@ VertexAttribInfo: class {
     vbo: VBO
 
     name: String
-    id: Int
+    id: UInt
     numComponents: Int
     type: GLenum
     normalized: Bool

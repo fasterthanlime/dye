@@ -34,7 +34,7 @@ TextureFilter: enum {
  */
 Texture: class {
 
-    id: Int
+    id: UInt
     width, height: Int
     path: String
 
