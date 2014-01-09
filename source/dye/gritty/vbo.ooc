@@ -15,7 +15,6 @@ VBO: abstract class {
     }
 
     finalize: func {
-        "[VBO] Dang it we're finalizing a %s %p" printfln(class name, this)
         glDeleteBuffers(1, id&)
     }
     

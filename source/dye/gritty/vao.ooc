@@ -54,7 +54,6 @@ version (!android) {
         }
 
         finalize: func {
-            "[VAO] Holy shit we're finalizing a %s %p" printfln(class name, this)
             glDeleteVertexArrays(1, id&)
         }
 
