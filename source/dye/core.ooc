@@ -216,7 +216,7 @@ DyeContext: class {
 
         logger info("Size = %s, Window size = %s", size _, windowSize _)
         mainPass = Pass new(this, RenderTarget TEXTURE, Fbo new(this, size))
-        mainPass main = true
+        mainPass catchAll = true
         mainPass clearColor set!(72, 60, 50) // taupe!
         windowPass = Pass new(this, RenderTarget WINDOW, mainPass fbo)
     }
@@ -288,8 +288,8 @@ GlDrawable: abstract class {
 
         match (this pass) {
             case null =>
-                // render if main pass
-                pass main
+                // render if pass catches all
+                pass catchAll
             case =>
                 // render if same pass
                 this pass == pass
@@ -491,8 +491,11 @@ Pass: class {
     targetOffset := vec2(0, 0)
     scale := 1.0
 
-    // is it the main pass?
-    main := false
+    // care about object's passes?
+    catchAll := false
+
+    // clears before drawing?
+    clears := true
 
     init: func (=dye, =target, =fbo) {
         match target {
@@ -558,8 +561,10 @@ Pass: class {
             case RenderTarget WINDOW =>
                 glViewport(0, 0, dye windowSize x, dye windowSize y)
         }
-        glClearColor(clearColor R, clearColor G, clearColor B, 1.0)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        if (clears) {
+            glClearColor(clearColor R, clearColor G, clearColor B, 1.0)
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        }
 
         group render(this, Matrix4 newIdentity())
 
