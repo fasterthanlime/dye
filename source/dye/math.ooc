@@ -759,22 +759,27 @@ Matrix4: class {
      *
      * This is a naive, unoptimized, O(n^3) function.
      */
-    mul: func (m2: This) -> This {
+    mul: final func (m2: This) -> This {
         m1 := this
-        res := Float[16] new()
 
-        for (row in 0..4) {
-            for (col in 0..4) {
-                product := 0.0f
+        result := Float[16] new()
 
-                for (inner in 0..4) {
-                    product += m1 values[inner * 4 + row] * m2 values[col * 4 + inner]
-                }
-                res[col * 4 + row] = product
+        m1v := m1 values data as Float*
+        m2v := m2 values data as Float*
+        rev := result data as Float*
+
+        for (col in 0..4) {
+            fourcol := col * 4
+            for (row in 0..4) {
+                rev[fourcol + row] = \
+                    m1v[     row] * m2v[fourcol    ] + \
+                    m1v[ 4 + row] * m2v[fourcol + 1] + \
+                    m1v[ 8 + row] * m2v[fourcol + 2] + \
+                    m1v[12 + row] * m2v[fourcol + 3]
             }
         }
 
-        new(res)
+        new(result)
     }
 
     /**
