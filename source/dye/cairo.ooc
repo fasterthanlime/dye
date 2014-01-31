@@ -2,12 +2,15 @@
 use cairo
 import cairo/Cairo
 
-import dye/core
+use sdl2
+import sdl2/[OpenGL]
+
+import dye/[core, math]
 
 CairoDrawable: abstract class {
 
     // You can use any Cairo calls here
-    draw: abstract func (dye: Dye, cr: CairoContext)
+    draw: abstract func (pass: Pass, cr: CairoContext)
 
 }
 
@@ -73,31 +76,30 @@ CairoRenderTarget: class extends GlDrawable {
 		     surfData)
     }
 
-    draw: func (dye: Dye) {
-	cairoDrawable draw(dye, context)	
-
-	drawTexture()
+    draw: func (pass: Pass, modelView: Matrix4) {
+        cairoDrawable draw(pass, context)	
+        drawTexture()
     }
 
     drawTexture: func {
-	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, textureID)
+        glBindTexture(GL_TEXTURE_RECTANGLE_ARB, textureID)
 
-	glColor3f(1.0, 1.0, 1.0)
-	glBegin(GL_QUADS)
+        glColor3f(1.0, 1.0, 1.0)
+        glBegin(GL_QUADS)
 
-	glTexCoord2f(0.0, 0.0)
-	glVertex2f(0.0, 0.0)
+        glTexCoord2f(0.0, 0.0)
+        glVertex2f(0.0, 0.0)
 
-	glTexCoord2f(width, 0.0)
-	glVertex2f(width, 0.0)
+        glTexCoord2f(width, 0.0)
+        glVertex2f(width, 0.0)
 
-	glTexCoord2f(width, height)
-	glVertex2f(width, height)
+        glTexCoord2f(width, height)
+        glVertex2f(width, height)
 
-	glTexCoord2f(0.0, height)
-	glVertex2f(0.0, height)
+        glTexCoord2f(0.0, height)
+        glVertex2f(0.0, height)
 
-	glEnd()
+        glEnd()
     }
 
 }

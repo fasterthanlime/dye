@@ -1,4 +1,5 @@
 
+use sdl2
 import sdl2/[OpenGL]
 
 use dye

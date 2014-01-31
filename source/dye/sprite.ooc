@@ -34,7 +34,7 @@ GlSprite: class extends GlSpriteLike {
     /* Uniforms */
     texLoc, projLoc, modelLoc, colorLoc: Int
 
-    init: func ~fromPath (path: String) {
+    init: func (path: String) {
         init(TextureLoader load(path))
     }
 
