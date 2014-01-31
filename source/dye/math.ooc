@@ -83,12 +83,12 @@ Vec2: class {
         y *= v y
     }
 
-    set!: func (v: This) {
+    set!: func ~self (v: This) {
         x = v x
         y = v y
     }
 
-    set!: func ~twofloats (px, py: Float) {
+    set!: func (px, py: Float) {
         x = px
         y = py
     }
@@ -281,7 +281,7 @@ Vec3: class {
         x * x + y * y + z * z
     }
 
-    set!: func (v: This) {
+    set!: func ~self (v: This) {
         x = v x
         y = v y
         z = v z
@@ -292,7 +292,7 @@ Vec3: class {
         y = v y
     }
 
-    set!: func ~threefloats (px, py, pz: Float) {
+    set!: func (px, py, pz: Float) {
         x = px
         y = py
         z = pz
@@ -1018,13 +1018,13 @@ Color: class {
     G: Float { get { g / 255.0f } }
     B: Float { get { b / 255.0f } }
 
-    set!: func (c: This) {
+    set!: func ~self (c: This) {
         r = c r
         g = c g
         b = c b
     }
 
-    set!: func ~ints (=r, =g, =b)
+    set!: func (=r, =g, =b)
 
     black: static func -> This { new(0, 0, 0) }
     white: static func -> This { new(255, 255, 255) }
@@ -1046,32 +1046,5 @@ Color: class {
         new(r * factor, g * factor, b * factor)
     }
 
-}
-
-/**
- * An RGBA color
- */
-Color4: class extends Color {
-    a: UInt8
-
-    init: func (.r, .g, .b, =a) {
-        super(r, g, b)
-    }
-
-    /* A = [0.0, 1.0] Float */
-    A: Float { get { a / 255.0 } }
-
-    set!: func ~four (c: This) {
-        r = c r
-        g = c g
-        b = c b
-        a = c a
-    }
-
-    set!: func ~intsFour (=r, =g, =b, =a)
-
-    toString: func -> String {
-        "(%d, %d, %d, %d)" format(r, g, b, a)
-    }
 }
 

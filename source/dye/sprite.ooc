@@ -176,7 +176,7 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
     /* Uniforms */
     texLoc, projLoc, modelLoc, colorLoc, gridLoc: Int
 
-    init: func ~fromPath (path: String, .xnum, .ynum) {
+    init: func (path: String, .xnum, .ynum) {
         init(TextureLoader load(path), xnum, ynum)
     }
 
