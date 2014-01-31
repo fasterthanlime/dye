@@ -84,6 +84,10 @@ Fbo: class {
             raise("fbo problem")
         }
 
+        // zeroes buffer
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
         // switch back to window-system-provided framebuffer
         unbind()
     }

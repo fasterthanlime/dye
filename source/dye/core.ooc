@@ -475,6 +475,7 @@ Pass: class {
 
     dye: DyeContext
     clearColor := Color new(0, 0, 0)
+    clearAlpha := 0.0f
     group := GlGroup new()
 
     target: RenderTarget
@@ -552,19 +553,20 @@ Pass: class {
     }
 
     doRender: func {
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-
         match target {
             case RenderTarget TEXTURE =>
                 glViewport(0, 0, fbo size x, fbo size y)
             case RenderTarget WINDOW =>
                 glViewport(0, 0, dye windowSize x, dye windowSize y)
         }
+
         if (clears) {
-            glClearColor(clearColor R, clearColor G, clearColor B, 1.0)
+            glClearColor(clearColor R, clearColor G, clearColor B, clearAlpha)
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         }
+
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
         group render(this, Matrix4 newIdentity())
 
