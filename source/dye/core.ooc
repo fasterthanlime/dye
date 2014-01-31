@@ -215,7 +215,7 @@ DyeContext: class {
         SDL glSetSwapInterval(1)
 
         logger info("Size = %s, Window size = %s", size _, windowSize _)
-        mainPass = Pass new(this, RenderTarget TEXTURE, Fbo new(this, size))
+        mainPass = Pass new(this, RenderTarget TEXTURE, Fbo new(size))
         mainPass catchAll = true
         mainPass clearColor set!(72, 60, 50) // taupe!
         windowPass = Pass new(this, RenderTarget WINDOW, mainPass fbo)

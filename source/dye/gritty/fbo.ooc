@@ -15,8 +15,6 @@ import dye/gritty/[texture]
  */
 Fbo: class {
 
-    dye: DyeContext
-
     size: Vec2i
     texture: Texture
     rboId: Int
@@ -25,7 +23,7 @@ Fbo: class {
     logger := static Log getLogger(This name)
     CORE := true
 
-    init: func (=dye, =size) {
+    init: func (=size) {
         // create a texture object
         texture = Texture new(size x, size y, "<fbo %p>" format(this))
         texture upload(null)
