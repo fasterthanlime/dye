@@ -58,7 +58,7 @@ Font: class {
         for (i in 32..127) {
             charPoint := i as ULong
             index := _face getCharIndex(charPoint)
-            _face loadGlyph(index, FTLoadFlag default)
+            _face loadGlyph(index, FTLoadFlag default_)
 
             glyph := Glyph new(charPoint, _face@ glyph)
             glyph sprite color = color // make them all point to the same thing
