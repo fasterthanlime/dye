@@ -14,7 +14,7 @@ use deadlogger
 import deadlogger/[Log, Logger]
 
 // sdk stuff
-import structs/[HashMap]
+import structs/[ArrayList, HashMap]
 
 Font: class {
 
@@ -41,10 +41,6 @@ Font: class {
             _ft init()
         }
 
-        // create bin
-        bin = RectangleBinPack new(512, 512)
-        atlas = GlyphAtlas new(bin binWidth, bin binHeight)
-
         // load font
         _ft newFace(fontPath, 0, _face&)
 
@@ -64,6 +60,8 @@ Font: class {
     }
 
     _loadCharset: func {
+        list := ArrayList<Glyph> new()
+
         // load all printable ASCII characters for now
         for (i in 32..127) {
             charPoint := i as ULong
@@ -71,16 +69,38 @@ Font: class {
             _face loadGlyph(index, FTLoadFlag default_)
 
             glyph := Glyph new(charPoint, _face@ glyph)
-            node := bin insert(bin root, glyph width + 1, glyph rows + 1)
-            if (!node) {
-                "Couldn't fit glyph!" println()
-            } else {
-                glyph binNode = node
-                atlas blit(glyph)
+            glyphs put(charPoint, glyph)
+            list add(glyph)
+        }
+
+        // create bin
+        poftwo := 6 // start with 64x64
+        bin = RectangleBinPack new(1 << poftwo, 1 << poftwo)
+        fit := false
+
+        while (!fit) {
+            fit = true
+
+            for (glyph in list) {
+                node := bin insert(bin root, glyph width + 1, glyph rows + 1)
+                if (node) {
+                    glyph binNode = node
+                } else {
+                    "Couldn't fit glyph! #{glyph width + 1}x#{glyph rows + 1}, occupancy = #{bin occupancy()}" println()
+                    fit = false
+                    break
+                }
             }
 
-            glyphs put(charPoint, glyph)
+            if (!fit) {
+                poftwo += 1
+                bin = RectangleBinPack new(1 << poftwo, 1 << poftwo)
+                "Re-trying with a #{bin root width}x#{bin root height} bin" println()
+            }
         }
+
+        atlas = GlyphAtlas new(bin binWidth, bin binHeight)
+        for(glyph in list) { atlas blit(glyph) }
         atlas bake()
         "Final bin occupancy: #{bin occupancy()}" println()
     }

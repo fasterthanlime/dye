@@ -47,7 +47,7 @@ GlText: class extends Geometry {
     size: Vec2 {
         get {
             bounds := getBounds(value)
-            vec2(bounds width, lineHeight)
+            vec2(bounds width, bounds height)
         }
     }
 

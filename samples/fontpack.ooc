@@ -21,27 +21,33 @@ FontTest: class extends App {
 
     init: func {
         super("Font packing test", 1280, 720)
-        dye setClearColor(Color white())
+        dye setClearColor(Color black())
     }
 
     setup: func {
-        addText("noodle", vec2(40, 720 - 50), 18)
+        addText("JackStory", vec2(40, 720 - 50), 40)
     }
 
     addText: func (fontName: String, pos: Vec2, fontSize: Int) {
         fontPath := "fonts/%s.ttf" format(fontName)
         text = GlText new(fontPath, "", fontSize)
-        text color set!(0, 0, 0)
+        text color set!(Color white())
         text pos set!(pos)
         dye add(text)
     }
 
     update: func {
         index += 1
-        if (index > 3 && length < source size) {
+        if (index > 1 && length < source size) {
             index = 0
-            length += 4
+            length += 1
             text value = source[0..length]
+        }
+
+        bounds := text size
+
+        if (text pos y < bounds y) {
+            text pos y lerp!(bounds y, 0.1)
         }
     }
 
