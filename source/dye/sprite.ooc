@@ -107,7 +107,7 @@ GlGridSprite: class extends GlSprite implements GlAnimSource {
            _col = col 
            _row = row 
            texX = texW * _col
-           texY = texH * _row
+           texY = texH * (ynum - 1 - _row)
            rebuild()
         }
 
