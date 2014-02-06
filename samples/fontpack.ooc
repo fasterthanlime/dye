@@ -25,7 +25,7 @@ FontTest: class extends App {
     }
 
     setup: func {
-        addText("JackStory", vec2(40, 720 - 50), 40)
+        addText("JackStory", vec2(40, 720 - 50), 20)
     }
 
     addText: func (fontName: String, pos: Vec2, fontSize: Int) {
@@ -33,6 +33,7 @@ FontTest: class extends App {
         text = GlText new(fontPath, "", fontSize)
         text color set!(Color white())
         text pos set!(pos)
+        text scale mul!(1.1f)
         dye add(text)
     }
 

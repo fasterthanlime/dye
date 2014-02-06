@@ -72,6 +72,9 @@ GlText: class extends Geometry {
                     pen add!(glyph advance)
             }
         )
+
+        pen x = 0
+        pen y -= lineHeight
         aabb expand!(pen)
 
         aabb
@@ -131,12 +134,12 @@ GlText: class extends Geometry {
                         builder quad6(
                             pen x + glyph left,
                             pen y + glyph top - glyph rows,
-                            node width,
-                            node height,
+                            node width  - 1,
+                            node height - 1,
                             node x as Float / font bin binWidth as Float,
                             node y as Float / font bin binHeight as Float,
-                            node width  as Float / font bin binWidth as Float,
-                            node height as Float / font bin binHeight as Float
+                            (node width  - 1) as Float / font bin binWidth as Float,
+                            (node height - 1) as Float / font bin binHeight as Float
                         )
 
                         pen add!(glyph advance x, glyph advance y)

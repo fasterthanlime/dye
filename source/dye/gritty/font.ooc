@@ -82,7 +82,7 @@ Font: class {
             fit = true
 
             for (glyph in list) {
-                node := bin insert(bin root, glyph width + 1, glyph rows + 1)
+                node := bin insert(bin root, glyph width + 2, glyph rows + 2)
                 if (node) {
                     glyph binNode = node
                 } else {
