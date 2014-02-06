@@ -87,6 +87,18 @@ Geometry: class extends GlSpriteLike {
         numElements := numVertices * 4
         vbo upload(numElements, data)
     }
+    
+    render: func (pass: Pass, modelView: Matrix4) {
+        if (!shouldDraw?(pass)) return
+
+        mv := computeModelView(modelView)
+
+        if (round) {
+            mv round!()
+        }
+
+        draw(pass, mv)
+    }
 
     draw: func (pass: Pass, modelView: Matrix4) {
         program use()

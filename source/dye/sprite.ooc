@@ -1,6 +1,6 @@
 
 // our stuff
-import dye/[core, math, anim]
+import dye/[core, math, anim, geometry]
 import dye/gritty/[shader, shaderlibrary, texture, vbo, vao]
 
 // sdk
@@ -14,10 +14,10 @@ import sdl2/[OpenGL]
  * with alpha blending, an opacity value, and a color to
  * tint the texture.
  */
-GlSprite: class extends GlSpriteLike {
+GlSprite: class extends Geometry {
 
-    texSize: Vec2
-    size: Vec2
+    texSize := vec2(0, 0)
+    size := vec2(0, 0)
 
     width: Float { get { size x } }
     height: Float { get { size y } }
@@ -25,52 +25,17 @@ GlSprite: class extends GlSpriteLike {
     texWidth: Float { get { texSize x } }
     texHeight: Float { get { texSize y } }
 
-    texture: Texture
-    vao: VAO
-
-    vbo: FloatVBO
-    data: Float[]
-
-    /* Uniforms */
-    texLoc, projLoc, modelLoc, colorLoc: Int
-
-    init: func (path: String) {
-        init(TextureLoader load(path))
+    new: static func (path: String) -> This {
+        This new(TextureLoader load(path))
     }
 
     init: func ~fromTex (.texture) {
-        vbo = FloatVBO new()
+        super(texture)
         setTexture(texture)
-        setProgram(ShaderLibrary getTexture())
-    }
-
-    setProgram: func (.program) {
-        if (this program) {
-            this program detach()
-        }
-        this program = program
-        program use()
-
-        if (vao) {
-            vao = null
-        }
-
-        vao = VAO new(program)
-        stride := 4 * Float size
-        vao add(vbo, "TexCoordIn", 2, GL_FLOAT, false,
-            stride, 0 as Pointer)
-        vao add(vbo, "Position", 2, GL_FLOAT, false,
-            stride,(2 * Float size) as Pointer)
-
-        texLoc = program getUniformLocation("Texture")
-        projLoc = program getUniformLocation("Projection")
-        modelLoc = program getUniformLocation("ModelView")
-        colorLoc = program getUniformLocation("InColor")
     }
 
     setTexture: func ~tex (=texture) {
-        size = vec2(texture width, texture height)
-        texSize = vec2(0, 0)
+        size set!(texture width, texture height)
         texSize set!(size)
         rebuild()
     }
@@ -95,54 +60,14 @@ GlSprite: class extends GlSpriteLike {
     }
 
     rebuild: func {
-        /*
-         * texcoord x, texcoord y,
-         * vertex x, vertex y
-         */
-        data = [
-            0.0, 0.0,
-            0.0, 0.0,
-
-            1.0, 0.0,
-            width, 0.0,
-
-            0.0, 1.0,
-            0.0, height,
-
-            1.0, 1.0,
-            width, height
-        ]
-
-        vbo upload(data)
-    }
-
-    draw: func (pass: Pass, modelView: Matrix4) {
-        program use()
-        vao bind()
-
-        glActiveTexture(GL_TEXTURE0)
-        texture bind()
-        glUniform1i(texLoc, 0)
-
-        glUniformMatrix4fv(projLoc, 1, false, pass projectionMatrix pointer)
-        glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
-
-        // premultiply color by opacity
-        glUniform4f(colorLoc,
-            opacity * color R,
-            opacity * color G,
-            opacity * color B,
-            opacity)
-
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-
-        applyEffects(pass, modelView)
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
-
-        // texture detach()
-        // vao detach()
-        // program detach()
+        build(6, |builder|
+            builder quad6(
+                0, 0,
+                width, height,
+                0, 0,
+                1, 1
+            )
+        )
     }
 
 }

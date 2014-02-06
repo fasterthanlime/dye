@@ -1,32 +1,34 @@
-use dye
-import dye/[core, sprite]
 
-use sdl2-opengl
+use dye
+import dye/[core, sprite, math, app]
 
 import os/Time
 
 main: func (argc: Int, argv: CString*) {
+    SpriteTest new() run(60.0)
+}
 
-    dye := DyeContext new(640, 480, "Dye example")
-    dye setClearColor(Color black())
+SpriteTest: class extends App {
 
-    {
-        sprite := GlSprite new("ship.png")
-        sprite pos set!(200, 200)
-        dye add(sprite)
+    init: func {
+        super("Sprite test", 1280, 720)
+        dye setClearColor(Color black())
     }
 
-    {
-        sprite := GlSprite new("ship.png")
-        sprite pos set!(400, 200)
-        sprite color set!(Color green())
-        dye add(sprite)
+    setup: func {
+        {
+            sprite := GlSprite new("ship.png")
+            sprite pos set!(200, 200)
+            dye add(sprite)
+        }
+
+        {
+            sprite := GlSprite new("ship.png")
+            sprite pos set!(400, 200)
+            sprite color set!(Color green())
+            dye add(sprite)
+        }
     }
-
-    dye render()
-    Time sleepSec(5)
-
-    dye quit()
 
 }
 
