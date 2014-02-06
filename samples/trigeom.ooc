@@ -18,35 +18,14 @@ TriGeomTest: class extends App {
 
     setup: func {
         texture := TextureLoader load("ship.png")
-        geom := TriGeom new(texture)
+        geom := Geometry new(texture)
         geom mode = GL_TRIANGLE_STRIP
 
-        geom upload(4, |data|
-            i := 0
-
-            data[i + 0] = 0.0f
-            data[i + 1] = 0.0f
-            data[i + 2] = 0.0f
-            data[i + 3] = 0.0f
-            i += 4
-
-            data[i + 0] = 1.0f
-            data[i + 1] = 0.0f
-            data[i + 2] = texture width
-            data[i + 3] = 0.0f
-            i += 4
-
-            data[i + 0] = 0.0f
-            data[i + 1] = 1.0f
-            data[i + 2] = 0.0f
-            data[i + 3] = texture height
-            i += 4
-
-            data[i + 0] = 1.0f
-            data[i + 1] = 1.0f
-            data[i + 2] = texture width
-            data[i + 3] = texture height
-            i += 4
+        geom build(4, |b|
+            b vertex(0, 0, 0, 0)
+            b vertex(1, 0, texture width, 0)
+            b vertex(0, 1, 0, texture height)
+            b vertex(1, 1, texture width, texture height)
         )
         dye add(geom)
     }

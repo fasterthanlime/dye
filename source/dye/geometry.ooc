@@ -9,7 +9,7 @@ import sdl2/[OpenGL]
 /**
  * Generic 2D geometry class, VBO-backed, textured.
  */
-TriGeom: class extends GlSpriteLike {
+Geometry: class extends GlSpriteLike {
 
     // number of bytes we can store
     capacity: Int
@@ -64,6 +64,13 @@ TriGeom: class extends GlSpriteLike {
         colorLoc = program getUniformLocation("InColor")
     }
 
+    build: func (.numVertices, cb: Func (GeomBuilder)) {
+        upload(numVertices, |data|
+            builder := GeomBuilder new(numVertices, data)
+            cb(builder)
+        )
+    }
+
     upload: func (=numVertices, cb: Func (Float*)) {
         numBytes := numVertices * 4 * Float size
 
@@ -74,14 +81,11 @@ TriGeom: class extends GlSpriteLike {
             }
             data = gc_malloc_atomic(numBytes)
             memset(data, 0, capacity)
-            "just reallocated to #{capacity}B capacity" println()
         }
         cb(data)
 
         numElements := numVertices * 4
         vbo upload(numElements, data)
-
-        "uploaded, #{numVertices} vertices, #{numElements} elements, data[0] = #{data[0]}" println()
     }
 
     draw: func (pass: Pass, modelView: Matrix4) {
@@ -111,6 +115,38 @@ TriGeom: class extends GlSpriteLike {
         // texture detach()
         // vao detach()
         // program detach()
+    }
+
+}
+
+GeomBuilder: class {
+
+    numElements: Int
+    index := 0
+    data: Float*
+
+    init: func (numVertices: Int, =data) {
+        numElements = numVertices * 4
+    }
+
+    vec: func (x, y: Float) {
+        if (index + 2 > numElements) {
+            raise("GeomBuilder Overflow!")
+        }
+        data[index    ] = x
+        data[index + 1] = y
+        index += 2
+    }
+
+    vertex: func (texX, texY, vertX, vertY: Float) {
+        if (index + 4 > numElements) {
+            raise("GeomBuilder Overflow!")
+        }
+        data[index    ] = texX
+        data[index + 1] = texY
+        data[index + 2] = vertX
+        data[index + 3] = vertY
+        index += 4
     }
 
 }
