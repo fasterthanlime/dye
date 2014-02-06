@@ -1,7 +1,7 @@
 
 // third-party stuff
 use dye
-import dye/[core, math, sprite]
+import dye/[core, math, sprite, geometry]
 import dye/gritty/[texture, rectanglebinpack]
 
 // debug
@@ -26,6 +26,9 @@ Font: class {
 
     bin: RectangleBinPack
     atlas: GlyphAtlas
+    geometry: Geometry
+
+    cachedText := ""
 
     debugRect: GlRectangle
 
@@ -54,6 +57,9 @@ Font: class {
         bin = RectangleBinPack new(512, 512)
         "Initial bin occupancy: #{bin occupancy()}" println()
         atlas = GlyphAtlas new(bin binWidth, bin binHeight)
+
+        // create geometry
+        geometry = Geometry new(atlas texture)
 
         // load font
         _ft newFace(fontPath, 0, _face&)
@@ -145,31 +151,51 @@ Font: class {
 
     render: func (pass: Pass, inputModelView: Matrix4, text: String,
         color: Color, opacity: Float) {
-        // debugging!
-        renderDebugAtlas(pass, inputModelView, text)
-        return
-
         modelView := inputModelView
         this color set!(color)
 
+        if (cachedText != text) {
+            cachedText = text clone()
+            rebuild()
+        }
+        geometry render(pass, inputModelView)
+    }
+
+    rebuild: func {
+        glyphCount := 0
+        _iterate(cachedText, |charPoint|
+            glyphCount += 1
+        )
+
         pen := vec2(0, 0)
 
-        _iterate(text, |charPoint|
-            match charPoint {
-                case '\n' =>
-                    pen x = 0
-                    pen y -= getLineHeight()
-                case =>
-                    glyph := getGlyph(charPoint)
+        geometry build(6 * glyphCount, |builder|
+            _iterate(cachedText, |charPoint|
+                match charPoint {
+                    case '\n' =>
+                        pen x = 0
+                        pen y -= getLineHeight()
+                    case =>
+                        glyph := getGlyph(charPoint)
 
-                    if (!glyph) {
-                        return
-                    }
-                    glyph sprite opacity = opacity
-                    glyph sprite render(pass, modelView)
-                    pen add!(glyph advance x, glyph advance y)
-            }
-            modelView = inputModelView * Matrix4 newTranslate(pen x, pen y, 0.0)
+                        if (!glyph || !glyph binNode) {
+                            return
+                        }
+                        node := glyph binNode
+                        builder quad6(
+                            pen x + glyph left,
+                            pen y + glyph top - glyph rows,
+                            node width,
+                            node height,
+                            node x as Float / bin binWidth as Float,
+                            node y as Float / bin binHeight as Float,
+                            node width  as Float / bin binWidth as Float,
+                            node height as Float / bin binHeight as Float
+                        )
+
+                        pen add!(glyph advance x, glyph advance y)
+                }
+            )
         )
     }
 
