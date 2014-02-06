@@ -20,7 +20,9 @@ Font: class {
     _ftInitialized := static false
     _ft: static FTLibrary
     _face: FTFace
+
     bin: RectangleBinPack
+    atlas: GlyphAtlas
 
     glyphs := HashMap<ULong, Glyph> new()
 
@@ -39,6 +41,7 @@ Font: class {
         // create bin
         bin = RectangleBinPack new(512, 512)
         "Initial bin occupancy: #{bin occupancy()}" println()
+        atlas = GlyphAtlas new(bin binWidth, bin binHeight)
 
         // load font
         _ft newFace(fontPath, 0, _face&)
@@ -49,7 +52,7 @@ Font: class {
 
         // render the chars we need
         _loadCharset()
-        
+
         // store metrics
         metrics := _face@ size@ metrics
         lineHeight = metrics height toFloat()
@@ -71,12 +74,14 @@ Font: class {
                 "Couldn't fit glyph!" println()
             } else {
                 "glyph size: #{glyph width} x #{glyph rows}, x, y = #{node x}, #{node y}, occupancy: #{bin occupancy()}" println()
+                glyph binNode = node
+                atlas blit(glyph)
             }
-            glyph binNode = node
 
             glyph sprite color = color // make them all point to the same thing
             glyphs put(charPoint, glyph)
         }
+        atlas bake()
     }
 
     getLineHeight: func -> Float {
@@ -109,6 +114,11 @@ Font: class {
         aabb
     }
 
+    renderDebugAtlas: func (pass: Pass, inputModelView: Matrix4) {
+        modelView := inputModelView
+        atlas sprite render(pass, modelView)
+    }
+
     renderDebug: func (pass: Pass, inputModelView: Matrix4) {
         modelView := inputModelView
 
@@ -127,7 +137,7 @@ Font: class {
     render: func (pass: Pass, inputModelView: Matrix4, text: String,
         color: Color, opacity: Float) {
         // debugging!
-        renderDebug(pass, inputModelView)
+        renderDebugAtlas(pass, inputModelView)
         return
 
         modelView := inputModelView
@@ -163,6 +173,65 @@ Font: class {
 
     getGlyph: func (charPoint: ULong) -> Glyph {
         glyphs get(charPoint)
+    }
+
+}
+
+GlyphAtlas: class {
+
+    // RGBA_8888 texture data
+    data: UInt8*
+
+    // OpenGL texture
+    texture: Texture
+
+    // used for debug
+    sprite: GlSprite
+    blitCount := 0
+
+    init: func (width, height: Int) {
+        texture = Texture new(width, height, "<glyph atlas>")
+        sprite = GlSprite new(texture)
+        sprite color set!(128, 64, 0)
+        sprite center = false
+
+        // allocate texture memory
+        numBytes := 4 * width * height
+        data = gc_malloc_atomic(numBytes)
+        // clear it
+        memset(data, 0, numBytes)
+    }
+
+    blit: func (glyph: Glyph) {
+        bin := glyph binNode
+        if (!bin) {
+            raise("node-less glyph!")
+        }
+        blitCount += 1
+
+        bitmap := (glyph _glyph as FTBitmapGlyph)@ bitmap
+
+        for (srcX in 0..glyph width) {
+            dstX := srcX + bin x
+            for (srcY in 0..glyph rows) {
+                srcIndex := srcX + srcY * glyph width
+
+                dstY := (glyph rows - srcY) + bin y
+                dstIndex := dstX + dstY * texture width
+
+                gray := (bitmap buffer[srcIndex]) as UInt8
+                data[dstIndex * 4 + 0] = (glyph charPoint * 21) % 256
+                data[dstIndex * 4 + 1] = (glyph charPoint * 47) % 256
+                data[dstIndex * 4 + 2] = gray
+                data[dstIndex * 4 + 3] = gray
+            }
+        }
+    }
+
+    bake: func {
+        "baking! blitCount = #{blitCount}" println()
+        texture bind()
+        texture upload(data)
     }
 
 }

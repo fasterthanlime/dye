@@ -16,7 +16,7 @@ FontTest: class extends App {
     }
 
     setup: func {
-        addText("noodle", vec2(0, 512), 95)
+        addText("USDeclaration", vec2(0, 0), 40)
     }
 
     addText: func (fontName: String, pos: Vec2, fontSize: Int) {
