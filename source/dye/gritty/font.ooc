@@ -43,7 +43,6 @@ Font: class {
 
         // create bin
         bin = RectangleBinPack new(512, 512)
-        "Initial bin occupancy: #{bin occupancy()}" println()
         atlas = GlyphAtlas new(bin binWidth, bin binHeight)
 
         // load font
@@ -76,7 +75,6 @@ Font: class {
             if (!node) {
                 "Couldn't fit glyph!" println()
             } else {
-                "glyph size: #{glyph width} x #{glyph rows}, x, y = #{node x}, #{node y}, occupancy: #{bin occupancy()}" println()
                 glyph binNode = node
                 atlas blit(glyph)
             }
@@ -84,6 +82,7 @@ Font: class {
             glyphs put(charPoint, glyph)
         }
         atlas bake()
+        "Final bin occupancy: #{bin occupancy()}" println()
     }
 
     getGlyph: func (charPoint: ULong) -> Glyph {
