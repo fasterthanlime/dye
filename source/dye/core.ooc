@@ -211,11 +211,11 @@ DyeContext: class {
         logger info("OpenGL renderer: %s" format(glGetString(GL_RENDERER)))
         logger info("GLSL version: %s" format(glGetString(GL_SHADING_LANGUAGE_VERSION)))
 
-        // // enable vsync
-        // SDL glSetSwapInterval(1)
+        // enable vsync
+        SDL glSetSwapInterval(1)
 
-        // disble vsync
-        SDL glSetSwapInterval(0)
+        // // disable vsync
+        // SDL glSetSwapInterval(0)
 
         logger info("Size = %s, Window size = %s", size _, windowSize _)
         mainPass = Pass new(this, RenderTarget TEXTURE, Fbo new(size))
