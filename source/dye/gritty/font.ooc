@@ -1,7 +1,7 @@
 
 // third-party stuff
 use dye
-import dye/[core, math, sprite, geometry]
+import dye/[core, math]
 import dye/gritty/[texture, rectanglebinpack]
 
 // debug
@@ -26,11 +26,6 @@ Font: class {
 
     bin: RectangleBinPack
     atlas: GlyphAtlas
-    geometry: Geometry
-
-    cachedText := ""
-
-    debugRect: GlRectangle
 
     glyphs := HashMap<ULong, Glyph> new()
 
@@ -46,20 +41,10 @@ Font: class {
             _ft init()
         }
 
-        debugRect = GlRectangle new(vec2(64, 64))
-        debugRect color set!(255, 255, 255)
-        debugRect lineWidth = 1.0f
-        debugRect center = false
-        debugRect filled = true
-        debugRect opacity = 0.018f
-
         // create bin
         bin = RectangleBinPack new(512, 512)
         "Initial bin occupancy: #{bin occupancy()}" println()
         atlas = GlyphAtlas new(bin binWidth, bin binHeight)
-
-        // create geometry
-        geometry = Geometry new(atlas texture)
 
         // load font
         _ft newFace(fontPath, 0, _face&)
@@ -96,114 +81,9 @@ Font: class {
                 atlas blit(glyph)
             }
 
-            glyph sprite color = color // make them all point to the same thing
             glyphs put(charPoint, glyph)
         }
         atlas bake()
-    }
-
-    getLineHeight: func -> Float {
-        lineHeight
-    }
-
-    getBounds: func (str: String) -> AABB2 {
-        aabb := AABB2 new()
-        tempAABB := AABB2 new()
-
-        pen := vec2(0, 0)
-
-        _iterate(str, |charPoint|
-            match charPoint {
-                case '\n' =>
-                    pen x = 0
-                    pen y -= getLineHeight()
-                case =>
-                    glyph := getGlyph(charPoint)
-
-                    tempAABB set!(glyph aabb)
-                    tempAABB add!(pen)
-                    aabb expand!(tempAABB)
-
-                    pen add!(glyph advance)
-            }
-        )
-        aabb expand!(pen)
-
-        aabb
-    }
-
-    renderDebugAtlas: func (pass: Pass, inputModelView: Matrix4, text: String) {
-        modelView := inputModelView
-
-        _iterate(text, |charPoint|
-            glyph := getGlyph(charPoint)
-
-            if (!glyph || !glyph binNode) {
-                return
-            }
-            node := glyph binNode
-            modelView = inputModelView * Matrix4 newTranslate(node x, node y, 0.0f)
-            debugRect size set!(node width, node height)
-            debugRect render(pass, modelView)
-        )
-        atlas sprite render(pass, modelView)
-    }
-
-    render: func (pass: Pass, inputModelView: Matrix4, text: String,
-        color: Color, opacity: Float) {
-        modelView := inputModelView
-        geometry color set!(color)
-
-        if (cachedText != text) {
-            cachedText = text clone()
-            rebuild()
-        }
-        geometry render(pass, inputModelView)
-    }
-
-    rebuild: func {
-        glyphCount := 0
-        _iterate(cachedText, |charPoint|
-            glyphCount += 1
-        )
-
-        pen := vec2(0, 0)
-
-        geometry build(6 * glyphCount, |builder|
-            _iterate(cachedText, |charPoint|
-                match charPoint {
-                    case '\n' =>
-                        pen x = 0
-                        pen y -= getLineHeight()
-                    case =>
-                        glyph := getGlyph(charPoint)
-
-                        if (!glyph || !glyph binNode) {
-                            return
-                        }
-                        node := glyph binNode
-                        builder quad6(
-                            pen x + glyph left,
-                            pen y + glyph top - glyph rows,
-                            node width,
-                            node height,
-                            node x as Float / bin binWidth as Float,
-                            node y as Float / bin binHeight as Float,
-                            node width  as Float / bin binWidth as Float,
-                            node height as Float / bin binHeight as Float
-                        )
-
-                        pen add!(glyph advance x, glyph advance y)
-                }
-            )
-        )
-    }
-
-    _iterate: func (str: String, f: Func (ULong)) {
-        // TODO: UTF-8 support using utf8proc, I guess
-        for (c in str) {
-            f(c as ULong)
-        }
     }
 
     getGlyph: func (charPoint: ULong) -> Glyph {
@@ -221,14 +101,10 @@ GlyphAtlas: class {
     texture: Texture
 
     // used for debug
-    sprite: GlSprite
     blitCount := 0
 
     init: func (width, height: Int) {
         texture = Texture new(width, height, "<glyph atlas>")
-        sprite = GlSprite new(texture)
-        sprite color set!(255, 255, 255)
-        sprite center = false
 
         // allocate texture memory
         numBytes := 4 * width * height
@@ -281,10 +157,6 @@ Glyph: class {
     top, left: Int
     rows, width: Int
 
-    texSize: Vec2i
-    texture: Texture
-    sprite: GlSprite
-
     init: func (=charPoint, slot: FTGlyphSlot) {
         slot getGlyph(_glyph&)
         _glyph toBitmap(FTRenderMode normal, null, false)
@@ -305,47 +177,6 @@ Glyph: class {
         top   = bitmapGlyph@ top
         rows  = bitmapGlyph@ bitmap rows
         width = bitmapGlyph@ bitmap width
-
-        texSize = vec2i(
-             width nextPowerOfTwo(),
-             rows  nextPowerOfTwo()
-        )
-        _createTexture(bitmapGlyph@ bitmap)
-
-        /*
-        Font logger info("Loaded glyph %c, aabb = %s, advance = %s, texSize = %s",
-            charPoint as Char, aabb _, advance _, texSize _)
-        Font logger info("left = %d, top = %d, rows = %d, width = %d",
-            left, top, rows, width)
-        */
-    }
-
-    _createTexture: func (bitmap: FTBitmap) {
-        texture = Texture new(texSize x, texSize y, "<font-glyph>")
-
-        // create an RGBA texture from the shades-of-grey freetype data
-        data := gc_malloc(4 * texture width * texture height) as UInt8*
-
-        for (x in 0..width) {
-            for (y in 0..rows) {
-                srcIndex := x + y * width
-
-                dstY := y + texSize y - rows
-                dstIndex := x + dstY * texture width
-
-                gray := (bitmap buffer[srcIndex]) as UInt8
-                data[dstIndex * 4 + 0] = gray
-                data[dstIndex * 4 + 1] = gray
-                data[dstIndex * 4 + 2] = gray
-                data[dstIndex * 4 + 3] = gray
-            }
-        }
-
-        TextureLoader _flip(data, texture width, texture height)
-        texture upload(data)
-        sprite = GlSprite new(texture)
-        sprite center = false
-        // sprite pos set!(left, top - rows)
     }
 
 }
