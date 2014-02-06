@@ -37,7 +37,7 @@ Font: class {
         }
 
         // create bin
-        bin = RectangleBinPack new(1024, 512)
+        bin = RectangleBinPack new(512, 512)
         "Initial bin occupancy: #{bin occupancy()}" println()
 
         // load font
@@ -66,7 +66,7 @@ Font: class {
             _face loadGlyph(index, FTLoadFlag default_)
 
             glyph := Glyph new(charPoint, _face@ glyph)
-            node := bin insert(bin root, glyph width, glyph rows)
+            node := bin insert(bin root, glyph width + 1, glyph rows + 1)
             if (!node) {
                 "Couldn't fit glyph!" println()
             } else {
@@ -118,7 +118,7 @@ Font: class {
                 numGlyphs += 1
                 node := glyph binNode
                 modelView = inputModelView * Matrix4 newTranslate(node x, 0.0f - node height - node y, 0.0)
-                glyph sprite color set!((key * 27) % 256, (key * 13) % 256, (key * 17) % 256)
+                glyph sprite color set!((key * 12) % 256, 120, 120)
                 glyph sprite render(pass, modelView)
             }
         )

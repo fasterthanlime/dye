@@ -11,12 +11,12 @@ FontTest: class extends App {
     testString := "{The 'quick' brown fox: jumps over, the lazy dog;)"
 
     init: func {
-        super("Font packing test", 1024, 512)
+        super("Font packing test", 512, 512)
         dye setClearColor(Color white())
     }
 
     setup: func {
-        addText("classiq-medium", vec2(0, 512), 130)
+        addText("noodle", vec2(0, 512), 95)
     }
 
     addText: func (fontName: String, pos: Vec2, fontSize: Int) {
