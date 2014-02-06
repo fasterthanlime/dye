@@ -152,7 +152,7 @@ Font: class {
     render: func (pass: Pass, inputModelView: Matrix4, text: String,
         color: Color, opacity: Float) {
         modelView := inputModelView
-        this color set!(color)
+        geometry color set!(color)
 
         if (cachedText != text) {
             cachedText = text clone()
@@ -227,7 +227,7 @@ GlyphAtlas: class {
     init: func (width, height: Int) {
         texture = Texture new(width, height, "<glyph atlas>")
         sprite = GlSprite new(texture)
-        sprite color set!(0, 0, 0)
+        sprite color set!(255, 255, 255)
         sprite center = false
 
         // allocate texture memory

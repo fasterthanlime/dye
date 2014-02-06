@@ -21,7 +21,7 @@ FontTest: class extends App {
 
     init: func {
         super("Font packing test", 1280, 720)
-        dye setClearColor(Color black())
+        dye setClearColor(Color white())
     }
 
     setup: func {
