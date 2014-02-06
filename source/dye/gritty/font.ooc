@@ -2,7 +2,7 @@
 // third-party stuff
 use dye
 import dye/[core, math, sprite]
-import dye/gritty/[texture]
+import dye/gritty/[texture, rectanglebinpack]
 
 use freetype2
 import freetype2
@@ -20,6 +20,7 @@ Font: class {
     _ftInitialized := static false
     _ft: static FTLibrary
     _face: FTFace
+    bin: RectangleBinPack
 
     glyphs := HashMap<ULong, Glyph> new()
 
@@ -34,6 +35,10 @@ Font: class {
             _ftInitialized = true
             _ft init()
         }
+
+        // create bin
+        bin = RectangleBinPack new(256, 256)
+        "Initial bin occupancy: #{bin occupancy()}" println()
 
         // load font
         _ft newFace(fontPath, 0, _face&)
@@ -61,6 +66,9 @@ Font: class {
             _face loadGlyph(index, FTLoadFlag default_)
 
             glyph := Glyph new(charPoint, _face@ glyph)
+            node := bin insert(bin root, glyph width, glyph rows)
+            "glyph size: #{glyph width} x #{glyph rows}, success? #{node != null}, occupancy: #{bin occupancy()}" println()
+
             glyph sprite color = color // make them all point to the same thing
             glyphs put(charPoint, glyph)
         }
