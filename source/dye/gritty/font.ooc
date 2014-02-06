@@ -37,7 +37,7 @@ Font: class {
         }
 
         // create bin
-        bin = RectangleBinPack new(256, 256)
+        bin = RectangleBinPack new(1024, 512)
         "Initial bin occupancy: #{bin occupancy()}" println()
 
         // load font
@@ -67,7 +67,12 @@ Font: class {
 
             glyph := Glyph new(charPoint, _face@ glyph)
             node := bin insert(bin root, glyph width, glyph rows)
-            "glyph size: #{glyph width} x #{glyph rows}, success? #{node != null}, occupancy: #{bin occupancy()}" println()
+            if (!node) {
+                "Couldn't fit glyph!" println()
+            } else {
+                "glyph size: #{glyph width} x #{glyph rows}, x, y = #{node x}, #{node y}, occupancy: #{bin occupancy()}" println()
+            }
+            glyph binNode = node
 
             glyph sprite color = color // make them all point to the same thing
             glyphs put(charPoint, glyph)
@@ -104,8 +109,27 @@ Font: class {
         aabb
     }
 
+    renderDebug: func (pass: Pass, inputModelView: Matrix4) {
+        modelView := inputModelView
+
+        numGlyphs := 0
+        glyphs each(|key, glyph|
+            if (glyph binNode) {
+                numGlyphs += 1
+                node := glyph binNode
+                modelView = inputModelView * Matrix4 newTranslate(node x, 0.0f - node height - node y, 0.0)
+                glyph sprite color set!((key * 27) % 256, (key * 13) % 256, (key * 17) % 256)
+                glyph sprite render(pass, modelView)
+            }
+        )
+    }
+
     render: func (pass: Pass, inputModelView: Matrix4, text: String,
         color: Color, opacity: Float) {
+        // debugging!
+        renderDebug(pass, inputModelView)
+        return
+
         modelView := inputModelView
         this color set!(color)
 
@@ -147,6 +171,7 @@ Glyph: class {
 
     charPoint: ULong
     _glyph: FTGlyph
+    binNode: BinNode
 
     aabb: AABB2
     advance: Vec2
@@ -219,7 +244,7 @@ Glyph: class {
         texture upload(data)
         sprite = GlSprite new(texture)
         sprite center = false
-        sprite pos set!(left, top - rows)
+        // sprite pos set!(left, top - rows)
     }
 
 }

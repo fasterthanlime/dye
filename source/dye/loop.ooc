@@ -46,12 +46,12 @@ FixedLoop: class {
 
             count += 1
 
-            if (count >= 30) {
+            if (count >= 120) {
                 count = 0
                 t2 := SDL getTicks()
                 delta := (t2 - t1) as Float
 
-                current := 1_000.0 * 30.0 / delta
+                current := 1_000.0 * 120.0 / delta
                 "current = #{current}" println()
                 _computedFps = _computedFps * 0.9 + current * 0.1
                 t1 = t2
