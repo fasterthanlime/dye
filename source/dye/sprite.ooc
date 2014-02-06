@@ -31,6 +31,7 @@ GlSprite: class extends Geometry {
 
     init: func ~fromTex (.texture) {
         super(texture)
+        mode = GL_TRIANGLE_STRIP
         setTexture(texture)
     }
 
@@ -60,8 +61,8 @@ GlSprite: class extends Geometry {
     }
 
     rebuild: func {
-        build(6, |builder|
-            builder quad6(
+        build(4, |builder|
+            builder quadStrip(
                 0, 0,
                 width, height,
                 0, 0,

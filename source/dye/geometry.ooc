@@ -171,5 +171,12 @@ GeomBuilder: class {
         vertex(texX           , texY + texHeight, quadX            , quadY + quadHeight)
     }
 
+    quadStrip: func (quadX, quadY, quadWidth, quadHeight, texX, texY, texWidth, texHeight: Float) {
+        vertex(texX           , texY            , quadX            , quadY)
+        vertex(texX + texWidth, texY            , quadX + quadWidth, quadY)
+        vertex(texX           , texY + texHeight, quadX            , quadY + quadHeight)
+        vertex(texX + texWidth, texY + texHeight, quadX + quadWidth, quadY + quadHeight)
+    }
+
 }
 
