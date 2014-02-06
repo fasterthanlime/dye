@@ -17,7 +17,7 @@ VBO: abstract class {
     finalize: func {
         glDeleteBuffers(1, id&)
     }
-    
+
     bind: func {
         glBindBuffer(target, id)
     }
