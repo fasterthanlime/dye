@@ -4,6 +4,9 @@ use dye
 import dye/[core, math, sprite]
 import dye/gritty/[texture, rectanglebinpack]
 
+// debug
+import dye/[primitives]
+
 use freetype2
 import freetype2
 
@@ -24,6 +27,8 @@ Font: class {
     bin: RectangleBinPack
     atlas: GlyphAtlas
 
+    debugRect: GlRectangle
+
     glyphs := HashMap<ULong, Glyph> new()
 
     fontSize: Float
@@ -37,6 +42,13 @@ Font: class {
             _ftInitialized = true
             _ft init()
         }
+
+        debugRect = GlRectangle new(vec2(64, 64))
+        debugRect color set!(255, 255, 255)
+        debugRect lineWidth = 1.0f
+        debugRect center = false
+        debugRect filled = true
+        debugRect opacity = 0.018f
 
         // create bin
         bin = RectangleBinPack new(512, 512)
@@ -114,30 +126,27 @@ Font: class {
         aabb
     }
 
-    renderDebugAtlas: func (pass: Pass, inputModelView: Matrix4) {
-        modelView := inputModelView
-        atlas sprite render(pass, modelView)
-    }
-
-    renderDebug: func (pass: Pass, inputModelView: Matrix4) {
+    renderDebugAtlas: func (pass: Pass, inputModelView: Matrix4, text: String) {
         modelView := inputModelView
 
-        numGlyphs := 0
-        glyphs each(|key, glyph|
-            if (glyph binNode) {
-                numGlyphs += 1
-                node := glyph binNode
-                modelView = inputModelView * Matrix4 newTranslate(node x, 0.0f - node height - node y, 0.0)
-                glyph sprite color set!((key * 12) % 256, 120, 120)
-                glyph sprite render(pass, modelView)
+        _iterate(text, |charPoint|
+            glyph := getGlyph(charPoint)
+
+            if (!glyph || !glyph binNode) {
+                return
             }
+            node := glyph binNode
+            modelView = inputModelView * Matrix4 newTranslate(node x, node y, 0.0f)
+            debugRect size set!(node width, node height)
+            debugRect render(pass, modelView)
         )
+        atlas sprite render(pass, modelView)
     }
 
     render: func (pass: Pass, inputModelView: Matrix4, text: String,
         color: Color, opacity: Float) {
         // debugging!
-        renderDebugAtlas(pass, inputModelView)
+        renderDebugAtlas(pass, inputModelView, text)
         return
 
         modelView := inputModelView
@@ -192,7 +201,7 @@ GlyphAtlas: class {
     init: func (width, height: Int) {
         texture = Texture new(width, height, "<glyph atlas>")
         sprite = GlSprite new(texture)
-        sprite color set!(128, 64, 0)
+        sprite color set!(0, 0, 0)
         sprite center = false
 
         // allocate texture memory
@@ -220,10 +229,7 @@ GlyphAtlas: class {
                 dstIndex := dstX + dstY * texture width
 
                 gray := (bitmap buffer[srcIndex]) as UInt8
-                data[dstIndex * 4 + 0] = (glyph charPoint * 21) % 256
-                data[dstIndex * 4 + 1] = (glyph charPoint * 47) % 256
-                data[dstIndex * 4 + 2] = gray
-                data[dstIndex * 4 + 3] = gray
+                memset(data + dstIndex * 4, gray, 4)
             }
         }
     }

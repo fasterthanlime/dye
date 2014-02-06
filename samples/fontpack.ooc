@@ -1,6 +1,10 @@
 
+// ours
 use dye
 import dye/[core, text, primitives, app, math]
+
+// sdk
+import io/File
 
 main: func (argc: Int, argv: CString*) {
     FontTest new() run(60.0)
@@ -8,15 +12,15 @@ main: func (argc: Int, argv: CString*) {
 
 FontTest: class extends App {
 
-    testString := "{The 'quick' brown fox: jumps over, the lazy dog;)"
+    testString := File new("theraven.txt") read()
 
     init: func {
         super("Font packing test", 512, 512)
-        dye setClearColor(Color white())
+        dye setClearColor(Color black())
     }
 
     setup: func {
-        addText("USDeclaration", vec2(0, 0), 40)
+        addText("classiq-medium", vec2(0, 0), 80)
     }
 
     addText: func (fontName: String, pos: Vec2, fontSize: Int) {
