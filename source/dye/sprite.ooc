@@ -16,14 +16,16 @@ import sdl2/[OpenGL]
  */
 GlSprite: class extends Geometry {
 
-    texSize := vec2(0, 0)
-    size := vec2(0, 0)
+    w := 0.0f
+    h := 0.0f
 
-    width: Float { get { size x } }
-    height: Float { get { size y } }
+    size: Vec2 { get { vec2(w, h) } }
 
-    texWidth: Float { get { texSize x } }
-    texHeight: Float { get { texSize y } }
+    // adjustments
+    texX := 0.0f
+    texY := 0.0f
+    texW := 1.0f
+    texH := 1.0f
 
     new: static func (path: String) -> This {
         This new(TextureLoader load(path))
@@ -36,8 +38,8 @@ GlSprite: class extends Geometry {
     }
 
     setTexture: func ~tex (=texture) {
-        size set!(texture width, texture height)
-        texSize set!(size)
+        w = texture width
+        h = texture height
         rebuild()
     }
 
@@ -51,7 +53,7 @@ GlSprite: class extends Geometry {
         mv := computeModelView(modelView)
 
         if (center) {
-            mv = mv * Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0)
+            mv = mv * Matrix4 newTranslate(w * -0.5, h * -0.5, 0.0)
         }
 
         if (round) {
@@ -64,9 +66,9 @@ GlSprite: class extends Geometry {
         build(4, |builder|
             builder quadStrip(
                 0, 0,
-                width, height,
-                0, 0,
-                1, 1
+                w, h,
+                texX, texY,
+                texW, texH 
             )
         )
     }
@@ -81,141 +83,35 @@ GlSprite: class extends Geometry {
  * number of columns and rows in the sheet. x and y are the column and
  * row you want to display.
  */
-GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
+GlGridSprite: class extends GlSprite implements GlAnimSource {
 
     xnum, ynum: Int
-    x := 0
-    y := 0
-
-    texSize: Vec2
-    size: Vec2
-
-    width: Float { get { size x } }
-    height: Float { get { size y } }
-
-    texture: Texture
-    vao: VAO
-
-    vbo: FloatVBO
-    data: Float[]
-
-    /* Uniforms */
-    texLoc, projLoc, modelLoc, colorLoc, gridLoc: Int
+    col, row: Int
+    _col, _row: Int
 
     init: func (path: String, .xnum, .ynum) {
         init(TextureLoader load(path), xnum, ynum)
     }
 
     init: func ~fromTex (.texture, =xnum, =ynum) {
-        vbo = FloatVBO new()
-        setTexture(texture)
-        setProgram(ShaderLibrary getGridTexture())
-    }
-
-    setProgram: func (.program) {
-        if (this program) {
-            this program detach()
-        }
-        this program = program
-        program use()
-
-        if (vao) {
-            vao = null
-        }
-
-        vao = VAO new(program)
-        stride := 4 * Float size
-        vao add(vbo, "TexCoordIn", 2, GL_FLOAT, false,
-            stride, 0 as Pointer)
-        vao add(vbo, "Position", 2, GL_FLOAT, false,
-            stride, (2 * Float size) as Pointer)
-
-        texLoc = program getUniformLocation("Texture")
-        projLoc = program getUniformLocation("Projection")
-        modelLoc = program getUniformLocation("ModelView")
-        colorLoc = program getUniformLocation("InColor")
-        gridLoc = program getUniformLocation("InGrid")
-    }
-
-    setTexture: func ~tex (=texture) {
-        size = vec2(texture width / xnum, texture height / ynum)
-        texSize = vec2(texture width, texture height)
+        super(texture)
+        texW = 1.0 / xnum as Float
+        texH = 1.0 / ynum as Float
+        w = texture width  as Float / xnum as Float
+        h = texture height as Float / ynum as Float
         rebuild()
     }
 
-    setTexture: func ~path (path: String) {
-        setTexture(TextureLoader load(path))
-    }
-
     render: func (pass: Pass, modelView: Matrix4) {
-        if (!shouldDraw?(pass)) return
-
-        mv := computeModelView(modelView)
-
-        if (center) {
-            mv = mv * Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0)
+        if (col != _col || row != _row) {
+           _col = col 
+           _row = row 
+           texX = texW * _col
+           texY = texH * _row
+           rebuild()
         }
 
-        if (round) {
-            mv round!()
-        }
-        draw(pass, mv)
-    }
-
-    rebuild: func {
-        /*
-         * texcoord x, texcoord y,
-         * vertex x, vertex y
-         */
-        data = [
-            0.0, 0.0,
-            0.0, 0.0,
-
-            1.0, 0.0,
-            width, 0.0,
-
-            0.0, 1.0,
-            0.0, height,
-
-            1.0, 1.0,
-            width, height
-        ]
-
-        vbo upload(data)
-    }
-
-    draw: func (pass: Pass, modelView: Matrix4) {
-        program use()
-        vao bind()
-
-        glActiveTexture(GL_TEXTURE0)
-        texture bind()
-        glUniform1i(texLoc, 0)
-
-        glUniformMatrix4fv(projLoc, 1, false, pass projectionMatrix pointer)
-        glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
-
-        texCellWidth :=  1.0 / xnum as Float
-        texCellHeight := 1.0 / ynum as Float
-
-        glUniform4f(gridLoc, x as Float, (ynum - 1 - y) as Float, texCellWidth, texCellHeight)
-
-        // premultiply color by opacity
-        glUniform4f(colorLoc,
-            opacity * color R,
-            opacity * color G,
-            opacity * color B,
-            opacity)
-
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-
-        applyEffects(pass, modelView)
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
-
-        // texture detach()
-        // vao detach()
-        // program detach()
+        super(pass, modelView)
     }
 
     // implement GlAnimSource
@@ -223,12 +119,12 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
     numFrames: func -> Int { xnum }
     getDrawable: func -> GlSpriteLike { this }
     frameOffset: func (offset: Int) {
-        setFrame(x + offset)
+        setFrame(col + offset)
     }
-    setFrame: func (x: Int) {
-        this x = x repeat(0, xnum)
+    setFrame: func (col: Int) {
+        this col = col repeat(0, xnum)
     }
-    currentFrame: func -> Int { x }
+    currentFrame: func -> Int { col }
 
 }
 
