@@ -1,6 +1,6 @@
 
 use dye, dye-cairo
-import dye/[core, math, app, cairo]
+import dye/[core, math, app, cairo, sprite]
 
 import cairo/Cairo
 import math
@@ -21,6 +21,10 @@ CairoStarTest: class extends App {
     }
 
     setup: func {
+        sprite := GlSprite new("ship.png")
+        sprite pos set!(10, 10)
+        dye add(sprite)
+
         canvas = Canvas new(dye width, dye height)
         dye add(canvas)
     }

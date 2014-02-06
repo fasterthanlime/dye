@@ -86,11 +86,6 @@ Texture: class {
 
     update: func (data: UInt8*, xOffset := 0, yOffset := 0, updateWidth := 0, updateHeight := 0) {
         bind()
-        internalFormat := GL_RGBA
-
-        version (!android) {
-            internalFormat = GL_RGBA8
-        }
 
         if (updateWidth == 0) {
             updateWidth = width
@@ -100,13 +95,13 @@ Texture: class {
             updateHeight = height
         }
 
-        glTexSubImage2D(GL_TEXTURE_2D, // target
+        glTexSubImage2D(GL_TEXTURE_2D,  // target
                     0,                  // level
                     xOffset,            // xoffset
                     yOffset,            // yoffset
                     updateWidth,        // width
                     updateHeight,       // height
-                    GL_RGBA,            // format
+                    format,             // format
                     GL_UNSIGNED_BYTE,   // type
                     data                // data
         )

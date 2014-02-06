@@ -26,14 +26,17 @@ Canvas: class extends GlSprite {
 
         texture = Texture new(width, height, "<cairo canvas>")
         texture format = GL_BGRA
-        super(texture)
+        texture upload(surfData)
+        super~fromTex(texture)
     }
 
     // internal cuisine
 
     _createCairoContext: func {
         channels := 4
-        surfData = gc_malloc_atomic(channels * width * height * UChar size)
+        numBytes := channels * width * height
+        surfData = gc_malloc_atomic(numBytes)
+        memset(surfData, 0, numBytes)
         if (!surfData) {
             raise("Canvas - could not allocate buffer")
         }
@@ -51,8 +54,42 @@ Canvas: class extends GlSprite {
     }
 
     render: func (pass: Pass, modelView: Matrix4) {
-        texture upload(surfData)
+        texture update(surfData, 0, 0, width, height)
         super(pass, modelView)
+    }
+
+    // draw stuff
+
+    paint: func {
+        context paint()
+    }
+
+    setLineWidth: func (width: Float) {
+        context setLineWidth(width)
+    }
+
+    setSourceRGB: func (r, g, b: Float) {
+        context setSourceRGB(r, g, b)
+    }
+
+    setSourceRGBA: func (r, g, b, a: Float) {
+        context setSourceRGBA(r, g, b, a)
+    }
+
+    moveTo: func (x, y: Float) {
+        context moveTo(x, y)
+    }
+
+    lineTo: func (x, y: Float) {
+        context lineTo(x, y)
+    }
+
+    stroke: func {
+        context stroke()
+    }
+
+    closePath: func {
+        context closePath()
     }
 
 }

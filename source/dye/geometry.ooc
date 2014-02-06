@@ -124,9 +124,9 @@ Geometry: class extends GlSpriteLike {
 
         glDrawArrays(mode, 0, numVertices)
 
-        // texture detach()
-        // vao detach()
-        // program detach()
+        texture detach()
+        vao detach()
+        program detach()
     }
 
 }
