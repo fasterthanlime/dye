@@ -149,5 +149,15 @@ GeomBuilder: class {
         index += 4
     }
 
+    quad6: func (quadX, quadY, quadWidth, quadHeight, texX, texY, texWidth, texHeight: Float) {
+        vertex(texX           , texY            , quadX            , quadY)
+        vertex(texX + texWidth, texY            , quadX + quadWidth, quadY)
+        vertex(texX           , texY + texHeight, quadX            , quadY + quadHeight)
+
+        vertex(texX + texWidth, texY + texHeight, quadX + quadWidth, quadY + quadHeight)
+        vertex(texX + texWidth, texY            , quadX + quadWidth, quadY)
+        vertex(texX           , texY + texHeight, quadX            , quadY + quadHeight)
+    }
+
 }
 

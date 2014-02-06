@@ -22,7 +22,7 @@ TriGeomTest: class extends App {
 
     setup: func {
         geom = Geometry new(TextureLoader load("ship.png"))
-        geom mode = GL_TRIANGLE_STRIP
+        geom mode = GL_TRIANGLES
         dye add(geom)
     }
 
@@ -30,27 +30,18 @@ TriGeomTest: class extends App {
         if (count == 0) {
             texture := geom texture
 
-            drawQuad := func (b: GeomBuilder, dx, dy: Float) {
-                b vertex(0, 0, dx, dy)
-                b vertex(1, 0, dx + texture width, dy)
-                b vertex(0, 1, dx, dy + texture height)
-                b vertex(1, 1, dx + texture width, dy + texture height)
-            }
-
             numQuads += 1
-            geom build(4 * numQuads, |b|
+            geom build(6 * numQuads, |b|
                 for (i in 0..numQuads) {
                     if (i % 2 == 0) {
-                        drawQuad(b, texture width * i * 0.2,
-                                    texture height * i * 0.1)
+                        b quad6(i * 40, i * 20, texture width, texture height, 0, 0, 1, 1)
                     } else {
-                        drawQuad(b, texture width * i * 0.1,
-                                    texture height * i * 0.2)
+                        b quad6(i * 20, i * 40, texture width, texture height, 0, 0, 1, 1)
                     }
                 }
             )
         }
-        count = (count + 1) % 15
+        count = (count + 1) % 10
     }
 
 }
