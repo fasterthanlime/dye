@@ -22,6 +22,8 @@ FixedLoop: class {
     _computedFps := 60.0
 
     fps: Float { get { _computedFps } }
+    _delay: Float
+    delay: Float { get { _delay } }
 
     running := true
     paused := false
@@ -29,14 +31,12 @@ FixedLoop: class {
     init: func (=dye, =fpsGoal)
 
     run: func (body: Func) {
-        maxFrameDuration := 1000.0 / fpsGoal
+        maxFrameDuration := 1000.0f / fpsGoal
 
-        t1 := SDL getTicks()
         count := 0
 
         while (running) {
-            t1 = SDL getTicks()
-
+            t1 := SDL getTicks()
             dye poll()
 
             if (!paused) {
@@ -47,28 +47,29 @@ FixedLoop: class {
             t2 := SDL getTicks()
             delta := (t2 - t1) as Float
 
-            delay := maxFrameDuration - delta
+            _delay = maxFrameDuration - delta
 
-            if (delay < 0) {
+            if (_delay < 0) {
                 // never sleep for a negative amount of time - that'll freeze 
-                delay = 0
+                "negative delay! delta = #{delta}, _delay = #{_delay}, t1 = #{t1}, t2 = #{t2}" println()
+                _delay = 0
             }
 
-            if (delay > maxFrameDuration) {
+            if (_delay > maxFrameDuration) {
+                "delay too big!" println()
                 // don't sleep for more than maxFrameDuration - whatever the weird reason.
-                delay = maxFrameDuration
+                _delay = maxFrameDuration
             }
 
-            SDL delay(delay as UInt32)
+            SDL delay(_delay as UInt32)
+            actualDelta := delta + _delay
 
             count += 1
 
             if (count >= 30) {
                 count = 0
-
-                actualDelta := delta + delay
-                current := 1000.0 / actualDelta as Float
-                _computedFps = _computedFps * 0.1 + current * 0.9
+                current := 1000.0 / actualDelta
+                _computedFps = _computedFps * 0.3 + current * 0.7
             }
         }
     }
