@@ -140,9 +140,9 @@ GlSprite: class extends GlSpriteLike {
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 
-        texture detach()
-        vao detach()
-        program detach()
+        // texture detach()
+        // vao detach()
+        // program detach()
     }
 
 }
@@ -287,9 +287,9 @@ GlGridSprite: class extends GlSpriteLike implements GlAnimSource {
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
 
-        texture detach()
-        vao detach()
-        program detach()
+        // texture detach()
+        // vao detach()
+        // program detach()
     }
 
     // implement GlAnimSource
