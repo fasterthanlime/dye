@@ -40,11 +40,18 @@ Texture: class {
 
     filter: TextureFilter
 
+    internalFormat := GL_RGBA
+    format := GL_RGBA
+
     init: func (=width, =height, =path, filter := TextureFilter LINEAR) {
         glGenTextures(1, id&)
         bind()
 
         this filter = filter
+        version (!android) {
+            internalFormat = GL_RGBA8
+        }
+
         setup()
     }
 
@@ -65,19 +72,13 @@ Texture: class {
     }
 
     upload: func (data: UInt8*) {
-        internalFormat := GL_RGBA
-
-        version (!android) {
-            internalFormat = GL_RGBA8
-        }
-
         glTexImage2D(GL_TEXTURE_2D,
                     0,
                     internalFormat,
                     width,
                     height,
                     0,
-                    GL_RGBA,
+                    format,
                     GL_UNSIGNED_BYTE,
                     data
         )

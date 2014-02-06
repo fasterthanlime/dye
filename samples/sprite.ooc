@@ -2,8 +2,6 @@
 use dye
 import dye/[core, sprite, math, app]
 
-import os/Time
-
 main: func (argc: Int, argv: CString*) {
     SpriteTest new() run(60.0)
 }

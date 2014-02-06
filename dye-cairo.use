@@ -1,0 +1,4 @@
+Name: dye-cairo
+Description: cairo integration for dye
+Requires: cairo
+
