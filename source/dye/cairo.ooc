@@ -41,14 +41,14 @@ Canvas: class extends GlSprite {
             raise("Canvas - could not allocate buffer")
         }
 
-        cairoSurface = CairoImageSurface new(surfData as UChar*, CairoFormat ARGB32,
+        cairoSurface = CairoImageSurface new(surfData as UChar*, CairoFormat argb32,
             width, height, channels * width)
-        if (cairoSurface status() != CairoStatus SUCCESS) {
+        if (cairoSurface status() != CairoStatus success) {
             raise("Canvas - could not create surface")
         }
 
         context = CairoContext new(cairoSurface)
-        if (context status() != CairoStatus SUCCESS) {
+        if (context status() != CairoStatus success) {
             raise("Canvas - could not create context")
         }
     }
