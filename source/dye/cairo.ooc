@@ -58,10 +58,31 @@ Canvas: class extends GlSprite {
         super(pass, modelView)
     }
 
-    // draw stuff
+    /*
+     * Cairo glue (useful from the other side of ooc-lua, for example)
+     * see http://cairographics.org/manual for documentation.
+     */
+
+    // Context operations
 
     paint: func {
         context paint()
+    }
+
+    stroke: func {
+        context stroke()
+    }
+
+    fill: func {
+        context fill()
+    }
+
+    strokePreserve: func {
+        context strokePreserve()
+    }
+
+    fillPreserve: func {
+        context fillPreserve()
     }
 
     setLineWidth: func (width: Float) {
@@ -76,6 +97,24 @@ Canvas: class extends GlSprite {
         context setSourceRGBA(r, g, b, a)
     }
 
+    rotate: func (angle: Float) {
+        context rotate(angle)
+    }
+
+    translate: func (x, y: Float) {
+        context translate(x, y)
+    }
+
+    save: func {
+        context save()
+    }
+
+    restore: func {
+        context restore()
+    }
+
+    // Path operations
+
     moveTo: func (x, y: Float) {
         context moveTo(x, y)
     }
@@ -84,8 +123,16 @@ Canvas: class extends GlSprite {
         context lineTo(x, y)
     }
 
-    stroke: func {
-        context stroke()
+    arc: func (xc, yc, radius, angle1, angle2: Float) {
+        context arc(xc, yc, radius, angle1, angle2)
+    }
+
+    setOperator: func (op: CairoOperator) {
+        context setOperator(op)
+    }
+
+    newSubPath: func {
+        context newSubPath()
     }
 
     closePath: func {
