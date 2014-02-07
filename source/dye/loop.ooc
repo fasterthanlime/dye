@@ -35,27 +35,35 @@ FixedLoop: class {
     run: func (body: Func) {
         count := 0
 
-        t1 := SDL getTicks()
+        ticksPerUpdate := 1000.0 / fpsGoal
+        lastUpdateTicks := SDL getTicks() as Float
+        lastFpsTicks := SDL getTicks() as Float
+
         while (running) {
             dye poll()
+            dye render()
 
-            if (!paused) {
-                body()
-                dye render()
+            currentUpdateTicks := SDL getTicks() as Float
+
+            // update game if needed, as much as needed
+            while (currentUpdateTicks - lastUpdateTicks >= ticksPerUpdate) {
+                lastUpdateTicks += ticksPerUpdate
+                if (!paused) {
+                    body()
+                }
+            }
+
+            // update fps counter every 30 ticks
+            if (count >= 30) {
+                count = 0
+                delta := currentUpdateTicks - lastFpsTicks
+
+                current := 1_000.0 * 30.0 / delta
+                _computedFps = current
+                lastFpsTicks = currentUpdateTicks
             }
 
             count += 1
-
-            if (count >= 120) {
-                count = 0
-                t2 := SDL getTicks()
-                delta := (t2 - t1) as Float
-
-                current := 1_000.0 * 120.0 / delta
-                "current = #{current}" println()
-                _computedFps = _computedFps * 0.9 + current * 0.1
-                t1 = t2
-            }
         }
     }
 
