@@ -5,7 +5,7 @@ import deadlogger/Log
 
 // our stuff
 use sdl2
-import sdl2/[Core, Event]
+import sdl2/[Core, Event, Joystick]
 
 import dye/[math, core]
 
@@ -245,13 +245,40 @@ SdlInput: class extends Input {
     MAX_BUTTON := static 6
     buttonState: Bool*
 
+    MAX_JOYS := static 4
+    joys: JoyState*
+    numJoys := 0
+
     debug := false
 
     _mousepos := vec2(0.0, 0.0)
 
     init: func (=dye) {
-        keyState = gc_malloc(Bool size * MAX_KEY)
-        buttonState = gc_malloc(Bool size * MAX_BUTTON)
+        {
+            numBytes := Bool size * MAX_KEY
+            keyState = gc_malloc_atomic(numBytes)
+            memset(keyState, 0, numBytes)
+        }
+
+        {
+            numBytes := Bool size * MAX_BUTTON
+            buttonState = gc_malloc_atomic(numBytes)
+            memset(buttonState, 0, numBytes)
+        }
+
+        {
+            joys = gc_malloc(Pointer size * MAX_JOYS)
+            numJoys = SdlJoystick num()
+
+            for (i in 0..MAX_JOYS) {
+                joy: SdlJoystick = null
+                if (i <= numJoys) {
+                    joy = SdlJoystick open(i)
+                }
+
+                joys[i] = JoyState new(joy)
+            }
+        }
 
         logger info("Input system initialized")
     }
@@ -281,6 +308,9 @@ SdlInput: class extends Input {
     _poll: func {
         event: SdlEvent
 
+        SdlEvent pump()
+        SdlJoystick update()
+
         while(SdlEvent poll(event&)) {
             match (event type) {
                 case SDL_KEYDOWN =>
@@ -309,6 +339,10 @@ SdlInput: class extends Input {
                             _windowFocusGained()
                     }
             }
+        }
+
+        for (i in 0..numJoys) {
+            joys[i] update()
         }
     }
 
@@ -632,5 +666,67 @@ MouseButton: enum from Int {
     LEFT   = SDL_BUTTON_LEFT
     MIDDLE = SDL_BUTTON_MIDDLE
     RIGHT  = SDL_BUTTON_RIGHT
+}
+
+JoyState: class {
+    numButtons := 0
+    buttons: Bool*
+
+    numHats := 0
+    hats: Int*
+
+    numAxes := 0
+    axes: Int*
+
+    joy: SdlJoystick
+
+    init: func (=joy) {
+        if (!joy) return
+
+        numButtons = joy numButtons()
+        {
+            numBytes := Bool size * numButtons
+            buttons = gc_malloc_atomic(numBytes)
+            memset(buttons, 0, numBytes)
+        }
+
+        numHats = joy numHats()
+        {
+            numBytes := Bool size * numHats
+            hats = gc_malloc_atomic(numBytes)
+            memset(hats, 0, numBytes)
+        }
+
+        numAxes = joy numAxes()
+        {
+            numBytes := Bool size * numAxes
+            axes = gc_malloc_atomic(numBytes)
+            memset(axes, 0, numBytes)
+        }
+
+        "====================" println()
+        "Joystick info" println()
+        "GUID: #{joy getGUID() toString()}" println()
+        "#{numButtons} buttons" println()
+        "#{numHats} hats" println()
+        "#{numAxes} axes" println()
+        "====================" println()
+    }
+
+    update: func {
+        if (!joy) return
+
+        for (i in 0..numButtons) {
+            buttons[i] = joy getButton(i) as Bool
+        }
+
+        for (i in 0..numHats) {
+            hats[i] = joy getHat(i) as Int
+        }
+
+        for (i in 0..numAxes) {
+            axes[i] = joy getAxis(i) as Int
+        }
+    }
 }
 
