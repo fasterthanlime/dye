@@ -123,6 +123,10 @@ Canvas: class extends GlSprite {
         context lineTo(x, y)
     }
 
+    rectangle: func (xc, yc, width, height: Float) {
+        context rectangle(xc, yc, width, height)
+    }
+
     arc: func (xc, yc, radius, angle1, angle2: Float) {
         context arc(xc, yc, radius, angle1, angle2)
     }

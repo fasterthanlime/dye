@@ -87,7 +87,8 @@ GlGridSprite: class extends GlSprite implements GlAnimSource {
 
     xnum, ynum: Int
     col, row: Int
-    _col, _row: Int
+    _col = -1: Int
+    _row = -1: Int
 
     init: func (path: String, .xnum, .ynum) {
         init(TextureLoader load(path), xnum, ynum)
