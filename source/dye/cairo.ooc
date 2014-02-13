@@ -105,6 +105,14 @@ Canvas: class extends GlSprite {
         context translate(x, y)
     }
 
+    clip: func {
+        context clip()
+    }
+
+    clipPreserve: func {
+        context clipPreserve()
+    }
+
     save: func {
         context save()
     }
