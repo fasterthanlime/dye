@@ -166,6 +166,10 @@ DyeContext: class {
         SDL setWindowTitle(window, title)
     }
 
+    setWindowPosition: func (x, y: Int) {
+        SDL setWindowPosition(window, x, y)
+    }
+
     setIcon: func (path: String) {
         surface := SDL loadBMP(path)
         SDL setWindowIcon(window, surface)
