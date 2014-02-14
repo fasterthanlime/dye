@@ -37,6 +37,7 @@ Texture: class {
     id: UInt
     width, height: Int
     path: String
+    _data: UInt8*
 
     filter: TextureFilter
 
@@ -72,6 +73,7 @@ Texture: class {
     }
 
     upload: func (data: UInt8*) {
+        _data = data
         glTexImage2D(GL_TEXTURE_2D,
                     0,
                     internalFormat,
@@ -127,7 +129,7 @@ TextureLoader: class {
 
     _placeholder: static Texture
 
-    load: static func (pathBase: String) -> Texture {
+    load: static func (pathBase: String, color: Color = null) -> Texture {
         path := pathBase
         if (!File new(pathBase) exists?()) {
             path = GlDrawable prefix + pathBase
@@ -167,12 +169,31 @@ TextureLoader: class {
         texture := Texture new(width, height, path)
 
         _flip(data, width, height)
+        if (color) {
+            _colorize(data, width, height, color r, color g, color b)
+        }
         _premultiply(data, width, height)
         texture upload(data)
 
         cache put(path, texture)
 
         texture
+    }
+
+    _colorize: static func (data: UInt8*, width, height: Int, r, g, b: Int) {
+        if (!data) return
+
+        R := r / 255.0f
+        G := g / 255.0f
+        B := b / 255.0f
+
+        "Colorizing to #{r}, #{g}, #{b}" println()
+        numPixels := width * height
+        for (i in 0..numPixels) {
+            data[i * 4 + 0] = r
+            data[i * 4 + 1] = g
+            data[i * 4 + 2] = b
+        }
     }
 
     _getPlaceholder: static func -> Texture {
