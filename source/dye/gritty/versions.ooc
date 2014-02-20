@@ -11,12 +11,14 @@ import structs/[List, ArrayList]
 
 ShaderVersion: enum {
     GLSL_100
+    GLSL_120
     GLSL_130
     GLSL_150
 
     toString: func -> String {
         match this {
             case This GLSL_100 => "100"
+            case This GLSL_120 => "120"
             case This GLSL_130 => "130"
             case This GLSL_150 => "150"
             case => "unknown"
@@ -49,7 +51,7 @@ OpenGLVersion: class {
         } else if (gte(3, 2)) {
             shader = ShaderVersion GLSL_150
         } else if (gte(2, 1)) {
-            shader = ShaderVersion GLSL_130
+            shader = ShaderVersion GLSL_120
         }
         logger info("Detected GLSL version: " + shader toString())
     }
@@ -67,8 +69,11 @@ OpenGLVersion: class {
         // Windows, nVidia
         // 4.2.0
 
-        // Virtualbox, Ubuntu 12.04
+        // Virtualbox, Ubuntu 12.04, 3D-accelerated
         // 2.1 Chromium 1.9
+
+        // Virtualbox, Debian Wheezy, non-3D-accelerated (Mesa)
+        // 2.1 Mesa 8.0.5
 
         profile := OpenGLProfile DESKTOP
         //logger debug("ver string = %s", ver)

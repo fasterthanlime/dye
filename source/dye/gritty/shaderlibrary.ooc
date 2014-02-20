@@ -30,6 +30,8 @@ ShaderLibrary: class {
         match target {
             case ShaderVersion GLSL_100 =>
                 getSolidColor100()
+            case ShaderVersion GLSL_120 =>
+                getSolidColor120()
             case ShaderVersion GLSL_130 =>
                 getSolidColor130()
             case ShaderVersion GLSL_150 =>
@@ -43,26 +45,12 @@ ShaderLibrary: class {
         match target {
             case ShaderVersion GLSL_100 =>
                 getTexture100()
+            case ShaderVersion GLSL_120 =>
+                getTexture120()
             case ShaderVersion GLSL_130 =>
                 getTexture130()
             case ShaderVersion GLSL_150 =>
                 getTexture150()
-            case =>
-                Exception new("No texture shader for your target yet!") throw()
-                null
-        }
-    }
-
-    getGridTexture: static func -> ShaderProgram { 
-        target := getTarget()
-
-        match target {
-            case ShaderVersion GLSL_100 =>
-                getGridTexture100()
-            case ShaderVersion GLSL_130 =>
-                getGridTexture130()
-            case ShaderVersion GLSL_150 =>
-                getGridTexture150()
             case =>
                 Exception new("No texture shader for your target yet!") throw()
                 null
@@ -96,6 +84,35 @@ ShaderLibrary: class {
         "
 
         getProgram("solid100", vertex, fragment)
+    }
+
+    getSolidColor120: static func -> ShaderProgram {
+        vertex := "
+            #version 120
+
+            uniform mat4 Projection;
+            uniform mat4 ModelView;
+
+            attribute vec2 Position;
+
+            void main()
+            {
+                gl_Position = Projection * ModelView * vec4(Position, 0.0, 1.0);
+            }
+        "
+
+        fragment := "
+            #version 120
+
+            uniform vec4 InColor;
+
+            void main()
+            {
+                gl_FragColor = InColor;
+            }
+        "
+
+        getProgram("solid120", vertex, fragment)
     }
 
     getSolidColor130: static func -> ShaderProgram {
@@ -192,6 +209,40 @@ ShaderLibrary: class {
         getProgram("tex100", vertex, fragment)
     }
 
+    getTexture120: static func -> ShaderProgram {
+        vertex := "
+            #version 120
+
+            uniform mat4 Projection;
+            uniform mat4 ModelView;
+
+            attribute vec2 Position;
+            attribute vec2 TexCoordIn;
+            varying vec2 TexCoordOut;
+
+            void main()
+            {
+                TexCoordOut = TexCoordIn;
+                gl_Position = Projection * ModelView * vec4(Position, 0.0, 1.0);
+            }
+        "
+
+        fragment := "
+            #version 120
+
+            uniform sampler2D Texture;
+            varying vec2 TexCoordOut;
+            uniform vec4 InColor;
+
+            void main()
+            {
+                gl_FragColor = texture2D(Texture, TexCoordOut) * InColor;
+            }
+        "
+
+        getProgram("tex120", vertex, fragment)
+    }
+
     getTexture130: static func -> ShaderProgram {
         vertex := "
             #version 130
@@ -262,120 +313,6 @@ ShaderLibrary: class {
         "
 
         getProgram("tex150", vertex, fragment)
-    }
-
-    getGridTexture100: static func -> ShaderProgram {
-        vertex := "
-            #version 100
-
-            uniform mat4 Projection;
-            uniform mat4 ModelView;
-            uniform vec4 InGrid;
-
-            attribute vec2 Position;
-            attribute vec2 TexCoordIn;
-            varying vec2 TexCoordOut;
-
-            void main()
-            {
-                TexCoordOut = vec2((TexCoordIn.x + InGrid.x) * InGrid.z,
-                                   (TexCoordIn.y + InGrid.y) * InGrid.w);
-                gl_Position = Projection * ModelView * vec4(Position, 0.0, 1.0);
-            }
-        "
-
-        fragment := "
-            #version 100
-
-            uniform sampler2D Texture;
-            varying mediump vec2 TexCoordOut;
-            uniform vec4 InColor;
-
-            void main()
-            {
-                gl_FragColor = texture2D(Texture, TexCoordOut) * InColor;
-            }
-        "
-
-        getProgram("gridtex100", vertex, fragment)
-    }
-
-    getGridTexture130: static func -> ShaderProgram {
-        vertex := "
-            #version 130
-
-            uniform mat4 Projection;
-            uniform mat4 ModelView;
-            uniform vec4 InGrid;
-
-            in vec2 Position;
-            in vec2 TexCoordIn;
-
-            out vec2 TexCoordOut;
-
-            void main()
-            {
-                TexCoordOut = vec2((TexCoordIn.x + InGrid.x) * InGrid.z,
-                                   (TexCoordIn.y + InGrid.y) * InGrid.w);
-                gl_Position = Projection * ModelView * vec4(Position, 0.0, 1.0);
-            }
-        "
-
-        fragment := "
-            #version 130
-
-            uniform sampler2D Texture;
-
-            in vec2 TexCoordOut;
-            out vec4 OutColor;
-            uniform vec4 InColor;
-
-            void main()
-            {
-                OutColor = texture(Texture, TexCoordOut) * InColor;
-            }
-        "
-
-        getProgram("gridtex130", vertex, fragment)
-    }
-
-    getGridTexture150: static func -> ShaderProgram {
-        vertex := "
-            #version 150
-
-            uniform mat4 Projection;
-            uniform mat4 ModelView;
-            uniform vec4 InGrid;
-
-            in vec2 Position;
-            in vec2 TexCoordIn;
-
-            out vec2 TexCoordOut;
-
-            void main()
-            {
-                TexCoordOut = vec2((TexCoordIn.x + InGrid.x) * InGrid.z,
-                                   (TexCoordIn.y + InGrid.y) * InGrid.w);
-                gl_Position = Projection * ModelView * vec4(Position, 0.0, 1.0);
-            }
-        "
-
-        fragment := "
-            #version 150
-
-            uniform sampler2D Texture;
-
-            in vec2 TexCoordOut;
-            out vec4 OutColor;
-            uniform vec4 InColor;
-
-            void main()
-            {
-                OutColor = texture(Texture, TexCoordOut) * InColor;
-            }
-        "
-
-        getProgram("gridtex150", vertex, fragment)
     }
 
 }
