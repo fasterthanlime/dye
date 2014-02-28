@@ -1048,3 +1048,34 @@ Color: class {
 
 }
 
+PolyUtils: class {
+
+    sanitize: static func (vecs: Vec2*, count: Int) {
+        valid := true
+
+        for (i in 0..count) {
+            a := vecs[i]
+            b := vecs[(i + 1) % count]
+            c := vecs[(i + 2) % count]
+
+            if (b sub(a) cross(c sub(a)) > 0.0f) {
+                valid = false
+                break
+            }
+        }
+
+        if (!valid) {
+            // reveeeeeeeeerse o/
+            bytes := Pointer size * count
+            copy := gc_malloc(bytes) as Vec2*
+            memcpy(copy, vecs, bytes)
+
+            for (i in 0..count) {
+                j := count - 1 - i
+                vecs[i] = copy[j]
+            }
+        }
+    }
+
+}
+
