@@ -86,7 +86,7 @@ Font: class {
                 if (node) {
                     glyph binNode = node
                 } else {
-                    "Couldn't fit glyph! #{glyph width + 1}x#{glyph rows + 1}, occupancy = #{bin occupancy()}" println()
+                    // couldn't fit glyph
                     fit = false
                     break
                 }
@@ -95,14 +95,13 @@ Font: class {
             if (!fit) {
                 poftwo += 1
                 bin = RectangleBinPack new(1 << poftwo, 1 << poftwo)
-                "Re-trying with a #{bin root width}x#{bin root height} bin" println()
+                // retrying with a bin the size of the next power of two
             }
         }
 
         atlas = GlyphAtlas new(bin binWidth, bin binHeight)
         for(glyph in list) { atlas blit(glyph) }
         atlas bake()
-        "Final bin occupancy: #{bin occupancy()}" println()
     }
 
     getGlyph: func (charPoint: ULong) -> Glyph {
@@ -156,7 +155,6 @@ GlyphAtlas: class {
     }
 
     bake: func {
-        "baking! blitCount = #{blitCount}" println()
         texture bind()
         texture upload(data)
     }
