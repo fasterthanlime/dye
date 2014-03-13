@@ -20,6 +20,8 @@ FixedLoop: class {
     dye: DyeContext
     fpsGoal: Float { get set }
 
+    timingInfo: String
+
     // let's start out optimistic
     _computedFps := 60.0
 
@@ -70,11 +72,11 @@ FixedLoop: class {
                 current := 1_000.0 * 30.0 / delta
                 _computedFps = current * 0.4 + _computedFps * 0.6
                 lastFpsTicks = currentUpdateTicks
-                dye setTitle("render+idle %02.0fms | game %02.0fms | total %02.0fms | %02.0f FPS" format(
+                timingInfo = "render+idle %02.0fms | game %02.0fms | total %02.0fms | %02.0f FPS" format(
                     currentUpdateTicks - beforeRenderTicks,
                     afterLogicTicks - currentUpdateTicks,
                     afterLogicTicks - beforeRenderTicks,
-                    _computedFps))
+                    _computedFps)
             }
 
             count += 1

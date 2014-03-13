@@ -30,6 +30,8 @@ App: class {
     // adjustable things
     escQuits? := true
 
+    showTiming := false
+
     init: func (=title, width := 800, height := 600, fullscreen := false, windowWidth := -1, windowHeight := -1) {
         setupLogging()
 
@@ -66,6 +68,9 @@ App: class {
 
         loop = FixedLoop new(dye, fps)
         loop run(||
+            if (showTiming) {
+                dye setTitle("#{title} | #{loop timingInfo}")
+            }
             update()
         )
     }
