@@ -25,6 +25,18 @@ Input: abstract class {
 
     getMousePos: abstract func -> Vec2
 
+    startTextInput: func {
+        SDL startTextInput()
+    }
+
+    stopTextInput: func {
+        SDL stopTextInput()
+    }
+
+    isTextInputActive: func -> Bool {
+        SDL isTextInputActive()
+    }
+
     enabled := true
 
     unsubscribe: func (l: Listener) -> Bool {
@@ -161,6 +173,24 @@ Input: abstract class {
                         // it's a drag!
                         cb(mm)
                     }
+            }
+        )
+    }
+
+    onTextEditing: func (cb: Func (TextEditing)) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case te: TextEditing =>
+                    cb(te)
+            }
+        )
+    }
+
+    onTextInput: func (cb: Func (TextInput)) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case ti: TextInput =>
+                    cb(ti)
             }
         )
     }
@@ -338,6 +368,11 @@ SdlInput: class extends Input {
                         case SDL_WINDOWEVENT_FOCUS_GAINED =>
                             _windowFocusGained()
                     }
+                case SDL_TEXTINPUT =>
+                    _textInput(event text text)
+                case SDL_TEXTEDITING =>
+                    edit := event edit
+                    _textEditing(edit text, edit start, edit length)
             }
         }
 
@@ -426,6 +461,14 @@ SdlInput: class extends Input {
         _notifyListeners(WindowRestored new())
     }
 
+    _textEditing: func (text: CString, start, length: Int) {
+        _notifyListeners(TextEditing new(text, start, length))
+    }
+
+    _textInput: func (text: CString) {
+        _notifyListeners(TextInput new(text))
+    }
+
     getMousePos: func -> Vec2 {
         result := vec2(_mousepos)
         result y = dye windowSize y - result y
@@ -457,6 +500,23 @@ LEvent: class {
     consume: func {
         consumed = true
     }
+}
+
+TextEditing: class extends LEvent {
+
+    text: CString
+    start, length: Int
+
+    init: func (=text, =start, =length)
+
+}
+
+TextInput: class extends LEvent {
+
+    text: CString
+
+    init: func (=text)
+
 }
 
 WindowSizeChanged: class extends LEvent {
