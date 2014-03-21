@@ -462,11 +462,11 @@ SdlInput: class extends Input {
     }
 
     _textEditing: func (text: CString, start, length: Int) {
-        _notifyListeners(TextEditing new(text, start, length))
+        _notifyListeners(TextEditing new(text toString(), start, length))
     }
 
     _textInput: func (text: CString) {
-        _notifyListeners(TextInput new(text))
+        _notifyListeners(TextInput new(text toString()))
     }
 
     getMousePos: func -> Vec2 {
@@ -504,7 +504,7 @@ LEvent: class {
 
 TextEditing: class extends LEvent {
 
-    text: CString
+    text: String
     start, length: Int
 
     init: func (=text, =start, =length)
@@ -513,8 +513,7 @@ TextEditing: class extends LEvent {
 
 TextInput: class extends LEvent {
 
-    text: CString
-
+    text: String
     init: func (=text)
 
 }
