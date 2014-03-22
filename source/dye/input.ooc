@@ -138,6 +138,33 @@ Input: abstract class {
         )
     }
 
+    onMousePress: func ~any (cb: Func (MousePress)) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case mp: MousePress =>
+                    cb(mp)
+            }
+        )
+    }
+
+    onMouseRelease: func ~any (cb: Func (MouseRelease)) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case mr: MouseRelease =>
+                    cb(mr)
+            }
+        )
+    }
+
+    onMouseMove: func ~any (cb: Func (MouseMotion)) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case mm: MouseMotion =>
+                    cb(mm)
+            }
+        )
+    }
+
     onMousePress: func (which: UInt, cb: Func (MousePress)) -> Listener {
         onEvent(|ev|
             match (ev) {
