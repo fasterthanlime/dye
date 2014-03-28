@@ -517,7 +517,7 @@ SdlInput: class extends Input {
     }
 
     scaleMouseDiff: func (x, y: Float) -> Vec2 {
-        result := vec2(x, y)
+        result := vec2(x, -y)
 
         if (dye size == dye windowSize) {
             // all good, no transformation to make
