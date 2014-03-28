@@ -433,8 +433,9 @@ SdlInput: class extends Input {
     }
 
     _mouseMoved: func (x, y, xrel, yrel: Int) {
-        _mousepos set!(x, y)
-        _notifyListeners(MouseMotion new(getMousePos(), vec2(xrel, yrel)))
+        _mousepos set!(translateMousePos(x, y))
+        rel := scaleMouseDiff(xrel as Float, yrel as Float)
+        _notifyListeners(MouseMotion new(getMousePos(), rel))
     }
 
     _mousePressed: func (button: Int) {
@@ -496,9 +497,8 @@ SdlInput: class extends Input {
         _notifyListeners(TextInput new(text toString()))
     }
 
-    getMousePos: func -> Vec2 {
-        result := vec2(_mousepos)
-        result y = dye windowSize y - result y
+    translateMousePos: func (x, y: Float) -> Vec2 {
+        result := vec2(x, dye windowSize y - y)
 
         if (dye size == dye windowSize) {
             // all good, no transformation to make
@@ -508,14 +508,32 @@ SdlInput: class extends Input {
             // 1) offset (there might be black bars on top/bottom or left/right)
             // 2) scaling (windowSize is different from dye canvas size)
             offset := dye windowPass targetOffset
-            result add!(
-                (dye windowPass targetSize x - dye windowSize x) / 2,
-                (dye windowPass targetSize y - dye windowSize y) / 2
-            )
+            result x += (dye windowPass targetSize x - dye windowSize x) / 2
+            result y += (dye windowPass targetSize y - dye windowSize y) / 2
             result x *= (dye windowPass size x / dye windowPass targetSize x)
             result y *= (dye windowPass size y / dye windowPass targetSize y)
             result
         }
+    }
+
+    scaleMouseDiff: func (x, y: Float) -> Vec2 {
+        result := vec2(x, y)
+
+        if (dye size == dye windowSize) {
+            // all good, no transformation to make
+            result
+        } else {
+            // We have two things to account for:
+            // 1) offset (there might be black bars on top/bottom or left/right)
+            // 2) scaling (windowSize is different from dye canvas size)
+            result x *= (dye windowPass size x / dye windowPass targetSize x)
+            result y *= (dye windowPass size y / dye windowPass targetSize y)
+            result
+        }
+    }
+
+    getMousePos: func -> Vec2 {
+        _mousepos
     }
 
 }
