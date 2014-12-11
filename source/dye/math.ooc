@@ -792,15 +792,16 @@ Matrix4: class {
         }
     }
 
+    rowToString: func (i: Int) -> String {
+        "[%5.5f, %5.5f, %5.5f, %5.5f]" format(values[i], values[i + 4], values[i + 8],  values[i + 12])
+    }
+
     toString: func -> String {
-"[%5.5f, %5.5f, %5.5f, %5.5f]
-[%5.5f, %5.5f, %5.5f, %5.5f]
-[%5.5f, %5.5f, %5.5f, %5.5f]
-[%5.5f, %5.5f, %5.5f, %5.5f]" format(
-         values[0], values[4], values[8],  values[12],
-         values[1], values[5], values[9],  values[13],
-         values[2], values[6], values[10], values[14],
-         values[3], values[7], values[11], values[15])
+        a := rowToString(0)
+        b := rowToString(1)
+        c := rowToString(2)
+        d := rowToString(3)
+        "#{a}\n#{b}\n#{c}\n#{d}"
     }
 
     _: String {
