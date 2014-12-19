@@ -408,6 +408,14 @@ SdlInput: class extends Input {
         }
     }
 
+    nthJoy: func (index: Int) -> JoyState {
+        if (index < 0 || index >= numJoys) {
+            raise("Joystick index out of bounds: #{index}")
+        }
+
+        joys[index]
+    }
+
     _quit: func () {
         if (debug) {
             logger debug("Requested exit")
@@ -831,6 +839,27 @@ JoyState: class {
         for (i in 0..numAxes) {
             axes[i] = joy getAxis(i) as Int
         }
+    }
+
+    nthButton: func (index: Int) -> Bool {
+        if (index < 0 || index >= numButtons) {
+            return false
+        }
+        buttons[index]
+    }
+
+    nthHat: func (index: Int) -> Int {
+        if (index < 0 || index >= numHats) {
+            return 0
+        }
+        hats[index]
+    }
+
+    nthAxis: func (index: Int) -> Int {
+        if (index < 0 || index >= numAxes) {
+            return 0
+        }
+        axes[index]
     }
 }
 
