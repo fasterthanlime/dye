@@ -187,7 +187,7 @@ TextureLoader: class {
         G := g / 255.0f
         B := b / 255.0f
 
-        "Colorizing to #{r}, #{g}, #{b}" println()
+        // "Colorizing to #{r}, #{g}, #{b}" println()
         numPixels := width * height
         for (i in 0..numPixels) {
             data[i * 4 + 0] = r

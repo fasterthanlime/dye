@@ -4,7 +4,7 @@ import dye/[core, math, sprite]
 import dye/gritty/[texture]
 
 use cairo
-import cairo/Cairo
+import cairo/Core
 
 use sdl2
 import sdl2/[OpenGL]
