@@ -506,8 +506,11 @@ Pass: abstract class {
 
     doRender: func {
         if (clears) {
+            glEnable(GL_SCISSOR_TEST)
+            glScissor(0, 0, size x, size y)
             glClearColor(clearColor R, clearColor G, clearColor B, clearAlpha)
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            glDisable(GL_SCISSOR_TEST)
         }
 
         glEnable(GL_BLEND)
@@ -528,15 +531,39 @@ TexturePass: class extends Pass {
         size = vec2i(fbo size x, fbo size y)
         _makeProjectionMatrix()
     }
-    
-    setFbo: func (=fbo) {
-        size = vec2i(fbo size x, fbo size y)
+
+    resize: func (=size) -> Bool {
+        resized := false
+
         _makeProjectionMatrix()
+        // fbo too small? resize!
+        if (fbo size x < size x || fbo size y < size y) {
+            newFboSize := vec2i(_nextPo2(size x), _nextPo2(size y))
+            fbo dispose()
+            fbo = Fbo new(newFboSize)
+            resized = true
+        }
+
+        // clear
+        fbo bind()
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        fbo unbind()
+
+        resized
+    }
+
+    _nextPo2: func (number: Int) -> Int {
+        poftwo := 1
+        while ((1 << poftwo) < number) {
+            poftwo += 1
+        }
+        1 << poftwo
     }
 
     render: func {
         fbo bind()
-        glViewport(0, 0, fbo size x, fbo size y)
+        glViewport(0, 0, size x, size y)
         doRender()
         fbo unbind()
     }
