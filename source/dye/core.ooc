@@ -506,11 +506,7 @@ Pass: abstract class {
 
     doRender: func {
         if (clears) {
-            glEnable(GL_SCISSOR_TEST)
-            glScissor(0, 0, size x, size y)
-            glClearColor(clearColor R, clearColor G, clearColor B, clearAlpha)
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-            glDisable(GL_SCISSOR_TEST)
+            doClear()
         }
 
         glEnable(GL_BLEND)
@@ -519,6 +515,11 @@ Pass: abstract class {
         group render(this, identity)
 
         glDisable(GL_BLEND)
+    }
+
+    doClear: func {
+        glClearColor(clearColor R, clearColor G, clearColor B, clearAlpha)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     }
 
 
@@ -551,6 +552,13 @@ TexturePass: class extends Pass {
         fbo unbind()
 
         resized
+    }
+
+    doClear: func {
+        glEnable(GL_SCISSOR_TEST)
+        glScissor(0, 0, size x, size y)
+        super()
+        glDisable(GL_SCISSOR_TEST)
     }
 
     _nextPo2: func (number: Int) -> Int {
