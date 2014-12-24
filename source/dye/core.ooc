@@ -34,7 +34,7 @@ DyeContext: class {
 
     mainPass: Pass
     passes := ArrayList<Pass> new()
-    windowPass: Pass
+    windowPass: WindowPass
 
     input: SdlInput
 
@@ -222,10 +222,10 @@ DyeContext: class {
         // SDL glSetSwapInterval(0)
 
         logger info("Size = %s, Window size = %s", size _, windowSize _)
-        mainPass = Pass new(this, RenderTarget TEXTURE, Fbo new(size))
-        mainPass catchAll = true
+        mainPass = TexturePass new(Fbo new(size))
+        mainPass catchAll = true;
         mainPass clearColor set!(72, 60, 50) // taupe!
-        windowPass = Pass new(this, RenderTarget WINDOW, mainPass fbo)
+        windowPass = WindowPass new(this, mainPass fbo)
     }
 
     setClearColor: func (c: Color) {
@@ -473,64 +473,93 @@ Scene: class extends GlGroup {
 
 }
 
-RenderTarget: enum {
-    TEXTURE
-    WINDOW
-}
+Pass: abstract class {
 
-Pass: class {
-
-    dye: DyeContext
-    clearColor := Color new(0, 0, 0)
-    clearAlpha := 0.0f
-    group := GlGroup new()
-
-    target: RenderTarget
-
-    projectionMatrix: Matrix4
-    size: Vec2i
-
-    // only for target: texture
-    fbo: Fbo
-
-    // only for target: window
-    sprite: GlSprite
-    targetSize := vec2(-1, -1)
-    targetOffset := vec2(0, 0)
-    scale := 1.0
-
-    // care about object's passes?
-    catchAll := false
+    identity := static Matrix4 newIdentity()
 
     // clears before drawing?
     clears := true
 
-    init: func (=dye, =target, =fbo) {
-        match target {
-            case RenderTarget TEXTURE =>
-                size = vec2i(fbo size x, fbo size y)
-            case RenderTarget WINDOW =>
-                size = vec2i(dye windowSize x, dye windowSize y)
-                sprite = GlSprite new(fbo texture)
-                sprite pass = this
-                sprite center = false
-                group add(sprite)
-        }
+    size: Vec2i
+    projectionMatrix: Matrix4
+    clearColor := Color new(0, 0, 0)
+    clearAlpha := 0.0f
+    group := GlGroup new()
+    fbo: Fbo
+
+    // passes catches all drawables?
+    catchAll := false
+
+    // convenience properties
+    width:  Int { get { size x } }
+    height: Int { get { size y } }
+
+    init: func (=fbo) {
+        // muffin!
+    }
+
+    _makeProjectionMatrix: func {
         projectionMatrix = Matrix4 newOrtho(0, size x, 0, size y, -1.0, 1.0)
     }
 
-    render: func {
-        match target {
-            case RenderTarget TEXTURE =>
-                fbo bind()
-                doRender()
-                fbo unbind()
-            case RenderTarget WINDOW =>
-                adjustSprite()
-                doRender()
-            case =>
-                raise("Invalid render target: #{target as Int}")
+    render: abstract func
+
+    doRender: func {
+        if (clears) {
+            glClearColor(clearColor R, clearColor G, clearColor B, clearAlpha)
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         }
+
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+
+        group render(this, identity)
+
+        glDisable(GL_BLEND)
+    }
+
+
+}
+
+TexturePass: class extends Pass {
+
+    init: func (.fbo) {
+        super(fbo)
+        size = vec2i(fbo size x, fbo size y)
+        _makeProjectionMatrix()
+    }
+
+    render: func {
+        fbo bind()
+        glViewport(0, 0, fbo size x, fbo size y)
+        doRender()
+        fbo unbind()
+    }
+
+}
+
+WindowPass: class extends Pass {
+
+    dye: DyeContext
+    sprite: GlSprite
+    targetSize := vec2(-1 , -1)
+    targetOffset := vec2(0, 0)
+    scale := 1.0
+
+    init: func (=dye, .fbo) {
+        super(fbo)
+        size = vec2i(dye windowSize x, dye windowSize y)
+        sprite = GlSprite new(fbo texture)
+        sprite pass = this
+        sprite center = false
+        group add(sprite)
+        _makeProjectionMatrix()
+    }
+
+    render: func {
+        adjustSprite()
+        glViewport(0, 0, dye windowSize x, dye windowSize y)
+        doRender()
     }
 
     adjustSprite: func {
@@ -558,31 +587,6 @@ Pass: class {
 
         sprite pos set!(targetOffset x, targetOffset y)
     }
-
-    doRender: func {
-        match target {
-            case RenderTarget TEXTURE =>
-                glViewport(0, 0, fbo size x, fbo size y)
-            case RenderTarget WINDOW =>
-                glViewport(0, 0, dye windowSize x, dye windowSize y)
-        }
-
-        if (clears) {
-            glClearColor(clearColor R, clearColor G, clearColor B, clearAlpha)
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        }
-
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-
-        group render(this, Matrix4 newIdentity())
-
-        glDisable(GL_BLEND)
-    }
-
-    // convenience properties
-    width:  Int { get { size x } }
-    height: Int { get { size y } }
 
 }
 
