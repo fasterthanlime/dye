@@ -108,5 +108,17 @@ Fbo: class {
         }
     }
 
+    dispose: func {
+        texture dispose()
+
+        if (CORE) {
+            glDeleteRenderbuffers(1, rboId&)
+            glDeleteFramebuffers(1, fboId&)
+        } else {
+            glDeleteRenderbuffersEXT(1, rboId&)
+            glDeleteFramebuffersEXT(1, fboId&)
+        }
+    }
+
 }
 

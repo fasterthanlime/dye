@@ -528,6 +528,11 @@ TexturePass: class extends Pass {
         size = vec2i(fbo size x, fbo size y)
         _makeProjectionMatrix()
     }
+    
+    setFbo: func (=fbo) {
+        size = vec2i(fbo size x, fbo size y)
+        _makeProjectionMatrix()
+    }
 
     render: func {
         fbo bind()

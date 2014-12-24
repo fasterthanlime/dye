@@ -117,6 +117,10 @@ Texture: class {
         glBindTexture(GL_TEXTURE_2D, 0)
     }
 
+    dispose: func {
+        glDeleteTextures(1, id&)
+    }
+
 }
 
 /**
