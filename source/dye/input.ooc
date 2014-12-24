@@ -165,6 +165,15 @@ Input: abstract class {
         )
     }
 
+    onMouseWheel: func (cb: Func (MouseWheel)) -> Listener {
+        onEvent(|ev|
+            match (ev) {
+                case mw: MouseWheel =>
+                    cb(mw)
+            }
+        )
+    }
+
     onMousePress: func (which: UInt, cb: Func (MousePress)) -> Listener {
         onEvent(|ev|
             match (ev) {
@@ -380,6 +389,8 @@ SdlInput: class extends Input {
                     _mousePressed (event button button)
                 case SDL_MOUSEMOTION =>
                     _mouseMoved (event motion x, event motion y, event motion xrel, event motion yrel)
+                case SDL_MOUSEWHEEL =>
+                    _mouseWheeled (event wheel x, event wheel y)
                 case SDL_QUIT =>
                     _quit()
                 case SDL_WINDOWEVENT =>
@@ -444,6 +455,10 @@ SdlInput: class extends Input {
         _mousepos set!(translateMousePos(x, y))
         rel := scaleMouseDiff(xrel as Float, yrel as Float)
         _notifyListeners(MouseMotion new(getMousePos(), rel))
+    }
+
+    _mouseWheeled: func (x, y: Int) {
+        _notifyListeners(MouseWheel new(x, y))
     }
 
     _mousePressed: func (button: Int) {
@@ -613,6 +628,14 @@ MouseMotion: class extends MouseEvent {
     init: func (.pos, =rel) {
         super(pos)
     }
+
+}
+
+MouseWheel: class extends LEvent {
+
+    x, y: Int
+
+    init: func (=x, =y)
 
 }
 
