@@ -84,7 +84,6 @@ GlSprite: class extends Geometry {
  * row you want to display.
  */
 GlGridSprite: class extends GlSprite implements GlAnimSource {
-
     xnum, ynum: Int
     col, row: Int
     _col = -1: Int
@@ -126,6 +125,131 @@ GlGridSprite: class extends GlSprite implements GlAnimSource {
         this col = col repeat(0, xnum)
     }
     currentFrame: func -> Int { col }
+
+}
+
+GlNinePatch: class extends Geometry {
+    DEBUG := static false
+
+    outerWidth, outerHeight: Int
+    _outerWidth  := -1
+    _outerHeight := -1
+    innerWidth  : Float { get { outerWidth  * (1 - left - right) } }
+    innerHeight : Float { get { outerHeight * (1 - top - bottom) } }
+
+    left   := 1.0 / 3.0
+    right  := 1.0 / 3.0
+    top    := 1.0 / 3.0
+    bottom := 1.0 / 3.0
+    _left   := -1.0
+    _right  := -1.0
+    _top    := -1.0
+    _bottom := -1.0
+
+    new: static func (path: String) -> This {
+        This new(TextureLoader load(path))
+    }
+
+    init: func ~fromText (.texture) {
+        super(texture)
+        mode = GL_TRIANGLE_STRIP
+        setTexture(texture)
+    }
+
+    setTexture: func ~tex (=texture) {
+        rebuild()
+    }
+
+    render: func (pass: Pass, modelView: Matrix4) {
+        if (!shouldDraw?(pass)) return
+
+        if (outerWidth != _outerWidth || outerHeight != _outerHeight ||
+            left != _left || right != _right || top != _top || bottom != _bottom) {
+            _outerWidth  = outerWidth
+            _outerHeight = outerHeight
+            _left   = left  
+            _right  = right 
+            _top    = top   
+            _bottom = bottom
+            rebuild()
+        }
+
+        mv := computeModelView(modelView)
+
+        if (center) {
+            dx := outerWidth * -0.5
+            dy := outerHeight * -0.5
+            mv = mv * Matrix4 newTranslate(dx, dy, 0.0)
+        }
+
+        if (round) {
+            mv round!()
+        }
+        draw(pass, mv)
+    }
+
+    rebuild: func {
+        tw : Float = texture width
+        th : Float = texture height
+
+        // useful texture coordinates
+        tx0 := 0.0
+        tx1 := left
+        tx2 := 1.0 - right
+        tx3 := 1.0
+
+        ty0 := 0.0
+        ty1 := bottom
+        ty2 := 1.0 - top
+        ty3 := 1.0
+
+        // useful vertex coordinates
+        vx0 := 0.0
+        vx1 := tx1 * tw
+        vx2 := outerWidth  - right * tw
+        vx3 := outerWidth
+
+        vy0 := 0.0
+        vy1 := ty1 * th
+        vy2 := outerHeight - top * th
+        vy3 := outerHeight
+
+        if (DEBUG) {
+            "tx: #{tx0}, #{tx1}, #{tx2}, #{tx3}" println()
+            "ty: #{ty0}, #{ty1}, #{ty2}, #{ty3}" println()
+            "vx: #{vx0}, #{vx1}, #{vx2}, #{vx3}" println()
+            "vy: #{vy0}, #{vy1}, #{vy2}, #{vy3}" println()
+        }
+
+        // external documentation may or may not be found at the following url:
+        // https://twitter.com/fasterthanlime/status/554233636250460160
+        build(22, |b|
+            b vertex(tx0, ty0, vx0, vy0) // 0
+            b vertex(tx0, ty1, vx0, vy1) // 1
+            b vertex(tx1, ty0, vx1, vy0) // 2
+            b vertex(tx1, ty1, vx1, vy1) // 3
+            b vertex(tx2, ty0, vx2, vy0) // 4
+            b vertex(tx2, ty1, vx2, vy1) // 5
+            b vertex(tx3, ty0, vx3, vy0) // 6
+            b vertex(tx3, ty1, vx3, vy1) // 7
+
+            b vertex(tx3, ty2, vx3, vy2) // 8
+            b vertex(tx2, ty1, vx2, vy1) // 9  = 5
+            b vertex(tx2, ty2, vx2, vy2) // 10
+            b vertex(tx1, ty1, vx1, vy1) // 11 = 3
+            b vertex(tx1, ty2, vx1, vy2) // 12
+            b vertex(tx0, ty1, vx0, vy1) // 13 = 1
+            b vertex(tx0, ty2, vx0, vy2) // 14
+
+            b vertex(tx0, ty3, vx0, vy3) // 15
+            b vertex(tx1, ty2, vx1, vy2) // 16
+            b vertex(tx1, ty3, vx1, vy3) // 17
+            b vertex(tx2, ty2, vx2, vy2) // 18 = 10
+            b vertex(tx2, ty3, vx2, vy3) // 19
+            b vertex(tx3, ty2, vx3, vy2) // 20
+            b vertex(tx3, ty3, vx3, vy3) // 21
+        )
+    }
 
 }
 
