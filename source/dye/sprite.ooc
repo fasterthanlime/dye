@@ -137,14 +137,14 @@ GlNinePatch: class extends Geometry {
     innerWidth  : Float { get { outerWidth  * (1 - left - right) } }
     innerHeight : Float { get { outerHeight * (1 - top - bottom) } }
 
-    left   := 1.0 / 3.0
-    right  := 1.0 / 3.0
-    top    := 1.0 / 3.0
-    bottom := 1.0 / 3.0
-    _left   := -1.0
-    _right  := -1.0
-    _top    := -1.0
-    _bottom := -1.0
+    left   := 8
+    right  := 8
+    top    := 8
+    bottom := 8
+    _left   := -1
+    _right  := -1
+    _top    := -1
+    _bottom := -1
 
     new: static func (path: String) -> This {
         This new(TextureLoader load(path))
@@ -192,27 +192,44 @@ GlNinePatch: class extends Geometry {
         tw : Float = texture width
         th : Float = texture height
 
+        L := (left   as Float / tw)
+        R := (right  as Float / tw)
+        T := (top    as Float / th)
+        B := (bottom as Float / th)
+
         // useful texture coordinates
         tx0 := 0.0
-        tx1 := left
-        tx2 := 1.0 - right
+        tx1 := L
+        tx2 := 1.0 - R
         tx3 := 1.0
 
         ty0 := 0.0
-        ty1 := bottom
-        ty2 := 1.0 - top
+        ty1 := B
+        ty2 := 1.0 - T
         ty3 := 1.0
 
         // useful vertex coordinates
         vx0 := 0.0
         vx1 := tx1 * tw
-        vx2 := outerWidth  - right * tw
+        vx2 := outerWidth  - right
         vx3 := outerWidth
 
         vy0 := 0.0
         vy1 := ty1 * th
-        vy2 := outerHeight - top * th
+        vy2 := outerHeight - top
         vy3 := outerHeight
+
+        if (round) {
+            vx0 = vx0 as Int
+            vx1 = vx1 as Int
+            vx2 = vx2 as Int
+            vx3 = vx3 as Int
+
+            vy0 = vy0 as Int
+            vy1 = vy1 as Int
+            vy2 = vy2 as Int
+            vy3 = vy3 as Int
+        }
 
         if (DEBUG) {
             "tx: #{tx0}, #{tx1}, #{tx2}, #{tx3}" println()
