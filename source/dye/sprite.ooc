@@ -132,19 +132,19 @@ GlNinePatch: class extends Geometry {
     DEBUG := static false
 
     outerWidth, outerHeight: Int
-    _outerWidth  := -1
-    _outerHeight := -1
+    _outerWidth  : Int = -1
+    _outerHeight : Int = -1
     innerWidth  : Float { get { outerWidth  * (1 - left - right) } }
     innerHeight : Float { get { outerHeight * (1 - top - bottom) } }
 
-    left   := 8
-    right  := 8
-    top    := 8
-    bottom := 8
-    _left   := -1
-    _right  := -1
-    _top    := -1
-    _bottom := -1
+    left   : Int = 8
+    right  : Int = 8
+    top    : Int = 8
+    bottom : Int = 8
+    _left   : Int = -1
+    _right  : Int = -1
+    _top    : Int = -1
+    _bottom : Int = -1
 
     new: static func (path: String) -> This {
         This new(TextureLoader load(path))

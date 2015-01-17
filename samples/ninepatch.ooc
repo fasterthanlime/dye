@@ -15,12 +15,18 @@ NinePatchTest: class extends App {
 
     init: func {
         super("NinePatch test", 1280, 720)
+        GlDrawable round = true
         dye setClearColor(Color new(20, 20, 20))
     }
 
     setup: func {
-        patch = GlNinePatch new("button-patch.png")
+        patch = GlNinePatch new("object-contour.png")
         patch center = false
+        patchSide := 18
+        patch top = patchSide
+        patch bottom = patchSide
+        patch left = patchSide
+        patch right = patchSide
         patch outerWidth  = 64
         patch outerHeight = 64
         patch pos set!(padding, padding)
