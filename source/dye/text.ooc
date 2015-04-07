@@ -13,6 +13,9 @@ import deadlogger/[Log, Logger]
 // sdk stuff
 import structs/HashMap
 
+/**
+ * Text rendered using a TTF font
+ */
 GlText: class extends Geometry {
 
     // static stuff

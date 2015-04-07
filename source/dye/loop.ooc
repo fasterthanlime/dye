@@ -12,8 +12,6 @@ import os/Time
 /**
  * A fixed loop allows you to keep a smooth fps all
  * the time. Except if your device is too slow, obviously :)
- * 
- * :author: Amos Wenger (@nddrylliog)
  */
 FixedLoop: class {
 
@@ -44,7 +42,11 @@ FixedLoop: class {
 
         while (running) {
             beforeRenderTicks := SDL getTicks() as Float
-            dye render()
+            if (paused) {
+                Time sleepMilli(10)
+            } else {
+                dye render()
+            }
             currentUpdateTicks := SDL getTicks() as Float
 
             // update game if needed, as much as needed but not too much
@@ -54,10 +56,8 @@ FixedLoop: class {
                 //"diff = %.2f >= %.2f - 1.0f" printfln(currentUpdateTicks - lastUpdateTicks, ticksPerUpdate)
                 lastUpdateTicks += ticksPerUpdate
                 updateCount += 1
-                if (!paused) {
-                    dye poll()
-                    body()
-                }
+                dye poll()
+                body()
                 if (updateCount >= maxUpdateCount) {
                     break
                 }

@@ -11,8 +11,6 @@ import deadlogger/[Log, Logger, Handler, Formatter, Filter, Level]
 import io/File
 
 /**
- * Class: App
- *
  * A simple app that sets up logging, a simple fixed loop and
  * exit events. Use that for short tests, not for serious applications.
  */
