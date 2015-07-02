@@ -16,17 +16,14 @@ import structs/HashMap
 import io/File
 
 TextureFilter: enum {
-    NEAREST
-    LINEAR
+    nearest = GL_NEAREST
+    linear  = GL_LINEAR
+}
 
-    toGL: func -> Int {
-        match this {
-            case This LINEAR =>
-                GL_LINEAR
-            case =>
-                GL_NEAREST
-        }
-    }
+WrapMode: enum {
+    clamp          = GL_CLAMP_TO_EDGE
+    mirroredRepeat = GL_MIRRORED_REPEAT
+    repeat         = GL_REPEAT
 }
 
 /**
@@ -40,15 +37,19 @@ Texture: class {
     _data: UInt8*
 
     filter: TextureFilter
+    wrap: WrapMode
 
     internalFormat := GL_RGBA
     format := GL_RGBA
 
-    init: func (=width, =height, =path, filter := TextureFilter LINEAR) {
+    init: func (=width, =height, =path,
+        filter := TextureFilter linear, wrap := WrapMode clamp) {
+
         glGenTextures(1, id&)
         bind()
 
         this filter = filter
+        this wrap = wrap
         version (!android) {
             internalFormat = GL_RGBA8
         }
@@ -57,19 +58,26 @@ Texture: class {
     }
 
     setup: func {
-        filterValue := filter toGL()
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterValue)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterValue)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE)
+        setMinFilter(filter)
+        setMagFilter(filter)
+        setWrapS(wrap)
+        setWrapT(wrap)
+    }
+
+    setWrapS: func (wrap: WrapMode) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap as GLint)
+    }
+
+    setWrapT: func (wrap: WrapMode) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap as GLint)
     }
 
     setMinFilter: func (filter: TextureFilter) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter toGL())
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter as GLint)
     }
 
     setMagFilter: func (filter: TextureFilter) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter toGL())
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter as GLint)
     }
 
     upload: func (data: UInt8*) {

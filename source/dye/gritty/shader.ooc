@@ -22,6 +22,44 @@ ShaderLoader: class {
         ShaderProgram new(vertex, fragment)
     }
 
+    loadFromPath: static func (vertexPath: String, fragmentPath: String) -> ShaderProgram {
+        vert := loadVertexShaderFromPath(vertexPath)
+        frag := loadFragmentShaderFromPath(fragmentPath)
+
+        ShaderProgram new(vert, frag)
+    }
+
+    loadFromRepo: static func (repo: String, name: String) -> ShaderProgram {
+        vertPath := File join(repo, name + ".vert")
+        fragPath := File join(repo, name + ".frag")
+
+        loadFromPath(vertPath, fragPath)
+    }
+
+    vertexShaderCache := static HashMap<String, VertexShader> new()
+
+    loadVertexShaderFromPath: static func (path: String) -> VertexShader {
+        file := File new(path)
+        shader := vertexShaderCache get(file getAbsolutePath())
+        if (!shader) {
+            shader = VertexShader new(file read())
+            vertexShaderCache put(file getAbsolutePath(), shader)
+        }
+        shader
+    }
+
+    fragmentShaderCache := static HashMap<String, FragmentShader> new()
+
+    loadFragmentShaderFromPath: static func (path: String) -> FragmentShader {
+        file := File new(path)
+        shader := fragmentShaderCache get(file getAbsolutePath())
+        if (!shader) {
+            shader = FragmentShader new(file read())
+            fragmentShaderCache put(file getAbsolutePath(), shader)
+        }
+        shader
+    }
+
 }
 
 Shader: class {

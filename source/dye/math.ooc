@@ -253,6 +253,10 @@ Vec2: class {
         x == v x && y == v y
     }
 
+    toVec2i: func -> Vec2i {
+        vec2i(x, y)
+    }
+
 }
 
 // cuz I'm lazy
