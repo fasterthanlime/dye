@@ -215,6 +215,10 @@ DyeContext: class {
         logger info("OpenGL renderer: %s" format(glGetString(GL_RENDERER)))
         logger info("GLSL version: %s" format(glGetString(GL_SHADING_LANGUAGE_VERSION)))
 
+        maxSize: Int
+        glGetIntegerv(GL_MAX_TEXTURE_SIZE, maxSize&)
+        logger info("Max texture size: %dx%d" format(maxSize, maxSize));
+
         // enable vsync
         SDL glSetSwapInterval(1)
 
