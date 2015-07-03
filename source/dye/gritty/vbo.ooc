@@ -79,12 +79,12 @@ UIntVBO: class extends VBO {
         target = GL_ELEMENT_ARRAY_BUFFER
     }
 
-    upload: func ~array (array: Int[]) {
+    upload: func ~array (array: UInt[]) {
         upload(array length, array data)
     }
 
-    upload: func ~pointer (numElements: Int, data: Int*) {
-        numBytes := (numElements * Int size) as GLsizeiptr
+    upload: func ~pointer (numElements: UInt, data: UInt*) {
+        numBytes := (numElements * UInt size) as GLsizeiptr
         _data(numBytes, data)
     }
 
