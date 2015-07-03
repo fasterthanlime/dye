@@ -12,7 +12,7 @@ SpriteTest: class extends App {
 
     init: func {
         super("Cube test", 1280, 720)
-        dye setClearColor(Color new(128, 128, 128))
+        dye setClearColor(Color new(0, 0, 0))
     }
 
     setup: func {
@@ -38,9 +38,10 @@ SpriteTest: class extends App {
 
     update: func {
         mp := dye input mousepos
-        // factor := 0.01
-        // cube rotateX = mp y * factor
-        // cube rotateY = mp x * factor
+        factor := 0.01
+        cube rotateX = -mp y * factor
+        cube rotateY = -mp x * factor
+
         // s := mp x * 0.3
         // cube angle = s
         // cube pos set!(mp)

@@ -15,10 +15,10 @@ GlCube: class extends GlDrawable {
     vao: VAO
 
     vbo: FloatVBO
-    // ebo: UShortVBO
+    ebo: UShortVBO
 
     vertices: Float[]
-    // indices: UShort[]
+    indices: UShort[]
 
     rotateX := 0.0f
     rotateY := 0.0f
@@ -28,7 +28,7 @@ GlCube: class extends GlDrawable {
 
     init: func {
         vbo = FloatVBO new()
-        // ebo = UShortVBO new()
+        ebo = UShortVBO new()
         rebuild()
         setProgram(ShaderLoader loadFromRepo("shaders", "cube"))
     }
@@ -47,7 +47,7 @@ GlCube: class extends GlDrawable {
         vao = VAO new(program)
         stride := 3 * Float size
         vao add(vbo, "Position", 3, GL_FLOAT, false, stride, 0 as Pointer)
-        // ebo bind()
+        ebo bind()
 
         projLoc = program getUniformLocation("Projection")
         modelLoc = program getUniformLocation("ModelView")
@@ -63,8 +63,8 @@ GlCube: class extends GlDrawable {
         //     mv = mv * Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0)
         // }
 
-        // mv = mv * Matrix4 newRotateX(rotateX)
-        // mv = mv * Matrix4 newRotateY(rotateY)
+        mv = mv * Matrix4 newRotateX(rotateX)
+        mv = mv * Matrix4 newRotateY(rotateY)
 
         draw(pass, mv)
     }
@@ -85,10 +85,9 @@ GlCube: class extends GlDrawable {
 
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
-        // glDrawElements(GL_TRIANGLES, indices length, GL_UNSIGNED_SHORT, 0 as Pointer)
-
-        // "calling glDrawArrays o/" println()
-        glDrawArrays(GL_TRIANGLES, 0, vertices length / 3)
+        glEnable(GL_DEPTH_TEST)
+        glDrawElements(GL_TRIANGLES, indices length, GL_UNSIGNED_SHORT, 0 as Pointer)
+        glDisable(GL_DEPTH_TEST)
 
         vao detach()
         program detach()
@@ -96,48 +95,44 @@ GlCube: class extends GlDrawable {
 
     rebuild: func {
         vertices = [
-            -1.0, -1.0, 0.0, // v0 // front
-             1.0, -1.0, 0.0, // v1
-             1.0,  1.0, 0.0, // v2
+            -1.0, -1.0,  1.0, // v0 // front
+             1.0, -1.0,  1.0, // v1
+             1.0,  1.0,  1.0, // v2
+            -1.0,  1.0,  1.0, // v3
 
-             1.0,  1.0, 0.0, // v2
-            -1.0,  1.0, 0.0, // v3
-            -1.0, -1.0, 0.0, // v0
-            // -1.0, -1.0,  0.0, // v4 // back
-            //  1.0, -1.0,  0.0, // v5
-            //  1.0,  1.0,  0.0, // v6
-            //  1.0,  1.0,  0.0, // v6
-            // -1.0,  1.0,  0.0, // v7
-            // -1.0, -1.0,  0.0, // v4
+            -1.0, -1.0, -1.0, // v4 // back
+             1.0, -1.0, -1.0, // v5
+             1.0,  1.0, -1.0, // v6
+            -1.0,  1.0, -1.0, // v7
         ]
         vbo upload(vertices)
 
-        // indices = [
-        //     // front
-        //     0, 1, 2,
-        //     2, 3, 0,
+        indices = [
+            // front
+            0, 1, 2,
+            2, 3, 0,
 
-        //     // top
-        //     3, 2, 6,
-        //     6, 7, 3,
+            // top
+            3, 2, 6,
+            6, 7, 3,
 
-        //     // back
-        //     7, 6, 5,
-        //     5, 4, 7,
+            // back
+            7, 6, 5,
+            5, 4, 7,
 
-        //     // bottom
-        //     4, 5, 1,
-        //     1, 0, 4,
+            // bottom
+            4, 5, 1,
+            1, 0, 4,
 
-        //     // left
-        //     4, 0, 3,
-        //     3, 7, 4,
+            // left
+            4, 0, 3,
+            3, 7, 4,
 
-        //     // right
-        //     1, 5, 6,
-        //     6, 2, 1,
-        // ]
-        // ebo upload(indices)
+            // right
+            1, 5, 6,
+            6, 2, 1,
+        ]
+        ebo upload(indices)
     }
 
 }
