@@ -506,7 +506,7 @@ Pass: abstract class {
         projectionMatrix = Matrix4 newOrtho(
             0, size x,
             0, size y,
-            -100.0,
+            -1000.0,
             1000.0)
     }
 

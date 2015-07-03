@@ -6,15 +6,19 @@ use dye
 import dye/[core, math]
 import dye/gritty/[shader, shaderlibrary, texture, vbo, vao]
 
-GlCube: class extends GlSpriteLike {
+GlCube: class extends GlDrawable {
+
+    program: ShaderProgram
+    color := Color new(255, 0, 0)
+    opacity := 1.0
 
     vao: VAO
 
     vbo: FloatVBO
-    ebo: UShortVBO
+    // ebo: UShortVBO
 
     vertices: Float[]
-    indices: UShort[]
+    // indices: UShort[]
 
     rotateX := 0.0f
     rotateY := 0.0f
@@ -24,9 +28,10 @@ GlCube: class extends GlSpriteLike {
 
     init: func {
         vbo = FloatVBO new()
-        ebo = UShortVBO new()
+        // ebo = UShortVBO new()
         rebuild()
-        setProgram(ShaderLoader loadFromRepo("shaders", "cube"))
+        // setProgram(ShaderLoader loadFromRepo("shaders", "cube"))
+        setProgram(ShaderLibrary getSolidColor())
     }
 
     setProgram: func (.program) {
@@ -41,8 +46,8 @@ GlCube: class extends GlSpriteLike {
         }
 
         vao = VAO new(program)
-        vao add(vbo, "Position", 3, GL_FLOAT, false, 0, 0 as Pointer)
-        ebo bind()
+        vao add(vbo, "Position", 2, GL_FLOAT, false, 0, 0 as Pointer)
+        // ebo bind()
 
         projLoc = program getUniformLocation("Projection")
         modelLoc = program getUniformLocation("ModelView")
@@ -58,11 +63,8 @@ GlCube: class extends GlSpriteLike {
         //     mv = mv * Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0)
         // }
 
-        s := 40.0f
-        mv = mv * Matrix4 newScale(s, s, s)
-        mv = mv * Matrix4 newRotateX(rotateX)
-        mv = mv * Matrix4 newRotateY(rotateY)
-        mv = mv * Matrix4 newRotateZ(angle)
+        // mv = mv * Matrix4 newRotateX(rotateX)
+        // mv = mv * Matrix4 newRotateY(rotateY)
 
         draw(pass, mv)
     }
@@ -81,10 +83,12 @@ GlCube: class extends GlSpriteLike {
             opacity * color B,
             opacity)
 
-        // glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-        glDisable(GL_BLEND)
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
-        glDrawElements(GL_TRIANGLES, indices length, GL_UNSIGNED_SHORT, 0 as Pointer)
+        // glDrawElements(GL_TRIANGLES, indices length, GL_UNSIGNED_SHORT, 0 as Pointer)
+
+        "calling glDrawArrays o/" println()
+        glDrawArrays(GL_TRIANGLES, 0, vertices length / 2)
 
         vao detach()
         program detach()
@@ -92,40 +96,52 @@ GlCube: class extends GlSpriteLike {
 
     rebuild: func {
         vertices = [
-            -1.0, -1.0,  1.0, // front
-            1.0,  -1.0,  1.0,
-            1.0,   1.0,  1.0,
-            -1.0,  1.0,  1.0,
+            // front
+            -1.0, -1.0, // 0.0, // v0
+            1.0,  -1.0, // 0.0, // v1
+            1.0,   1.0, // 0.0, // v2
 
-            -1.0, -1.0, -1.0, // back
-            1.0,  -1.0, -1.0,
-            1.0,   1.0, -1.0,
-            -1.0,  1.0, -1.0,
+            1.0,   1.0, // 0.0, // v2
+            -1.0,  1.0, // 0.0, // v3
+            -1.0, -1.0, // 0.0, // v0
+
+//             // back
+//             -1.0, -1.0, 1.0, // v4
+//             1.0,  -1.0, 1.0, // v5
+//             1.0,   1.0, 1.0, // v6
+
+//             1.0,   1.0, 1.0, // v6
+//             -1.0,  1.0, 1.0, // v7
+//             -1.0, -1.0, 1.0, // v4
         ]
         vbo upload(vertices)
 
-        indices = [
-            // front
-            0, 1, 2,
-            2, 3, 0,
+        // indices = [
+        //     // front
+        //     0, 1, 2,
+        //     2, 3, 0,
 
-            // top
-            3, 2, 6,
-            6, 7, 3,
-            // back
-            7, 6, 5,
-            5, 4, 7,
-            // bottom
-            4, 5, 1,
-            1, 0, 4,
-            // left
-            4, 0, 3,
-            3, 7, 4,
-            // right
-            1, 5, 6,
-            6, 2, 1,
-        ]
-        ebo upload(indices)
+        //     // top
+        //     3, 2, 6,
+        //     6, 7, 3,
+
+        //     // back
+        //     7, 6, 5,
+        //     5, 4, 7,
+
+        //     // bottom
+        //     4, 5, 1,
+        //     1, 0, 4,
+
+        //     // left
+        //     4, 0, 3,
+        //     3, 7, 4,
+
+        //     // right
+        //     1, 5, 6,
+        //     6, 2, 1,
+        // ]
+        // ebo upload(indices)
     }
 
 }
