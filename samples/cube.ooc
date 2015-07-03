@@ -12,17 +12,18 @@ SpriteTest: class extends App {
 
     init: func {
         super("Cube test", 1280, 720)
-        dye setClearColor(Color new(0, 0, 0))
+        dye setClearColor(Color new(255, 255, 255))
     }
 
     setup: func {
         cube = GlCube new()
-        cube pos = dye center
+        cube pos set!(40, 40)
         dye add(cube)
     }
 
     update: func {
         cube rotateY += 0.01f
+        // cube angle += 0.01f
     }
 
 }

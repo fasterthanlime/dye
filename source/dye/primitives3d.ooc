@@ -11,7 +11,7 @@ GlCube: class extends GlSpriteLike {
     vao: VAO
 
     vbo: FloatVBO
-    ibo: UIntVBO
+    ebo: UShortVBO
 
     vertices: Float[]
 
@@ -22,7 +22,7 @@ GlCube: class extends GlSpriteLike {
 
     init: func {
         vbo = FloatVBO new()
-        ibo = UIntVBO new()
+        ebo = UShortVBO new()
         rebuild()
         setProgram(ShaderLoader loadFromRepo("shaders", "cube"))
     }
@@ -51,14 +51,13 @@ GlCube: class extends GlSpriteLike {
 
         mv := computeModelView(modelView)
 
-//         if (center) {
-//             mv = mv * Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0)
-//         }
+        // if (center) {
+        //     mv = mv * Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0)
+        // }
 
-        s := 120.0f
+        s := 20.0f
         mv = mv * Matrix4 newScale(s, s, s)
-        mv = mv * Matrix4 newRotateY(rotateY)
-        // mv = mv * Matrix4 newRotateX(20.0f)
+        mv = mv * Matrix4 newRotateX(rotateY)
 
         draw(pass, mv)
     }
@@ -66,7 +65,7 @@ GlCube: class extends GlSpriteLike {
     draw: func (pass: Pass, modelView: Matrix4) {
         program use()
         vao bind()
-        ibo bind()
+        ebo bind()
 
         glUniformMatrix4fv(projLoc, 1, false, pass projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
@@ -80,7 +79,7 @@ GlCube: class extends GlSpriteLike {
 
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
-        glDrawElements(GL_TRIANGLES, 6 * 2 * 3 * 4, GL_UNSIGNED_SHORT, 0 as Pointer)
+        glDrawElements(GL_TRIANGLES, 6 * 2 * 3, GL_UNSIGNED_SHORT, 0 as Pointer)
 
         vao detach()
         program detach()
@@ -88,45 +87,40 @@ GlCube: class extends GlSpriteLike {
 
     rebuild: func {
         vertices = [
-            -1.0, -1.0, -1.0, // v0
-             1.0, -1.0, -1.0, // v1
-             1.0,  1.0, -1.0, // v2
-            -1.0,  1.0, -1.0, // v3
-
-            -1.0, -1.0,  1.0, // v4
-             1.0, -1.0,  1.0, // v5
-             1.0,  1.0,  1.0, // v6
-            -1.0,  1.0,  1.0  // v7
+            // front
+            -1.0, -1.0,  1.0,
+            1.0, -1.0,  1.0,
+            1.0,  1.0,  1.0,
+            -1.0,  1.0,  1.0,
+            // back
+            -1.0, -1.0, -1.0,
+            1.0, -1.0, -1.0,
+            1.0,  1.0, -1.0,
+            -1.0,  1.0, -1.0,
         ]
-
         vbo upload(vertices)
 
         indices := [
-            // bottom
-            0 as UInt, 1, 5,
-            0, 5, 4,
-
-            // right
-            5, 6, 2,
-            5, 2, 1,
-
-            // back
+            // front
             0, 1, 2,
-            0, 2, 3,
-
+            2, 3, 0,
+            // top
+            3, 2, 6,
+            6, 7, 3,
+            // back
+            7, 6, 5,
+            5, 4, 7,
+            // bottom
+            4, 5, 1,
+            1, 0, 4,
             // left
             4, 0, 3,
-            4, 3, 7,
-
-            // top
-            7, 3, 2,
-            7, 2, 6,
-
-            // front
-            4, 5, 7,
-            7, 5, 6
+            3, 7, 4,
+            // right
+            1, 5, 6,
+            6, 2, 1,
         ]
-        ibo upload(indices)
+        ebo upload(indices)
     }
 
 }

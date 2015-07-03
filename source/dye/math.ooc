@@ -743,6 +743,8 @@ Matrix4: class {
         (l, r, b, t) := (left, right, bottom, top)
         (n, f) := (_near, _far)
 
+        w := r - l
+        h := t - b
         d := f - n // depth
 
         /*
@@ -751,10 +753,10 @@ Matrix4: class {
          * Converted by hand to column-major
          */
         new([
-            n / r,         0.0f,               0.0f,           0.0f,
-            0.0f,          n / t,              0.0f,           0.0f,
-            0.0f,          0.0f,       (f + n) / -d,          -1.0f,
-            0.0f,          0.0f,  -2.0f * f * n / d,           0.0f
+            2 * n / w,     0.0f,                     0.0f,           0.0f,
+            0.0f,          2 * n / h,                0.0f,           0.0f,
+            (r + l) / w,   (t + b) / h,      (f + n) / -d,          -1.0f,
+            0.0f,          0.0f,        -2.0f * f * n / d,           0.0f
         ])
     }
 
