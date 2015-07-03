@@ -14,7 +14,9 @@ GlCube: class extends GlSpriteLike {
     ebo: UShortVBO
 
     vertices: Float[]
+    indices: UShort[]
 
+    rotateX := 0.0f
     rotateY := 0.0f
 
     /* Uniforms */
@@ -40,6 +42,7 @@ GlCube: class extends GlSpriteLike {
 
         vao = VAO new(program)
         vao add(vbo, "Position", 3, GL_FLOAT, false, 0, 0 as Pointer)
+        ebo bind()
 
         projLoc = program getUniformLocation("Projection")
         modelLoc = program getUniformLocation("ModelView")
@@ -55,9 +58,11 @@ GlCube: class extends GlSpriteLike {
         //     mv = mv * Matrix4 newTranslate(width * -0.5, height * -0.5, 0.0)
         // }
 
-        s := 20.0f
+        s := 40.0f
         mv = mv * Matrix4 newScale(s, s, s)
-        mv = mv * Matrix4 newRotateX(rotateY)
+        mv = mv * Matrix4 newRotateX(rotateX)
+        mv = mv * Matrix4 newRotateY(rotateY)
+        mv = mv * Matrix4 newRotateZ(angle)
 
         draw(pass, mv)
     }
@@ -65,7 +70,6 @@ GlCube: class extends GlSpriteLike {
     draw: func (pass: Pass, modelView: Matrix4) {
         program use()
         vao bind()
-        ebo bind()
 
         glUniformMatrix4fv(projLoc, 1, false, pass projectionMatrix pointer)
         glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
@@ -77,9 +81,10 @@ GlCube: class extends GlSpriteLike {
             opacity * color B,
             opacity)
 
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+        // glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
+        glDisable(GL_BLEND)
 
-        glDrawElements(GL_TRIANGLES, 6 * 2 * 3, GL_UNSIGNED_SHORT, 0 as Pointer)
+        glDrawElements(GL_TRIANGLES, indices length, GL_UNSIGNED_SHORT, 0 as Pointer)
 
         vao detach()
         program detach()
@@ -87,23 +92,23 @@ GlCube: class extends GlSpriteLike {
 
     rebuild: func {
         vertices = [
-            // front
-            -1.0, -1.0,  1.0,
-            1.0, -1.0,  1.0,
-            1.0,  1.0,  1.0,
+            -1.0, -1.0,  1.0, // front
+            1.0,  -1.0,  1.0,
+            1.0,   1.0,  1.0,
             -1.0,  1.0,  1.0,
-            // back
-            -1.0, -1.0, -1.0,
-            1.0, -1.0, -1.0,
-            1.0,  1.0, -1.0,
+
+            -1.0, -1.0, -1.0, // back
+            1.0,  -1.0, -1.0,
+            1.0,   1.0, -1.0,
             -1.0,  1.0, -1.0,
         ]
         vbo upload(vertices)
 
-        indices := [
+        indices = [
             // front
             0, 1, 2,
             2, 3, 0,
+
             // top
             3, 2, 6,
             6, 7, 3,

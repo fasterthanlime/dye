@@ -74,7 +74,7 @@ version (!android) {
 }
 
 /**
- * This class is used for pre-3.0 OpenGL platforms,
+ * This class is used for pre-2.0 OpenGL platforms,
  * such as OpenGL ES 2.0, where we can't use VAOs and
  * have to remember the vertex attribs instead.
  *

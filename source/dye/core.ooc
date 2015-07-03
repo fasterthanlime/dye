@@ -503,7 +503,11 @@ Pass: abstract class {
     }
 
     _makeProjectionMatrix: func {
-        projectionMatrix = Matrix4 newOrtho(0, size x, 0, size y, -100000.0, 100000.0)
+        projectionMatrix = Matrix4 newOrtho(
+            0, size x,
+            0, size y,
+            -100.0,
+            1000.0)
     }
 
     render: abstract func

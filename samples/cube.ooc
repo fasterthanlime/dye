@@ -17,13 +17,15 @@ SpriteTest: class extends App {
 
     setup: func {
         cube = GlCube new()
-        cube pos set!(40, 40)
+        cube pos = dye center
         dye add(cube)
     }
 
     update: func {
-        cube rotateY += 0.01f
-        // cube angle += 0.01f
+        mp := dye input mousepos
+        factor := 0.01
+        cube rotateX = mp x * factor
+        cube rotateY = mp y * factor
     }
 
 }
