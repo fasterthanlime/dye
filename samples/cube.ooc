@@ -37,10 +37,13 @@ SpriteTest: class extends App {
     }
 
     update: func {
-        // mp := dye input mousepos
+        mp := dye input mousepos
         // factor := 0.01
         // cube rotateX = mp y * factor
         // cube rotateY = mp x * factor
+        // s := mp x * 0.3
+        // cube angle = s
+        // cube pos set!(mp)
     }
 
 }

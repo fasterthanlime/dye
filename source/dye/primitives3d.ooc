@@ -30,8 +30,7 @@ GlCube: class extends GlDrawable {
         vbo = FloatVBO new()
         // ebo = UShortVBO new()
         rebuild()
-        // setProgram(ShaderLoader loadFromRepo("shaders", "cube"))
-        setProgram(ShaderLibrary getSolidColor())
+        setProgram(ShaderLoader loadFromRepo("shaders", "cube"))
     }
 
     setProgram: func (.program) {
@@ -46,7 +45,8 @@ GlCube: class extends GlDrawable {
         }
 
         vao = VAO new(program)
-        vao add(vbo, "Position", 2, GL_FLOAT, false, 0, 0 as Pointer)
+        stride := 3 * Float size
+        vao add(vbo, "Position", 3, GL_FLOAT, false, stride, 0 as Pointer)
         // ebo bind()
 
         projLoc = program getUniformLocation("Projection")
@@ -87,8 +87,8 @@ GlCube: class extends GlDrawable {
 
         // glDrawElements(GL_TRIANGLES, indices length, GL_UNSIGNED_SHORT, 0 as Pointer)
 
-        "calling glDrawArrays o/" println()
-        glDrawArrays(GL_TRIANGLES, 0, vertices length / 2)
+        // "calling glDrawArrays o/" println()
+        glDrawArrays(GL_TRIANGLES, 0, vertices length / 3)
 
         vao detach()
         program detach()
@@ -96,23 +96,19 @@ GlCube: class extends GlDrawable {
 
     rebuild: func {
         vertices = [
-            // front
-            -1.0, -1.0, // 0.0, // v0
-            1.0,  -1.0, // 0.0, // v1
-            1.0,   1.0, // 0.0, // v2
+            -1.0, -1.0, 0.0, // v0 // front
+             1.0, -1.0, 0.0, // v1
+             1.0,  1.0, 0.0, // v2
 
-            1.0,   1.0, // 0.0, // v2
-            -1.0,  1.0, // 0.0, // v3
-            -1.0, -1.0, // 0.0, // v0
-
-//             // back
-//             -1.0, -1.0, 1.0, // v4
-//             1.0,  -1.0, 1.0, // v5
-//             1.0,   1.0, 1.0, // v6
-
-//             1.0,   1.0, 1.0, // v6
-//             -1.0,  1.0, 1.0, // v7
-//             -1.0, -1.0, 1.0, // v4
+             1.0,  1.0, 0.0, // v2
+            -1.0,  1.0, 0.0, // v3
+            -1.0, -1.0, 0.0, // v0
+            // -1.0, -1.0,  0.0, // v4 // back
+            //  1.0, -1.0,  0.0, // v5
+            //  1.0,  1.0,  0.0, // v6
+            //  1.0,  1.0,  0.0, // v6
+            // -1.0,  1.0,  0.0, // v7
+            // -1.0, -1.0,  0.0, // v4
         ]
         vbo upload(vertices)
 
