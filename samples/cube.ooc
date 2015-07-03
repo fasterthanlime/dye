@@ -16,18 +16,16 @@ SpriteTest: class extends App {
     }
 
     setup: func {
-        // for (x in 0..12) {
-        //     for (y in 0..7) {
-        //         sprite := GlSprite new("ship.png")
-        //         sprite center = false
-        //         sprite pos set!(x * 100, y * 100)
-        //         dye add(sprite)
-        //     }
-        // }
+        sprite := GlSprite new("ship.png")
+        sprite center = false
+        sprite pos set!(dye center add(120, 0))
+        sprite center = true
+        dye add(sprite)
 
         square := GlRectangle new(vec2(1, 1))
-        square scale set!(40, 40)
+        square scale set!(80, 80)
         square pos set!(dye center sub(120, 0))
+        square center = true
         dye add(square)
 
         cube = GlCube new()
