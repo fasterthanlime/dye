@@ -8,7 +8,7 @@ main: func (argc: Int, argv: CString*) {
 
 GridSpriteTest: class extends App {
 
-    sprite: GlGridSprite
+    sprite: GridSprite
     counter := 0
 
     init: func {
@@ -17,7 +17,7 @@ GridSpriteTest: class extends App {
     }
 
     setup: func {
-        sprite = GlGridSprite new("grid.png", 4, 4)
+        sprite = GridSprite new("images/grid.png", 4, 4)
         sprite pos set!(dye center)
         sprite center = true
         sprite scale set!(10, 10)
@@ -39,8 +39,6 @@ GridSpriteTest: class extends App {
             } else {
                 sprite col += 1
             }
-
-            "sprite texX/Y = #{sprite texX}, #{sprite texY}, width height = #{sprite w}, #{sprite h}" println()
         }
     }
 

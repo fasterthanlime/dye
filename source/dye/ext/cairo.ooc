@@ -1,7 +1,6 @@
 
 // ours
-import dye/[core, math, sprite]
-import dye/gritty/[texture]
+import dye/[core, pass, math, sprite, texture]
 
 use cairo
 import cairo/Core
@@ -12,7 +11,7 @@ import sdl2/[OpenGL]
 /**
  * Something on which you can draw with cairo
  */
-Canvas: class extends GlSprite {
+Canvas: class extends Sprite {
 
     width, height: Int
     cairoSurface: CairoSurface

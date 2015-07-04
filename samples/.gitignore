@@ -1,8 +1,7 @@
 *
 !*.ooc
-!*.png
-!*.ttf
-!*.txt
 !fonts
 !fbo
 !shaders
+!text
+!images

@@ -1,8 +1,8 @@
 
 // our stuff
 use dye
-import dye/[core, math, geometry]
-import dye/gritty/[font, rectanglebinpack]
+import dye/[core, pass, math, geometry]
+import dye/base/[font, rectanglebinpack]
 
 // third-party stuff
 import sdl2/[OpenGL]
@@ -16,7 +16,7 @@ import structs/HashMap
 /**
  * Text rendered using a TTF font
  */
-GlText: class extends Geometry {
+Text: class extends Geometry {
 
     // static stuff
     cache := static HashMap<String, Font> new()
@@ -30,8 +30,7 @@ GlText: class extends Geometry {
     value: String
     _cachedValue := ""
 
-    init: func (fontPathBase: String, =value, fontSize := 40) {
-        fontPath = prefix + fontPathBase
+    init: func (fontPath: String, =value, fontSize := 40) {
         font = loadFont(fontPath, fontSize)
         super(font atlas texture)
         rebuild()

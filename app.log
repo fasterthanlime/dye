@@ -1,0 +1,12 @@
+[Sat Jul  4 04:16:59 2015] [INFO] [Context] Compiled against SDL v2.0.3
+[Sat Jul  4 04:16:59 2015] [INFO] [Context] Linked against SDL v2.0.3
+[Sat Jul  4 04:16:59 2015] [INFO] [SdlInput] Input system initialized
+[Sat Jul  4 04:16:59 2015] [INFO] [Context] OpenGL version: 4.1 INTEL-10.6.31
+[Sat Jul  4 04:16:59 2015] [INFO] [Context] OpenGL vendor: Intel Inc.
+[Sat Jul  4 04:16:59 2015] [INFO] [Context] OpenGL renderer: Intel Iris Pro OpenGL Engine
+[Sat Jul  4 04:16:59 2015] [INFO] [Context] GLSL version: 4.10
+[Sat Jul  4 04:16:59 2015] [INFO] [Context] Max texture size: 16384x16384
+[Sat Jul  4 04:16:59 2015] [INFO] [Context] Size = (1280, 720), Window size = (1280, 720)
+[Sat Jul  4 04:16:59 2015] [WARN] [TextureLoader] Failed to read ship.png. Reason: Couldn't open for reading.
+[Sat Jul  4 04:16:59 2015] [INFO] [Cube test] Welcome to Cube test, running at 60.00FPS
+[Sat Jul  4 04:16:59 2015] [INFO] [Cube test] Press ESC or close the window to exit

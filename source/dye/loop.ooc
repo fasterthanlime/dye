@@ -15,7 +15,7 @@ import os/Time
  */
 FixedLoop: class {
 
-    dye: DyeContext
+    dye: Context
     fpsGoal: Float { get set }
 
     timingInfo: String

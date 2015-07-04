@@ -1,7 +1,7 @@
 
 // our stuff
-import dye/[core, math, anim]
-import dye/gritty/[shader, shaderlibrary, texture, vbo, vao]
+import dye/[core, pass, math, shader, shader, texture]
+import dye/base/[vbo, vao]
 
 // third-party stuff
 import sdl2/[OpenGL]
@@ -9,7 +9,7 @@ import sdl2/[OpenGL]
 /**
  * Generic 2D geometry class, VBO-backed, textured.
  */
-Geometry: class extends GlSpriteLike {
+Geometry: class extends SpriteLike {
 
     // number of bytes we can store
     capacity: Int
@@ -37,7 +37,7 @@ Geometry: class extends GlSpriteLike {
 
     init: func (=texture) {
         vbo = FloatVBO new()
-        setProgram(ShaderLibrary getTexture())
+        setProgram(ShaderLoader load("dye/texture_2d"))
     }
 
     setProgram: func (.program) {
@@ -89,7 +89,7 @@ Geometry: class extends GlSpriteLike {
     }
     
     render: func (pass: Pass, modelView: Matrix4) {
-        if (!shouldDraw?(pass)) return
+        if (!visible) return
 
         mv := computeModelView(modelView)
 
@@ -131,6 +131,10 @@ Geometry: class extends GlSpriteLike {
 
 }
 
+/**
+ * A geometry builder that knows a few tricks.
+ * Assumes 2*float of texcoords, 2*float of vertices
+ */
 GeomBuilder: class {
 
     numElements: Int

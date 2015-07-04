@@ -1,4 +1,7 @@
 
+// ours
+import dye/[math, core, pass]
+
 // third-party stuff
 use deadlogger
 import deadlogger/Log
@@ -6,8 +9,6 @@ import deadlogger/Log
 // our stuff
 use sdl2
 import sdl2/[Core, Event, Joystick]
-
-import dye/[math, core]
 
 // sdk stuff
 import structs/[ArrayList]
@@ -302,7 +303,7 @@ SubInput: class extends Input {
  */
 SdlInput: class extends Input {
 
-    dye: DyeContext
+    dye: Context
     logger := static Log getLogger(This name)
 
     MAX_KEY := static 65536

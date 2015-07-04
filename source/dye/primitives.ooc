@@ -3,13 +3,13 @@ use sdl2
 import sdl2/[OpenGL]
 
 use dye
-import dye/[core, math]
-import dye/gritty/[shader, shaderlibrary, texture, vbo, vao]
+import dye/[core, pass, math, shader, texture]
+import dye/base/[vbo, vao]
 
 /**
  * Plain, monochrome, non-textured rectangle
  */
-GlRectangle: class extends GlDrawable {
+Rectangle: class extends Drawable {
 
     size: Vec2
     oldSize := vec2(0, 0)
@@ -41,7 +41,7 @@ GlRectangle: class extends GlDrawable {
         this size = size clone()
         vbo = FloatVBO new()
         rebuild()
-        setProgram(ShaderLibrary getSolidColor())
+        setProgram(ShaderLoader load("dye/solid_2d"))
     }
 
     setProgram: func (.program) {
@@ -64,7 +64,7 @@ GlRectangle: class extends GlDrawable {
     }
 
     render: func (pass: Pass, modelView: Matrix4) {
-        if (!shouldDraw?(pass)) return
+        if (!visible) return
 
         mv := computeModelView(modelView)
 
@@ -125,7 +125,7 @@ GlRectangle: class extends GlDrawable {
 /**
  * Plain, monochrome, non-textured convex polygon
  */
-GlPoly: class extends GlDrawable {
+Poly: class extends Drawable {
 
     points: Vec2*
     count: Int
@@ -147,7 +147,7 @@ GlPoly: class extends GlDrawable {
     init: func (=points, =count) {
         vbo = FloatVBO new()
         rebuild()
-        setProgram(ShaderLibrary getSolidColor())
+        setProgram(ShaderLoader load("dye/solid_2d"))
     }
 
     setProgram: func (.program) {
@@ -170,7 +170,7 @@ GlPoly: class extends GlDrawable {
     }
 
     render: func (pass: Pass, modelView: Matrix4) {
-        if (!shouldDraw?(pass)) return
+        if (!visible) return
 
         mv := computeModelView(modelView)
         draw(pass, mv)

@@ -1,7 +1,7 @@
 
 // ours
-import dye/[core, math, anim]
-import dye/gritty/[io]
+import dye/[core, math]
+import dye/base/[io]
 
 // third
 import sdl2/[OpenGL]
@@ -39,6 +39,7 @@ Texture: class {
     filter: TextureFilter
     wrap: WrapMode
 
+    target := GL_TEXTURE_2D
     internalFormat := GL_RGBA
     format := GL_RGBA
 
@@ -65,24 +66,24 @@ Texture: class {
     }
 
     setWrapS: func (wrap: WrapMode) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap as GLint)
+        glTexParameteri(target, GL_TEXTURE_WRAP_S, wrap as GLint)
     }
 
     setWrapT: func (wrap: WrapMode) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap as GLint)
+        glTexParameteri(target, GL_TEXTURE_WRAP_T, wrap as GLint)
     }
 
     setMinFilter: func (filter: TextureFilter) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter as GLint)
+        glTexParameteri(target, GL_TEXTURE_MIN_FILTER, filter as GLint)
     }
 
     setMagFilter: func (filter: TextureFilter) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter as GLint)
+        glTexParameteri(target, GL_TEXTURE_MAG_FILTER, filter as GLint)
     }
 
     upload: func (data: UInt8*) {
         _data = data
-        glTexImage2D(GL_TEXTURE_2D,
+        glTexImage2D(target,
                     0,
                     internalFormat,
                     width,
@@ -105,7 +106,7 @@ Texture: class {
             updateHeight = height
         }
 
-        glTexSubImage2D(GL_TEXTURE_2D,  // target
+        glTexSubImage2D(target,  // target
                     0,                  // level
                     xOffset,            // xoffset
                     yOffset,            // yoffset
@@ -118,11 +119,11 @@ Texture: class {
     }
 
     bind: func {
-        glBindTexture(GL_TEXTURE_2D, id)
+        glBindTexture(target, id)
     }
 
     detach: func {
-        glBindTexture(GL_TEXTURE_2D, 0)
+        glBindTexture(target, 0)
     }
 
     dispose: func {
@@ -141,11 +142,7 @@ TextureLoader: class {
 
     _placeholder: static Texture
 
-    load: static func (pathBase: String, color: Color = null) -> Texture {
-        path := pathBase
-        if (!File new(pathBase) exists?()) {
-            path = GlDrawable prefix + pathBase
-        }
+    load: static func (path: String, color: Color = null) -> Texture {
         if (cache contains?(path)) {
             return cache get(path)
         }

@@ -1,12 +1,10 @@
 
-// third-party stuff
+// ours
 use dye
-import dye/[core, math]
-import dye/gritty/[texture, rectanglebinpack]
+import dye/[core, math, primitives, texture]
+import rectanglebinpack
 
-// debug
-import dye/[primitives]
-
+// third
 use freetype2
 import freetype2
 
@@ -16,6 +14,10 @@ import deadlogger/[Log, Logger]
 // sdk stuff
 import structs/[ArrayList, HashMap]
 
+/**
+ * A font, loaded from TTF, rendered to a certain size
+ * and packed into a texture.
+ */
 Font: class {
 
     logger := static Log getLogger(This name)

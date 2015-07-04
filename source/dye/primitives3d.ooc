@@ -3,10 +3,10 @@ use sdl2
 import sdl2/[OpenGL]
 
 use dye
-import dye/[core, math]
-import dye/gritty/[shader, shaderlibrary, texture, vbo, vao]
+import dye/[core, pass, math, shader, texture]
+import dye/base/[vbo, vao]
 
-GlCube: class extends GlDrawable {
+Cube: class extends Drawable {
 
     program: ShaderProgram
     color := Color new(255, 0, 0)
@@ -30,7 +30,7 @@ GlCube: class extends GlDrawable {
         vbo = FloatVBO new()
         ebo = UShortVBO new()
         rebuild()
-        setProgram(ShaderLoader loadFromRepo("shaders", "cube"))
+        setProgram(ShaderLoader load("dye/solid_3d"))
     }
 
     setProgram: func (.program) {
@@ -55,7 +55,7 @@ GlCube: class extends GlDrawable {
     }
 
     render: func (pass: Pass, modelView: Matrix4) {
-        if (!shouldDraw?(pass)) return
+        if (!visible) return
 
         mv := computeModelView(modelView)
 

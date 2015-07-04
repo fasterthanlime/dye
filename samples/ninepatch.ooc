@@ -9,18 +9,18 @@ main: func (argc: Int, argv: CString*) {
 NinePatchTest: class extends App {
 
     padding := 128
-    patch: GlNinePatch
-    sprite: GlSprite
+    patch: NinePatch
+    sprite: Sprite
     counter := 0
 
     init: func {
         super("NinePatch test", 1280, 720)
-        GlDrawable round = true
+        Drawable round = true
         dye setClearColor(Color new(20, 20, 20))
     }
 
     setup: func {
-        patch = GlNinePatch new("object-contour.png")
+        patch = NinePatch new("images/object-contour.png")
         patch center = false
         patchSide := 18
         patch top = patchSide
@@ -32,7 +32,7 @@ NinePatchTest: class extends App {
         patch pos set!(padding, padding)
         dye add(patch)
 
-        sprite = GlSprite new("button-patch.png")
+        sprite = Sprite new("images/button-patch.png")
         sprite center = false
         sprite pos set!(padding + 256, padding)
         dye add(sprite)

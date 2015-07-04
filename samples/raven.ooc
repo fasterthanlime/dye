@@ -12,12 +12,11 @@ main: func (argc: Int, argv: CString*) {
 
 FontTest: class extends App {
 
-    source := File new("theraven.txt") read()
-    //source := "Maybe.\nMaybe not.\nMaybe go fuck yourself."
+    source := File new("text/theraven.txt") read()
     index := 0
     length := 0
 
-    text: GlText
+    text: Text
 
     init: func {
         super("Font packing test", 1280, 720)
@@ -30,7 +29,7 @@ FontTest: class extends App {
 
     addText: func (fontName: String, pos: Vec2, fontSize: Int) {
         fontPath := "fonts/%s.ttf" format(fontName)
-        text = GlText new(fontPath, "", fontSize)
+        text = Text new(fontPath, "", fontSize)
         text color set!(Color white())
         text pos set!(pos)
         text scale mul!(1.1f)

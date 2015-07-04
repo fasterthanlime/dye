@@ -1,7 +1,6 @@
 
 use dye
-import dye/[core, app, math, geometry]
-import dye/gritty/[texture]
+import dye/[core, app, math, geometry, texture]
 
 import sdl2/[OpenGL]
 
@@ -21,7 +20,7 @@ TriGeomTest: class extends App {
     }
 
     setup: func {
-        geom = Geometry new(TextureLoader load("ship.png"))
+        geom = Geometry new(TextureLoader load("images/ship.png"))
         geom mode = GL_TRIANGLES
         dye add(geom)
     }

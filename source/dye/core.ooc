@@ -11,15 +11,14 @@ import structs/ArrayList
 
 // our stuff
 use dye
-import dye/[input, math, sprite]
-import dye/gritty/[fbo, shader]
+import dye/[input, math, sprite, fbo, shader, pass]
 
 /**
  * A dye context - ie. a window bound to an OpenGL context,
- * with an associated Input, can has a custom cursor, a list of
+ * with an associated Input, can have a custom cursor, a list of
  * scenes that can be swapped for one another
  */
-DyeContext: class {
+Context: class {
 
     window: SdlWindow
     context: SdlGlContext
@@ -33,13 +32,9 @@ DyeContext: class {
     center: Vec2
 
     mainPass: Pass
-    passes := ArrayList<Pass> new()
     windowPass: WindowPass
 
     input: SdlInput
-
-    scenes := ArrayList<Scene> new()
-    currentScene: Scene
 
     fullscreen := false
 
@@ -47,6 +42,7 @@ DyeContext: class {
 
     init: func (width, height: Int, title: String, fullscreen := false,
             windowWidth := -1, windowHeight := -1) {
+
         size = vec2i(width, height)
         if (windowWidth == -1)  windowWidth  = size x
         if (windowHeight == -1) windowHeight = size y
@@ -62,11 +58,9 @@ DyeContext: class {
         SDL getLinkedVersion(ver&)
         logger info("Linked against SDL v#{ver major}.#{ver minor}.#{ver patch}")
 
-        version (apple) {
-            SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
-            SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2)
-            SDL glSetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
-        }
+        SDL glSetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3)
+        SDL glSetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2)
+        SDL glSetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
 
         SDL glSetAttribute(SDL_GL_RED_SIZE, 5)
         SDL glSetAttribute(SDL_GL_GREEN_SIZE, 6)
@@ -117,19 +111,7 @@ DyeContext: class {
             windowSize set!(x, y)
         )
 
-        version ((windows || linux || apple) && !android) {
-            // we use glew on Desktop
-            glewExperimental = true
-            glewValue := glewInit()
-            if (glewValue != 0) {
-                logger error("Failed to initialize glew!", glewValue)
-                raise("glew failure")
-            }
-        }
-
         initGL()
-
-        setScene(createScene())
     }
 
     hideWindow: func {
@@ -183,6 +165,9 @@ DyeContext: class {
         SDL setRelativeMouseMode(enabled)
     }
 
+    /**
+     * Poll the input devices
+     */
     poll: func {
         input _poll()
     }
@@ -190,13 +175,7 @@ DyeContext: class {
     render: func {
         SDL glMakeCurrent(window, context)
 
-        mainPass group = currentScene
         mainPass render()
-
-        if (!passes empty?()) for (p in passes) {
-            p render()
-        }
-
         windowPass render()
 
         SDL glSwapWindow(window)
@@ -204,12 +183,17 @@ DyeContext: class {
 
     quit: func {
         SDL quit()
-        // on Desktop, chances are SDL quit will exit the app.  on mobile,
-        // exit(0) is apparently needed.  It can't hurt anyway.
-        exit(0)
     }
 
     initGL: func {
+        // we use glew on Desktop
+        glewExperimental = true
+        glewValue := glewInit()
+        if (glewValue != 0) {
+            logger error("Failed to initialize glew!", glewValue)
+            raise("glew failure")
+        }
+
         logger info("OpenGL version: %s" format(glGetString(GL_VERSION)))
         logger info("OpenGL vendor: %s" format(glGetString(GL_VENDOR)))
         logger info("OpenGL renderer: %s" format(glGetString(GL_RENDERER)))
@@ -226,43 +210,29 @@ DyeContext: class {
         // SDL glSetSwapInterval(0)
 
         logger info("Size = %s, Window size = %s", size _, windowSize _)
-        mainPass = TexturePass new(Fbo new(size))
-        mainPass catchAll = true;
+        mainPass = TexturePass new(size)
         mainPass clearColor set!(72, 60, 50) // taupe!
         windowPass = WindowPass new(this, mainPass fbo)
     }
 
-    setClearColor: func (c: Color) {
+    setClearColor: func (r, g, b: Int) {
+        mainPass clearColor set!(r, g, b)
+    }
+
+    setClearColor: func ~color (c: Color) {
         mainPass clearColor set!(c)
     }
 
-    createScene: func -> Scene {
-        Scene new(this)
+    add: func (d: Drawable) {
+        mainPass group add(d)
     }
 
-    setScene: func (scene: Scene) {
-        if (currentScene) {
-            currentScene input enabled = false
-        }
-
-        currentScene = scene
-        currentScene input enabled = true
-    }
-
-    getScene: func -> Scene {
-        currentScene
-    }
-
-    add: func (d: GlDrawable) {
-        currentScene add(d)
-    }
-
-    remove: func (d: GlDrawable) {
-        currentScene remove(d)
+    remove: func (d: Drawable) {
+        mainPass group remove(d)
     }
 
     clear: func {
-        currentScene clear()
+        mainPass group clear()
     }
 
 }
@@ -270,53 +240,33 @@ DyeContext: class {
 /**
  * Anything that can be drawn on a context
  */
-GlDrawable: abstract class {
-
-    // if null, will be rendered in the main pass
-    pass: Pass = null
+Drawable: abstract class {
 
     // round to nearest pixel for transformation matrices
     round := static false
-    // prefix to add to all asset requests
-    prefix := static ""
 
+    // transformations
     scale := vec2(1, 1)
     pos := vec2(0, 0)
     angle := 0.0f
-    userObject: Object = null // anything you want o/
 
     visible := true
 
-    // You can use OpenGL calls here
+    // Override to add additional transformations
     render: func (pass: Pass, modelView: Matrix4) {
-        if (!shouldDraw?(pass)) return
+        if (!visible) return
 
-        draw(pass, computeModelView(modelView))
+        mv := computeModelView(modelView)
+
+        draw(pass, mv)
     }
 
-    shouldDraw?: final func (pass: Pass) -> Bool {
-        if (!visible) return false
-
-        match (this pass) {
-            case null =>
-                // render if pass catches all
-                pass catchAll
-            case =>
-                // render if same pass
-                this pass == pass
-        }
-    }
-
-    center!: func (pass: Pass, size: Vec2) {
-        pos set!(pass width / 2 - size x / 2, pass height / 2 - size y / 2)
-    }
-
-    center!: func ~childCentered (pass: Pass) {
-        pos set!(pass width / 2, pass height / 2)
-    }
-
+    // Right place to bind / set up uniforms / use programs / draw whatever you need
     draw: abstract func (pass: Pass, modelView: Matrix4)
 
+    /**
+     * Recompute modelView matrix
+     */
     computeModelView: func (input: Matrix4) -> Matrix4 {
         modelView: Matrix4
 
@@ -326,7 +276,7 @@ GlDrawable: abstract class {
             modelView = Matrix4 newIdentity()
         }
 
-        if (!pos zero?()) {
+        if (pos x != 0.0 || pos y != 0.0) {
             modelView = modelView * Matrix4 newTranslate(pos x, pos y, 0.0)
         }
 
@@ -334,16 +284,11 @@ GlDrawable: abstract class {
             modelView = modelView * Matrix4 newRotateZ(angle toRadians())
         }
 
-        if (!scale unit?()) {
+        if (scale x != 1.0 || scale y != 1.0) {
             modelView = modelView * Matrix4 newScale(scale x, scale y, 1.0)
         }
 
-
         modelView
-    }
-
-    free: func {
-        // muffin so far
     }
 
 }
@@ -351,11 +296,11 @@ GlDrawable: abstract class {
 /**
  * A group of drawables, that has its own position, scale, and rotation
  */
-GlGroup: class extends GlDrawable {
+Group: class extends Drawable {
 
     init: func
 
-    children := ArrayList<GlDrawable> new()
+    children := ArrayList<Drawable> new()
 
     render: func (pass: Pass, modelView: Matrix4) {
         if (!visible) return
@@ -373,11 +318,11 @@ GlGroup: class extends GlDrawable {
         }
     }
 
-    add: func (d: GlDrawable) {
+    add: func (d: Drawable) {
         children add(d)
     }
 
-    remove: func (d: GlDrawable) {
+    remove: func (d: Drawable) {
         children remove(d)
     }
 
@@ -385,21 +330,12 @@ GlGroup: class extends GlDrawable {
         children clear()
     }
 
-    clearHard: func {
-        iter := children iterator()
-        while (iter hasNext?()) {
-            node := iter next()
-            iter remove()
-            node free()
-        }
-    }
-
 }
 
 /**
  * A group of drawables, sorted by y coordinate
  */
-GlSortedGroup: class extends GlGroup {
+SortedGroup: class extends Group {
 
     init: func {
         super()
@@ -416,18 +352,18 @@ GlSortedGroup: class extends GlGroup {
  * Base class for all things sprite - has a color
  * and an opacity so we can tint and make them transparent.
  */
-GlSpriteLike: abstract class extends GlDrawable {
+SpriteLike: abstract class extends Drawable {
 
     color := Color white()
     program: ShaderProgram
     opacity := 1.0f
-    effects: ArrayList<GlEffect> = null
+    effects: ArrayList<Effect> = null
     center := true
 
     init: func
 
-    addEffect: func (e: GlEffect) {
-        if (!effects) effects = ArrayList<GlEffect> new()
+    addEffect: func (e: Effect) {
+        if (!effects) effects = ArrayList<Effect> new()
         effects add(e)
     }
 
@@ -445,196 +381,10 @@ GlSpriteLike: abstract class extends GlDrawable {
 /**
  * Create your own effects and stuff
  */
-GlEffect: abstract class {
+Effect: abstract class {
 
     // here you get a chance to set uniforms
-    apply: abstract func (sprite: GlSpriteLike, pass: Pass, modelView: Matrix4)
-
-}
-
-
-/**
- * Regroups a graphic scene (GlGroup) and some event handling (Input)
- */
-Scene: class extends GlGroup {
-
-    dye: DyeContext
-    input: Input
-
-    size  : Vec2i { get { dye size } }
-    center: Vec2  { get { dye center } }
-
-    init: func (.dye) {
-        init(dye, dye input sub())
-        input enabled = false
-    }
-
-    init: func ~specific (=dye, =input) { }
-
-    sub: func -> This {
-        new(dye, input sub())
-    }
-
-}
-
-Pass: abstract class {
-
-    identity := static Matrix4 newIdentity()
-
-    // clears before drawing?
-    clears := true
-
-    size: Vec2i
-    projectionMatrix: Matrix4
-    clearColor := Color new(0, 0, 0)
-    clearAlpha := 0.0f
-    group := GlGroup new()
-    fbo: Fbo
-
-    // passes catches all drawables?
-    catchAll := false
-
-    // convenience properties
-    width:  Int { get { size x } }
-    height: Int { get { size y } }
-
-    init: func (=fbo) {
-        // muffin!
-    }
-
-    _makeProjectionMatrix: func {
-        projectionMatrix = Matrix4 newOrtho(
-            0, size x,
-            0, size y,
-            -1000.0,
-            1000.0)
-    }
-
-    render: abstract func
-
-    doRender: func {
-        if (clears) {
-            doClear()
-        }
-
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
-
-        group render(this, identity)
-
-        glDisable(GL_BLEND)
-    }
-
-    doClear: func {
-        glClearColor(clearColor R, clearColor G, clearColor B, clearAlpha)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    }
-
-
-}
-
-TexturePass: class extends Pass {
-
-    init: func (.fbo) {
-        super(fbo)
-        size = vec2i(fbo size x, fbo size y)
-        _makeProjectionMatrix()
-    }
-
-    resize: func (=size) -> Bool {
-        resized := false
-
-        _makeProjectionMatrix()
-        // fbo too small? resize!
-        if (fbo size x < size x || fbo size y < size y) {
-            newFboSize := vec2i(_nextPo2(size x), _nextPo2(size y))
-            fbo dispose()
-            fbo = Fbo new(newFboSize)
-            resized = true
-        }
-
-        // clear
-        fbo bind()
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-        fbo unbind()
-
-        resized
-    }
-
-    doClear: func {
-        glEnable(GL_SCISSOR_TEST)
-        glScissor(0, 0, size x, size y)
-        super()
-        glDisable(GL_SCISSOR_TEST)
-    }
-
-    _nextPo2: func (number: Int) -> Int {
-        poftwo := 1
-        while ((1 << poftwo) < number) {
-            poftwo += 1
-        }
-        1 << poftwo
-    }
-
-    render: func {
-        fbo bind()
-        glViewport(0, 0, size x, size y)
-        doRender()
-        fbo unbind()
-    }
-
-}
-
-WindowPass: class extends Pass {
-
-    dye: DyeContext
-    sprite: GlSprite
-    targetSize := vec2(-1 , -1)
-    targetOffset := vec2(0, 0)
-    scale := 1.0
-
-    init: func (=dye, .fbo) {
-        super(fbo)
-        size = vec2i(dye windowSize x, dye windowSize y)
-        sprite = GlSprite new(fbo texture)
-        sprite pass = this
-        sprite center = false
-        group add(sprite)
-        _makeProjectionMatrix()
-    }
-
-    render: func {
-        adjustSprite()
-        glViewport(0, 0, dye windowSize x, dye windowSize y)
-        doRender()
-    }
-
-    adjustSprite: func {
-        ratio := fbo size ratio()
-        targetRatio := dye windowSize ratio()
-        windowSize := vec2(dye windowSize x, dye windowSize y)
-
-        if (targetRatio < ratio) {
-            // target thinner than window (pillarbox)
-            targetSize x = windowSize y / ratio
-            targetSize y = windowSize y
-            sprite scale set!(targetRatio / ratio, 1.0f)
-
-            targetOffset x = ((size y / targetRatio) - size x) * 0.5 * sprite scale x
-            targetOffset y = 0.0f
-        } else {
-            // target wider than window (letterbox)
-            targetSize x = windowSize x
-            targetSize y = windowSize x * ratio
-            sprite scale set!(1.0f, ratio / targetRatio)
-
-            targetOffset x = 0.0f
-            targetOffset y = ((size x * targetRatio) - size y) * 0.5 * sprite scale y
-        }
-
-        sprite pos set!(targetOffset x, targetOffset y)
-    }
+    apply: abstract func (sprite: SpriteLike, pass: Pass, modelView: Matrix4)
 
 }
 

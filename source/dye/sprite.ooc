@@ -1,7 +1,7 @@
 
 // our stuff
-import dye/[core, math, anim, geometry]
-import dye/gritty/[shader, shaderlibrary, texture, vbo, vao]
+import dye/[core, pass, math, geometry, shader, texture]
+import dye/base/[vbo, vao]
 
 // sdk
 import structs/[ArrayList]
@@ -14,7 +14,7 @@ import sdl2/[OpenGL]
  * with alpha blending, an opacity value, and a color to
  * tint the texture.
  */
-GlSprite: class extends Geometry {
+Sprite: class extends Geometry {
 
     w := 0.0f
     h := 0.0f
@@ -48,7 +48,7 @@ GlSprite: class extends Geometry {
     }
 
     render: func (pass: Pass, modelView: Matrix4) {
-        if (!shouldDraw?(pass)) return
+        if (!visible) return
 
         mv := computeModelView(modelView)
 
@@ -83,7 +83,7 @@ GlSprite: class extends Geometry {
  * number of columns and rows in the sheet. x and y are the column and
  * row you want to display.
  */
-GlGridSprite: class extends GlSprite implements GlAnimSource {
+GridSprite: class extends Sprite {
     xnum, ynum: Int
     col, row: Int
     _col = -1: Int
@@ -113,22 +113,13 @@ GlGridSprite: class extends GlSprite implements GlAnimSource {
 
         super(pass, modelView)
     }
-
-    // implement GlAnimSource
-
-    numFrames: func -> Int { xnum }
-    getDrawable: func -> GlSpriteLike { this }
-    frameOffset: func (offset: Int) {
-        setFrame(col + offset)
-    }
-    setFrame: func (col: Int) {
-        this col = col repeat(0, xnum)
-    }
-    currentFrame: func -> Int { col }
-
 }
 
-GlNinePatch: class extends Geometry {
+/**
+ * Stretchable surface
+ * See https://github.com/libgdx/libgdx/wiki/Ninepatches
+ */
+NinePatch: class extends Geometry {
     DEBUG := static false
 
     outerWidth, outerHeight: Int
@@ -161,7 +152,7 @@ GlNinePatch: class extends Geometry {
     }
 
     render: func (pass: Pass, modelView: Matrix4) {
-        if (!shouldDraw?(pass)) return
+        if (!visible) return
 
         if (outerWidth != _outerWidth || outerHeight != _outerHeight ||
             left != _left || right != _right || top != _top || bottom != _bottom) {

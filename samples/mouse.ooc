@@ -1,34 +1,31 @@
 
 use dye
-import dye/[core, font, sprite, input, math]
-
-import os/Time
+import dye/[core, sprite, input, math, app, loop]
 
 main: func (argc: Int, argv: CString*) {
+    MouseTest new() run(60.0)
+}
 
-    dye := DyeContext new(640, 480, "Dye mouse example")
-    dye setShowCursor(false)
-    input := dye input
+MouseTest: class extends App {
 
-    crosshair := GlSprite new("crosshair.png")
-    crosshairGroup := GlGroup new()
-    crosshairGroup add(crosshair)
-    dye add(crosshairGroup)
+    crosshair: Sprite
 
-    running := true
+    init: func {
+        super("Mouse demo", 640, 480)
+        dye setShowCursor(false)
+        dye setClearColor(Color new(30, 30, 30))
 
-    input onMousePress(1, || running = false)
+        dye input onMousePress(1, |mp|
+            loop running = false
+        )
 
-    while (running) {
-        input _poll()
-        dye render()
-
-        crosshairGroup pos set!(input getMousePos())
-        Time sleepMilli(8)
+        crosshair = Sprite new("images/crosshair.png")
+        dye add(crosshair)
     }
 
-    dye setShowCursor(true)
-    dye quit()
+    update: func {
+        crosshair pos set!(dye input mousepos)
+    }
 
 }
 

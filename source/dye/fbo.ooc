@@ -7,8 +7,7 @@ import sdl2/[OpenGL]
 
 // our stuff
 use dye
-import dye/[core, math, sprite]
-import dye/gritty/[texture]
+import dye/[core, math, sprite, texture]
 
 /*
  * Frame buffer object support

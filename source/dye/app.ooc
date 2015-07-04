@@ -16,7 +16,7 @@ import io/File
  */
 App: class {
 
-    dye: DyeContext
+    dye: Context
     title: String
     loop: FixedLoop
 
@@ -33,7 +33,7 @@ App: class {
     init: func (=title, width := 800, height := 600, fullscreen := false, windowWidth := -1, windowHeight := -1) {
         setupLogging()
 
-        dye = DyeContext new(width, height, title, fullscreen, windowWidth, windowHeight)
+        dye = Context new(width, height, title, fullscreen, windowWidth, windowHeight)
         dye setClearColor(Color black())
 
         initEvents()

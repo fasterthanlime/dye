@@ -21,7 +21,7 @@ FontTest: class extends App {
     }
 
     addColumn: func (x: Float, fontName: String) {
-        initialSize := 24
+        initialSize := 32
         getSize := func -> Int {
             value := initialSize
             initialSize -= 1
@@ -31,24 +31,24 @@ FontTest: class extends App {
         initialHeight := 740
         getHeight := func -> Int {
             value := initialHeight
-            initialHeight -= 32
+            initialHeight -= 42
             value
         }
 
-        for (i in 0..32) {
+        for (i in 0..18) {
             addText(fontName, vec2(x, getHeight()), getSize())
         }
     }
 
     addText: func (fontName: String, pos: Vec2, fontSize: Int) {
         fontPath := "fonts/%s.ttf" format(fontName)
-        text := GlText new(fontPath, testString, fontSize)
+        text := Text new(fontPath, testString, fontSize)
         text color set!(Color black())
         text pos set!(pos)
 
         size := text size
 
-        rect := GlRectangle new(vec2(text size x, 2))
+        rect := Rectangle new(vec2(text size x, 2))
         rect pos set!(text pos sub(0, 2))
         rect color set!(Color new(150, 40, 40))
         rect center = false
