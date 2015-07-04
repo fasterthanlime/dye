@@ -15,10 +15,10 @@ Cube: class extends Drawable {
     vao: VAO
 
     vbo: FloatVBO
-    ebo: UShortVBO
+    ebo: UIntVBO
 
     vertices: Float[]
-    indices: UShort[]
+    indices: UInt[]
 
     rotateX := 0.0f
     rotateY := 0.0f
@@ -28,7 +28,7 @@ Cube: class extends Drawable {
 
     init: func {
         vbo = FloatVBO new()
-        ebo = UShortVBO new()
+        ebo = UIntVBO new()
         rebuild()
         setProgram(ShaderLoader load("dye/solid_3d"))
     }
@@ -86,7 +86,7 @@ Cube: class extends Drawable {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
         glEnable(GL_DEPTH_TEST)
-        glDrawElements(GL_TRIANGLES, indices length, GL_UNSIGNED_SHORT, 0 as Pointer)
+        glDrawElements(GL_TRIANGLES, indices length, GL_UNSIGNED_INT, 0 as Pointer)
         glDisable(GL_DEPTH_TEST)
 
         vao detach()
