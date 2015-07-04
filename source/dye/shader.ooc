@@ -184,7 +184,7 @@ ShaderLoader: class {
 
     addBuiltin: static func (name, vert, frag: String) {
         builtinCache put(name, ShaderPair new(vert, frag))
-        Shader logger debug("Registered #{name}")
+        Shader logger info("Registered built-in #{name}")
     }
 
     // program
@@ -202,7 +202,7 @@ ShaderLoader: class {
         for (searchPath in searchPaths) {
             file := File new(searchPath, path)
             if (file exists?()) {
-                Shader logger debug("Found #{name} in #{file path}")
+                Shader logger info("Loading shader from file #{file path}")
                 return file read()
             }
         }
@@ -211,6 +211,7 @@ ShaderLoader: class {
 
         pair := builtinCache get(name)
         if (pair) {
+            Shader logger info("Using built-in shader #{name}")
             match ext {
                 case "vert" =>
                     return pair vert
