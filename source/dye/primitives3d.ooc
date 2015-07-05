@@ -86,11 +86,18 @@ Cube: class extends Drawable {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
         glEnable(GL_DEPTH_TEST)
+
+        drawBetween()
         glDrawElements(GL_TRIANGLES, indices length, GL_UNSIGNED_INT, 0 as Pointer)
+
         glDisable(GL_DEPTH_TEST)
 
         vao detach()
         program detach()
+    }
+
+    drawBetween: func {
+        // override
     }
 
     rebuild: func {

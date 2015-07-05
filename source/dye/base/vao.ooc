@@ -32,10 +32,16 @@ VAO: class {
         glBindVertexArray(id)
     }
 
-    add: func (vbo: VBO, name: String, numComponents: Int, type: GLenum,
+    add: func (vbo: VBO, name: String, size: Int, type: GLenum,
         normalized: Bool, stride: Int, pointer: Pointer) {
 
-        add(VertexAttribInfo new(program, vbo, name, numComponents, type, normalized, stride, pointer))
+        add(VertexAttribInfo new(program, vbo, name, size, type, normalized, stride, pointer))
+    }
+
+    addI: func (vbo: VBO, name: String, size: Int, type: GLenum,
+        stride: Int, pointer: Pointer) {
+
+        add(VertexAttribIInfo new(program, vbo, name, size, type, stride, pointer))
     }
 
     add: func ~vai (vai: VertexAttribInfo) {
@@ -50,9 +56,6 @@ VAO: class {
 
 /**
  * Where we store the data for a vertex attrib info.
- *
- * If using SoftVAO, it'll be used each time it's bound.
- * If using HardVAO, it'll be used only once, at creation.
  */
 VertexAttribInfo: class {
 
@@ -61,13 +64,13 @@ VertexAttribInfo: class {
 
     name: String
     id: UInt
-    numComponents: Int
+    size: Int
     type: GLenum
     normalized: Bool
     stride: Int
     pointer: Pointer
 
-    init: func (=program, =vbo, =name, =numComponents, =type, =normalized, =stride, =pointer) {
+    init: func (=program, =vbo, =name, =size, =type, =normalized, =stride, =pointer) {
         id = glGetAttribLocation(program id, name toCString())
         bind()
     }
@@ -75,7 +78,29 @@ VertexAttribInfo: class {
     bind: func {
         vbo bind()
         glEnableVertexAttribArray(id)
-        glVertexAttribPointer(id, numComponents, type, normalized, stride, pointer)
+        glVertexAttribPointer(id, size, type, normalized, stride, pointer)
+    }
+
+    detach: func {
+        glDisableVertexAttribArray(id)
+    }
+
+}
+
+/**
+ * Where we store the data for a vertex attrib info.
+ */
+VertexAttribIInfo: class extends VertexAttribInfo {
+
+    init: func (=program, =vbo, =name, =type, =size, =stride, =pointer) {
+        id = glGetAttribLocation(program id, name toCString())
+        bind()
+    }
+
+    bind: func {
+        vbo bind()
+        glEnableVertexAttribArray(id)
+        glVertexAttribIPointerEXT(id, size, type, stride, pointer)
     }
 
     detach: func {
