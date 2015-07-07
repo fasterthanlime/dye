@@ -37,8 +37,8 @@ Rectangle: class extends Drawable {
     /* Uniforms */
     projLoc, modelLoc, colorLoc: Int
 
-    init: func (size := vec2(16, 16)) {
-        this size = size clone()
+    init: func (width := 16.0f, height := 16.0f) {
+        size = (width, height) as Vec2
         vbo = FloatVBO new()
         rebuild()
         setProgram(ShaderLoader load("dye/solid_2d"))
@@ -115,7 +115,7 @@ Rectangle: class extends Drawable {
             0.0, size y,
             size x, size y
         ]
-        oldSize set!(size)
+        oldSize = size
 
         vbo upload(vertices)
     }

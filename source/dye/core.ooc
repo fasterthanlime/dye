@@ -108,7 +108,7 @@ Context: class {
 
         input = SdlInput new(this)
         input onWindowSizeChange(|x, y|
-            windowSize set!(x, y)
+            windowSize = vec2i(x, y)
         )
 
         initGL()
@@ -136,7 +136,7 @@ Context: class {
         if (fullscreen) {
             x, y: Int
             SDL getWindowSize(window, x&, y&)
-            windowSize set!(x, y)
+            windowSize = (x, y) as Vec2i
             setShowCursor(false)
         } else {
             SDL setWindowSize(window, size x, size y)

@@ -43,14 +43,14 @@ FontTest: class extends App {
     addText: func (fontName: String, pos: Vec2, fontSize: Int) {
         fontPath := "fonts/%s.ttf" format(fontName)
         text := Text new(fontPath, testString, fontSize)
-        text color set!(Color black())
-        text pos set!(pos)
+        text color = Color black()
+        text pos = pos
 
         size := text size
 
-        rect := Rectangle new(vec2(text size x, 2))
-        rect pos set!(text pos sub(0, 2))
-        rect color set!(Color new(150, 40, 40))
+        rect := Rectangle new(text size x, 2)
+        rect pos = text pos sub(0, 2)
+        rect color = Color new(150, 40, 40)
         rect center = false
 
         dye add(rect)

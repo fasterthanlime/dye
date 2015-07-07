@@ -150,7 +150,7 @@ WindowPass: class extends Pass {
             // target thinner than window (pillarbox)
             targetSize x = windowSize y / ratio
             targetSize y = windowSize y
-            sprite scale set!(targetRatio / ratio, 1.0f)
+            sprite scale = (targetRatio / ratio, 1.0f) as Vec2
 
             targetOffset x = ((size y / targetRatio) - size x) * 0.5 * sprite scale x
             targetOffset y = 0.0f
@@ -158,13 +158,13 @@ WindowPass: class extends Pass {
             // target wider than window (letterbox)
             targetSize x = windowSize x
             targetSize y = windowSize x * ratio
-            sprite scale set!(1.0f, ratio / targetRatio)
+            sprite scale = (1.0f, ratio / targetRatio) as Vec2
 
             targetOffset x = 0.0f
             targetOffset y = ((size x * targetRatio) - size y) * 0.5 * sprite scale y
         }
 
-        sprite pos set!(targetOffset x, targetOffset y)
+        sprite pos = targetOffset
     }
 
 }

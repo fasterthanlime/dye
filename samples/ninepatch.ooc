@@ -29,12 +29,12 @@ NinePatchTest: class extends App {
         patch right = patchSide
         patch outerWidth  = 64
         patch outerHeight = 64
-        patch pos set!(padding, padding)
+        patch pos = (padding, padding) as Vec2
         dye add(patch)
 
         sprite = Sprite new("images/button-patch.png")
         sprite center = false
-        sprite pos set!(padding + 256, padding)
+        sprite pos = (padding + 256, padding) as Vec2
         dye add(sprite)
     }
 
@@ -43,7 +43,7 @@ NinePatchTest: class extends App {
         patch outerWidth  = size x
         patch outerHeight = size y
 
-        sprite scale set!(size x / sprite w, size y / sprite h)
+        sprite scale = (size x / sprite w, size y / sprite h) as Vec2
     }
 
 }

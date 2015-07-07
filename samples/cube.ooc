@@ -16,21 +16,21 @@ SpriteTest: class extends App {
     }
 
     setup: func {
-        sprite := Sprite new("ship.png")
+        sprite := Sprite new("images/ship.png")
         sprite center = false
-        sprite pos set!(dye center add(120, 0))
+        sprite pos = dye center add(120, 0)
         sprite center = true
         dye add(sprite)
 
-        square := Rectangle new(vec2(1, 1))
-        square scale set!(80, 80)
-        square pos set!(dye center sub(120, 0))
+        square := Rectangle new(1, 1)
+        square scale = (80, 80) as Vec2
+        square pos = dye center sub(120, 0)
         square center = true
         dye add(square)
 
         cube = Cube new()
-        cube scale set!(40, 40)
-        cube pos set!(dye center)
+        cube scale = (40, 40) as Vec2
+        cube pos = dye center
         dye add(cube)
     }
 
@@ -39,10 +39,6 @@ SpriteTest: class extends App {
         factor := 0.01
         cube rotateX = -mp y * factor
         cube rotateY = -mp x * factor
-
-        // s := mp x * 0.3
-        // cube angle = s
-        // cube pos set!(mp)
     }
 
 }

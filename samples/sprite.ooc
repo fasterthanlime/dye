@@ -15,14 +15,14 @@ SpriteTest: class extends App {
 
     setup: func {
         {
-            sprite := GlSprite new("ship.png")
-            sprite pos set!(200, 200)
+            sprite := Sprite new("images/ship.png")
+            sprite pos = vec2(200, 200)
             dye add(sprite)
         }
 
         {
-            sprite := GlSprite new("ship.png")
-            sprite pos set!(400, 200)
+            sprite := Sprite new("images/ship.png")
+            sprite pos = vec2(400, 200)
             sprite color set!(Color green())
             dye add(sprite)
         }

@@ -71,7 +71,7 @@ Text: class extends Geometry {
                     tempAABB add!(pen)
                     aabb expand!(tempAABB)
 
-                    pen add!(glyph advance)
+                    pen = pen add(glyph advance)
             }
         )
 
@@ -144,7 +144,7 @@ Text: class extends Geometry {
                             (node height - 1) as Float / font bin binHeight as Float
                         )
 
-                        pen add!(glyph advance x, glyph advance y)
+                        pen = pen add(glyph advance)
                 }
             )
         )

@@ -24,7 +24,7 @@ MouseTest: class extends App {
     }
 
     update: func {
-        crosshair pos set!(dye input mousepos)
+        crosshair pos = dye input mousepos
     }
 
 }

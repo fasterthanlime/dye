@@ -453,7 +453,7 @@ SdlInput: class extends Input {
     }
 
     _mouseMoved: func (x, y, xrel, yrel: Int) {
-        _mousepos set!(translateMousePos(x, y))
+        _mousepos = translateMousePos(x, y)
         rel := scaleMouseDiff(xrel as Float, yrel as Float)
         _notifyListeners(MouseMotion new(getMousePos(), rel))
     }

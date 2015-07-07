@@ -25,7 +25,7 @@ CairoStarTest: class extends App {
 
     setup: func {
         sprite := Sprite new("images/ship.png")
-        sprite pos set!(10, 10)
+        sprite pos = (10, 10) as Vec2
         dye add(sprite)
 
         canvas = Canvas new(dye width, dye height)

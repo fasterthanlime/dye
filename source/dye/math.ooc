@@ -7,45 +7,38 @@ EPSILON := 0.001
 /**
  * A 2-dimensional floating point vector
  */
-Vec2: class {
+Vec2: cover {
 
     x, y: Float
 
-    init: func (=x, =y)
-
     norm: func -> Float {
-        sqrt(squaredNorm())
+        sqrt(x * x + y * y)
     }
 
     neg: func -> This {
-        new(-x, -y)
+        (-x, -y) as This
     }
 
     squaredNorm: func -> Float {
         x * x + y * y
     }
 
-    normalize!: func {
-        n := norm()
-        if (n == 0.0) return // better 0 than NaN
-        mul!(1.0 / n)
-    }
-
-    normalized: func -> This {
-        v := clone()
-        v normalize!()
-        v
+    normalize: func -> This {
+        n := sqrt(x * x + y * y)
+        if (n == 0.0) return this
+        (x / n, y / n) as This
     }
 
     dist: func (v: This) -> Float {
-        v sub(this) norm()
+        diff := (v x - x, v y - y) as This
+        sqrt(diff x * diff x + diff y * diff y)
     }
 
     /**
      * Unit vector that has a certain angle - in radians
      */
     fromAngle: static func (radians: Float) -> This {
-        new(cos(radians), sin(radians))
+        (cos(radians), sin(radians)) as This
     }
 
     /**
@@ -59,38 +52,12 @@ Vec2: class {
         angle
     }
 
-    clone: func -> This { new(x, y) }
-
     mul: func (f: Float) -> This {
-        c := clone()
-        c mul!(f)
-        c
-    }
-
-    mul!: func (f: Float) {
-        x *= f
-        y *= f
+        (x * f, y * f) as This
     }
 
     mul: func ~vec (v: This) -> This {
-        c := clone()
-        c mul!(v)
-        c
-    }
-
-    mul!: func ~vec (v: This) {
-        x *= v x
-        y *= v y
-    }
-
-    set!: func ~self (v: This) {
-        x = v x
-        y = v y
-    }
-
-    set!: func (px, py: Float) {
-        x = px
-        y = py
+        (x * v x, y * v y) as This
     }
 
     zero?: func -> Bool {
@@ -105,84 +72,56 @@ Vec2: class {
         ix := ceil(- 0.5 + (x / size as Float)) * size
         iy := ceil(- 0.5 + (y / size as Float)) * size
 
-        vec2(ix, iy)
-    }
-
-    snap!: func (size: Int) {
-        set!(snap(size))
+        (ix, iy) as This
     }
 
     snap: func ~rect (size: This, gridSize: Int) -> This {
-        halfSize := vec2(size x * 0.5, - size y * 0.5)
-        vec2(this sub(halfSize) snap(gridSize) add(halfSize))
+        halfSize := (size x * 0.5, - size y * 0.5) as This
+        diff := (x - halfSize x, y - halfSize y) as This
+        snapped := diff snap(gridSize)
+        (snapped x + halfSize x, snapped y + halfSize y) as This
     }
 
     getColRow: func (gridSize: Int) -> Vec2i {
         col := ceil(- 0.5 + (x / gridSize as Float))
         row := ceil(- 0.5 + (y / gridSize as Float))
-        vec2i(col, row)
+        (col, row) as Vec2i
     }
 
     round: func -> Vec2i {
-        Vec2i new(x as Int, y as Int)
+        (x as Int, y as Int) as Vec2i
     }
 
     sub: func (v: This) -> This {
-        new(x - v x, y - v y)
-    }
-
-    sub!: func (v: This) {
-        x -= v x
-        y -= v y
-    }
-
-    sub!: func ~floats (px, py: Float) {
-        x -= px
-        y -= py
-    }
-
-    add: func (v: This) -> This {
-        new(x + v x, y + v y)
-    }
-
-    add: func ~floats (px, py: Float) -> This {
-        new(x + px, y + py)
+        (x - v x, y - v y) as This
     }
 
     sub: func ~floats (px, py: Float) -> This {
-        new(x - px, y - py)
+        (x - px, y - py) as This
     }
 
-    add!: func (v: This) {
-        x += v x
-        y += v y
+    add: func (v: This) -> This {
+        (x + v x, y + v y) as This
     }
 
-    add!: func ~floats (px, py: Float) {
-        x += px
-        y += py
+    add: func ~floats (px, py: Float) -> This {
+        (x + px, y + py) as This
     }
 
     /// Returns a perpendicular vector. (90 degree rotation)
     perp: func -> This {
-        new(-y, x)
+        (-y, x) as This
     }
 
     /// Returns a perpendicular vector. (-90 degree rotation)
     rperp: func -> This {
-        new(-y, x)
+        (-y, x) as This
     }
 
-    projected: func (v: This) -> This {
-        p := clone()
-        p project!(v)
-        p
-    }
-
-    project!: func (v: This) {
-        v = v normalized()
+    project: func (v: This) -> This {
+        v = v normalize()
         d := dot(v)
-        (x, y) = (v x * d, v y * d)
+        (v x * d, v y * d) as This
     }
 
     dot: func (v: This) -> Float {
@@ -194,35 +133,23 @@ Vec2: class {
     }
 
     lerp: func (target: This, alpha: Float) -> Vec2 {
-        c := clone()
-        c lerp!(target, alpha)
-        c
+        (x * (1 - alpha) + target x * alpha,
+         y * (1 - alpha) + target y * alpha) as This
     }
 
-    lerp!: func (target: This, alpha: Float) {
-        (x, y) = (x * (1 - alpha) + target x * alpha,
-                  y * (1 - alpha) + target y * alpha)
+    lerpX: func (target: Float, alpha: Float) -> This {
+        (x * (1 - alpha) + target * alpha, y) as This
     }
 
-    lerpX!: func (target: Float, alpha: Float) {
-        x = x * (1 - alpha) + target * alpha
-    }
-
-    lerpY!: func (target: Float, alpha: Float) {
-        y = y * (1 - alpha) + target * alpha
+    lerpY: func (target: Float, alpha: Float) -> This {
+        (x, y * (1 - alpha) + target * alpha) as This
     }
 
     clamp: func (bottomLeft, topRight: Vec2) -> This {
-        v := vec2(this)
-        v clamp!(bottomLeft, topRight)
-        v
-    }
-
-    clamp!: func (bottomLeft, topRight: Vec2) {
-        set!(
+        (
             x clamp(bottomLeft x, topRight x),
             y clamp(bottomLeft y, topRight y)
-        )
+        ) as This
     }
 
     inside?: func (bottomLeft, topRight: Vec2) -> Bool {
@@ -253,17 +180,11 @@ Vec2: class {
         x == v x && y == v y
     }
 
-    toVec2i: func -> Vec2i {
-        vec2i(x, y)
-    }
-
 }
 
 // cuz I'm lazy
-vec2: func (x, y: Float) -> Vec2 { Vec2 new(x, y) }
-vec2: func ~square (xy: Float) -> Vec2 { Vec2 new(xy, xy) }
-vec2: func ~clone (v: Vec2) -> Vec2 { Vec2 new(v x, v y) }
-vec: func ~two (x, y: Float) -> Vec2 { Vec2 new(x, y) }
+vec2: func (x, y: Float) -> Vec2 { (x, y) as Vec2 }
+vec2: func ~square (xy: Float) -> Vec2 { (xy, xy) as Vec2 }
 
 /**
  * A 3-dimensional vector class with a few
@@ -271,11 +192,9 @@ vec: func ~two (x, y: Float) -> Vec2 { Vec2 new(x, y) }
  *
  * I've never been good at math
  */
-Vec3: class {
+Vec3: cover {
 
     x, y, z: Float
-
-    init: func (=x, =y, =z)
 
     norm: func -> Float {
         sqrt(squaredNorm())
@@ -285,32 +204,10 @@ Vec3: class {
         x * x + y * y + z * z
     }
 
-    set!: func ~self (v: This) {
-        x = v x
-        y = v y
-        z = v z
-    }
-
-    set!: func ~vec2 (v: Vec2) {
-        x = v x
-        y = v y
-    }
-
-    set!: func (px, py, pz: Float) {
-        x = px
-        y = py
-        z = pz
-    }
-
-    set!: func ~twofloats (px, py: Float) {
-        x = px
-        y = py
-    }
-
-    lerp!: func (target: This, alpha: Float) {
-        (x, y, z) = (x * (1 - alpha) + target x * alpha,
-                     y * (1 - alpha) + target y * alpha,
-                     z * (1 - alpha) + target z * alpha)
+    lerp: func (target: This, alpha: Float) -> This {
+        (x * (1 - alpha) + target x * alpha,
+         y * (1 - alpha) + target y * alpha,
+         z * (1 - alpha) + target z * alpha) as This
     }
 
     toString: func -> String {
@@ -335,76 +232,38 @@ Vec3: class {
 }
 
 // cuz I'm lazy (number two)
-vec3: func (x, y, z: Float) -> Vec3 { Vec3 new(x, y, z) }
+vec3: func (x, y, z: Float) -> Vec3 { (x, y, z) as Vec3 }
 
-Vec2i: class {
+Vec2i: cover {
 
     x, y: Int
-
-    init: func (=x, =y)
-
-    clone: func -> This { new(x, y) }
 
     equals?: func (v: This) -> Bool {
         (x == v x && y == v y)
     }
 
-    set!: func ~twoints (x, y: Int) {
-        this x = x
-        this y = y
-    }
-
-    set!: func ~vec2i (v: This) {
-        this x = v x
-        this y = v y
-    }
-
     div: func (i: Int) -> This {
-        new(x / i, y / i)
-    }
-
-    add!: func ~ints (x, y: Int) {
-        this x += x
-        this y += y
-    }
-
-    add!: func ~vec2i (v: This) {
-        this x += v x
-        this y += v y
+        (x / i, y / i) as This
     }
 
     add: func ~ints (x, y: Int) -> This {
-        new(this x + x, this y + y)
+        (this x + x, this y + y) as This
     }
 
     add: func ~vec2i (v: This) -> This {
-        new(this x + v x, this y + v y)
+        (this x + v x, this y + v y) as This
     }
 
     add: func ~vec2 (v: Vec2) -> Vec2 {
-        vec2(v x + x as Float, v y + y as Float)
+        (v x + x as Float, v y + y as Float) as Vec2
     }
 
     mul: func (f: Int) -> This {
-        c := clone()
-        c mul!(f)
-        c
-    }
-
-    mul!: func (f: Int) {
-        x *= f
-        y *= f
+        (x * f, y * f) as This
     }
 
     mul: func ~vec (v: This) -> This {
-        c := clone()
-        c mul!(v)
-        c
-    }
-
-    mul!: func ~vec (v: This) {
-        x *= v x
-        y *= v y
+        (x * v x, y * v y) as This
     }
 
     toString: func -> String {
@@ -412,21 +271,21 @@ Vec2i: class {
     }
 
     toVec2: func -> Vec2 {
-        vec2(x, y)
+        (x as Float, y as Float) as Vec2
     }
 
     /**
-     * :return: the y / x ratio, as Float
+     * @return the y / x ratio, as Float
      */
     ratio: func -> Float {
         y as Float / x as Float
     }
 
     clamp: func (bottomLeft, topRight: Vec2i) -> This {
-        vec2i(
+        (
             x clamp(bottomLeft x, topRight x),
             y clamp(bottomLeft y, topRight y)
-        )
+        ) as This
     }
 
     _: String { get { toString() } }
@@ -437,8 +296,8 @@ operator == (v1, v2: Vec2i) -> Bool {
     v1 equals?(v2)
 }
 
-vec2i: func ~ints (x, y: Int) -> Vec2i { Vec2i new(x, y) }
-vec2i: func ~vec2i (v: Vec2i) -> Vec2i { Vec2i new(v x, v y) }
+vec2i: func ~ints (x, y: Int) -> Vec2i { (x, y) as Vec2i }
+vec2i: func ~vec2i (v: Vec2i) -> Vec2i { (v x, v y) as Vec2i }
 
 extend Float {
 

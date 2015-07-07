@@ -18,9 +18,9 @@ GridSpriteTest: class extends App {
 
     setup: func {
         sprite = GridSprite new("images/grid.png", 4, 4)
-        sprite pos set!(dye center)
+        sprite pos = dye center
         sprite center = true
-        sprite scale set!(10, 10)
+        sprite scale = (10, 10) as Vec2
         dye add(sprite)
     }
 
