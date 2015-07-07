@@ -27,6 +27,10 @@ Cube: class extends Drawable {
     projLoc, modelLoc, colorLoc: Int
 
     init: func {
+        firstBuild()
+    }
+
+    firstBuild: func {
         vbo = FloatVBO new()
         ebo = UIntVBO new()
         rebuild()

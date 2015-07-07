@@ -35,7 +35,7 @@ VAO: class {
     add: func (vbo: VBO, name: String, size: Int, type: GLenum,
         normalized: Bool, stride: Int, pointer: Pointer) {
 
-        add(VertexAttribInfo new(program, vbo, name, size, type, normalized, stride, pointer))
+        add(VertexAttribFInfo new(program, vbo, name, size, type, normalized, stride, pointer))
     }
 
     addI: func (vbo: VBO, name: String, size: Int, type: GLenum,
@@ -54,23 +54,14 @@ VAO: class {
     }
 }
 
-/**
- * Where we store the data for a vertex attrib info.
- */
-VertexAttribInfo: class {
+VertexAttribInfo: abstract class {
 
     program: ShaderProgram
     vbo: VBO
-
     name: String
     id: UInt
-    size: Int
-    type: GLenum
-    normalized: Bool
-    stride: Int
-    pointer: Pointer
 
-    init: func (=program, =vbo, =name, =size, =type, =normalized, =stride, =pointer) {
+    init: func (=program, =vbo, =name) {
         id = glGetAttribLocation(program id, name toCString())
         bind()
     }
@@ -78,7 +69,6 @@ VertexAttribInfo: class {
     bind: func {
         vbo bind()
         glEnableVertexAttribArray(id)
-        glVertexAttribPointer(id, size, type, normalized, stride, pointer)
     }
 
     detach: func {
@@ -90,21 +80,44 @@ VertexAttribInfo: class {
 /**
  * Where we store the data for a vertex attrib info.
  */
-VertexAttribIInfo: class extends VertexAttribInfo {
+VertexAttribFInfo: class extends VertexAttribInfo {
 
-    init: func (=program, =vbo, =name, =type, =size, =stride, =pointer) {
-        id = glGetAttribLocation(program id, name toCString())
-        bind()
+    size: Int
+    type: GLenum
+    normalized: Bool
+    stride: Int
+    pointer: Pointer
+
+    init: func (.program, .vbo, .name,
+            =size, =type, =normalized, =stride, =pointer) {
+        super(program, vbo, name)
     }
 
     bind: func {
-        vbo bind()
-        glEnableVertexAttribArray(id)
-        glVertexAttribIPointerEXT(id, size, type, stride, pointer)
+        super()
+        glVertexAttribPointer(id, size, type, normalized, stride, pointer)
     }
 
-    detach: func {
-        glDisableVertexAttribArray(id)
+}
+
+/**
+ * Where we store the data for a vertex attrib info.
+ */
+VertexAttribIInfo: class extends VertexAttribInfo {
+
+    size: Int
+    type: GLenum
+    stride: Int
+    pointer: Pointer
+
+    init: func (.program, .vbo, .name,
+            =size, =type, =stride, =pointer) {
+        super(program, vbo, name)
+    }
+
+    bind: func {
+        super()
+        glVertexAttribIPointerEXT(id, size, type, stride, pointer)
     }
 
 }

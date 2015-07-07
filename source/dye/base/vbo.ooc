@@ -2,7 +2,7 @@
 // third-party stuff
 import sdl2/[OpenGL]
 
-VBO: abstract class {
+VBO: class {
 
     id: UInt
     target := GL_ARRAY_BUFFER // most common VBO type
