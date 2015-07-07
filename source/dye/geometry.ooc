@@ -94,7 +94,7 @@ Geometry: class extends SpriteLike {
         mv := computeModelView(modelView)
 
         if (round) {
-            mv round!()
+            mv = mv round()
         }
 
         draw(pass, mv)
@@ -108,8 +108,8 @@ Geometry: class extends SpriteLike {
         texture bind()
         glUniform1i(texLoc, 0)
 
-        glUniformMatrix4fv(projLoc, 1, false, pass projectionMatrix pointer)
-        glUniformMatrix4fv(modelLoc, 1, false, modelView pointer)
+        glUniformMatrix4fv(projLoc, 1, false, (pass projectionMatrix&) as Pointer)
+        glUniformMatrix4fv(modelLoc, 1, false, modelView& as Pointer)
 
         // premultiply color by opacity
         glUniform4f(colorLoc,

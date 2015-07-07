@@ -57,7 +57,7 @@ Sprite: class extends Geometry {
         }
 
         if (round) {
-            mv round!()
+            mv = mv round()
         }
         draw(pass, mv)
     }
@@ -174,8 +174,9 @@ NinePatch: class extends Geometry {
         }
 
         if (round) {
-            mv round!()
+            mv = mv round()
         }
+
         draw(pass, mv)
     }
 

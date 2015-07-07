@@ -7,8 +7,6 @@ import sdl2/OpenGL
  */
 Pass: abstract class {
 
-    identity := static Matrix4 newIdentity()
-
     // clears before drawing?
     clears := true
 
@@ -48,7 +46,7 @@ Pass: abstract class {
         glEnable(GL_BLEND)
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
-        group render(this, identity)
+        group render(this, Matrix4 identity)
 
         glDisable(GL_BLEND)
     }

@@ -268,13 +268,7 @@ Drawable: abstract class {
      * Recompute modelView matrix
      */
     computeModelView: func (input: Matrix4) -> Matrix4 {
-        modelView: Matrix4
-
-        if (input) {
-            modelView = input
-        } else {
-            modelView = Matrix4 newIdentity()
-        }
+        modelView := input
 
         if (pos x != 0.0 || pos y != 0.0) {
             modelView = modelView * Matrix4 newTranslate(pos x, pos y, 0.0)

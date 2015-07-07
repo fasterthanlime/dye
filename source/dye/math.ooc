@@ -2,10 +2,10 @@
 // libs deps
 import math
 
-EPSILON := 0.001
+EPSILON := 0.001f
 
 /**
- * A 2-dimensional floating point vector
+ * A 2-dimensional float point vector
  */
 Vec2: cover {
 
@@ -182,15 +182,12 @@ Vec2: cover {
 
 }
 
-// cuz I'm lazy
+// shortcuts (performance penalty)
 vec2: func (x, y: Float) -> Vec2 { (x, y) as Vec2 }
 vec2: func ~square (xy: Float) -> Vec2 { (xy, xy) as Vec2 }
 
 /**
- * A 3-dimensional vector class with a few
- * utility things.
- *
- * I've never been good at math
+ * A 3-dimensional float vector
  */
 Vec3: cover {
 
@@ -231,7 +228,7 @@ Vec3: cover {
 
 }
 
-// cuz I'm lazy (number two)
+// shortcuts (performance penalty)
 vec3: func (x, y, z: Float) -> Vec3 { (x, y, z) as Vec3 }
 
 Vec2i: cover {
@@ -296,9 +293,13 @@ operator == (v1, v2: Vec2i) -> Bool {
     v1 equals?(v2)
 }
 
+// shortcuts (performance penalty)
 vec2i: func ~ints (x, y: Int) -> Vec2i { (x, y) as Vec2i }
 vec2i: func ~vec2i (v: Vec2i) -> Vec2i { (v x, v y) as Vec2i }
 
+/**
+ * Extend float with angle conversion routines, clamping/repetition, lerping
+ */
 extend Float {
 
     toRadians: func -> This {
@@ -366,6 +367,9 @@ extend Float {
 
 }
 
+/**
+ * Extend Int with repeat/clamp/next power of two
+ */
 extend Int {
 
     repeat: func (min, max: This) -> This {
@@ -426,57 +430,44 @@ extend Int {
 /**
  * A 4x4 matrix, mostly used for transformations
  */
-Matrix4: class {
+Matrix4: cover {
 
     /** 16 floats, column-major format */
-    values: Float[]
 
-    /**
-     * Initialize from a 16-floats array
-     */
-    init: func (=values) {
-        _checkSize(values)
-    }
+    a1, a2, a3, a4: Float
+    b1, b2, b3, b4: Float
+    c1, c2, c3, c4: Float
+    d1, d2, d3, d4: Float
 
     transpose: func -> This {
-        new([
-            values[ 0], values[ 4], values[ 8], values[12]
-            values[ 1], values[ 5], values[ 9], values[13]
-            values[ 2], values[ 6], values[10], values[14]
-            values[ 3], values[ 7], values[11], values[15]
-        ])
-    }
-
-    get: func (column, row: Int) -> Float {
-        values[column * 4 + row]
-    }
-
-    set: func (column, row: Int, value: Float) {
-        values[column * 4 + row] = value
+        (
+            a1, b1, c1, d1, 
+            a2, b2, c2, d2, 
+            a3, b3, c3, d3, 
+            a4, b4, c4, d4
+        ) as This
     }
 
     /**
-     * Create a new identity matrix
+     * The identity matrix
      */
-    newIdentity: static func -> This {
-        new([
-            1.0f, 0.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f
-        ])
-    }
+    identity := static (
+        1.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    ) as This
 
     /**
      * Create a new translation matrix
      */
     newTranslate: static func (x, y, z: Float) -> This {
-        new([
+        (
             1.0f,   0.0f,   0.0f,   0.0f,
             0.0f,   1.0f,   0.0f,   0.0f,
             0.0f,   0.0f,   1.0f,   0.0f,
             x,      y,      z,      1.0f
-        ])
+        ) as This
     }
 
     /**
@@ -494,12 +485,12 @@ Matrix4: class {
         c := a cos()
         s := a sin()
 
-        new([
+        (
             1.0f,   0.0f,   0.0f,   0.0f,
             0.0f,   c,      s,      0.0f,
             0.0f,  -s,      c,      0.0f,
             0.0f,   0.0f,   0.0f,   1.0f
-        ])
+        ) as This
     }
 
     /**
@@ -517,12 +508,12 @@ Matrix4: class {
         c := a cos()
         s := a sin()
 
-        new([
+        (
             c,      0.0f,  -s,      0.0f,
             0.0f,   1.0f,   0.0f,   0.0f,
             s,      0.0f,   c,      0.0f,
             0.0f,   0.0f,   0.0f,   1.0f
-        ])
+        ) as This
     }
 
     /**
@@ -540,12 +531,12 @@ Matrix4: class {
         c := a cos()
         s := a sin()
 
-        new([
+        (
              c,     s,      0.0f,   0.0f,
             -s,     c,      0.0f,   0.0f,
             0.0f,   0.0f,   1.0f,   0.0f,
             0.0f,   0.0f,   0.0f,   1.0f
-        ])
+        ) as This
     }
 
     /**
@@ -559,12 +550,12 @@ Matrix4: class {
          * ie. m transposed() == m
          */
 
-        new([
+        (
             x,    0.0f, 0.0f, 0.0f
             0.0f, y,    0.0f, 0.0f
             0.0f, 0.0f, z,    0.0f
             0.0f, 0.0f, 0.0f, 1.0f
-        ])
+        ) as This
     }
 
     /**
@@ -585,12 +576,12 @@ Matrix4: class {
          *
          * Converted by hand to column-major
          */
-        new([
+        (
             2.0f / w,       0.0f,            0.0f,          0.0f,
             0.0f,           2.0f / h,        0.0f,          0.0f,
             0.0f,           0.0f,           -2.0f / d,      0.0f,
             ((r + l) / -w), ((t + b) / -h), ((f + n) / -d), 1.0f
-        ])
+        ) as This
     }
 
     /**
@@ -611,12 +602,12 @@ Matrix4: class {
          *
          * Converted by hand to column-major
          */
-        new([
+        (
             2 * n / w,     0.0f,                     0.0f,           0.0f,
             0.0f,          2 * n / h,                0.0f,           0.0f,
             (r + l) / w,   (t + b) / h,      (f + n) / -d,          -1.0f,
             0.0f,          0.0f,        -2.0f * f * n / d,           0.0f
-        ])
+        ) as This
     }
 
     /**
@@ -625,13 +616,11 @@ Matrix4: class {
      * This is a naive, unoptimized, O(n^3) function.
      */
     mul: final func (m2: This) -> This {
-        m1 := this
+        result: This
 
-        result := Float[16] new()
-
-        m1v := m1 values data as Float*
-        m2v := m2 values data as Float*
-        rev := result data as Float*
+        m1v := this& as Float*
+        m2v := m2& as Float*
+        rev := result& as Float*
 
         for (col in 0..4) {
             fourcol := col * 4
@@ -644,49 +633,27 @@ Matrix4: class {
             }
         }
 
-        new(result)
-    }
-
-    /**
-     * Return a pointer to the raw data - suitable to be passed
-     * as an OpenGL uniform, for example.
-     */
-    pointer: Float* {
-        get {
-            values data
-        }
-    }
-
-    rowToString: func (i: Int) -> String {
-        "[%5.5f, %5.5f, %5.5f, %5.5f]" format(values[i], values[i + 4], values[i + 8],  values[i + 12])
+        result
     }
 
     toString: func -> String {
-        a := rowToString(0)
-        b := rowToString(1)
-        c := rowToString(2)
-        d := rowToString(3)
-        "#{a}\n#{b}\n#{c}\n#{d}"
+        "[[#{a1}, #{a2}, #{a3}, #{a4}]\n" +
+        " [#{b1}, #{b2}, #{b3}, #{b4}]\n" +
+        " [#{c1}, #{c2}, #{c3}, #{c4}]\n" +
+        " [#{d1}, #{d2}, #{d3}, #{d4}]]"
     }
 
     _: String {
-        get {
-            toString()
-        }
+        get { toString() }
     }
 
-    _checkSize: static func (m: Float[]) {
-        if (m length != 16) {
-            MatrixException new(This name, "Matrix4 initializers should take 16 floats, not %d" \
-                format(m length)) throw()
-        }
-    }
-
-    round!: func {
-        raw := values data as Float*
-        raw[12] = raw[12] as Int
-        raw[13] = raw[13] as Int
-        raw[14] = raw[14] as Int
+    round: func -> This {
+        (
+            a1,        a2,        a3,        a4,
+            b1,        b2,        b3,        b4,
+            c1,        c2,        c3,        c4,
+            d1 as Int, d2 as Int, d3 as Int, d4
+        ) as This
     }
 
 }
@@ -906,6 +873,9 @@ Color: cover {
 
 }
 
+/**
+ * Convex polygon utilities: make sure it has the correct winding
+ */
 PolyUtils: class {
 
     sanitize: static func (vecs: Vec2*, count: Int) {
