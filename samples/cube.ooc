@@ -12,7 +12,6 @@ SpriteTest: class extends App {
 
     init: func {
         super("Cube test", 1280, 720)
-        dye setClearColor(Color new(0, 0, 0))
     }
 
     setup: func {

@@ -9,7 +9,7 @@ import dye/base/[vbo, vao]
 Cube: class extends Drawable {
 
     program: ShaderProgram
-    color := Color new(255, 0, 0)
+    color := Color red
     opacity := 1.0
 
     vao: VAO

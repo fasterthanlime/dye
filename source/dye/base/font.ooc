@@ -35,7 +35,7 @@ Font: class {
     fontPath: String
     lineHeight: Float
 
-    color := Color white()
+    color := Color white
 
     init: func (=fontSize, =fontPath) {
         if (!_ftInitialized) {
@@ -44,7 +44,15 @@ Font: class {
         }
 
         // load font
-        _ft newFace(fontPath, 0, _face&)
+        if (_ft newFace(fontPath, 0, _face&) != 0) {
+            logger warn("Could not load font (file not found): #{fontPath}")
+            atlas = GlyphAtlas new(1, 1)
+            atlas bake()
+            _face done()
+            return
+        }
+
+        logger info("Loading font at size #{fontSize}: #{fontPath}")
 
         // set the right size
         dpi := 72

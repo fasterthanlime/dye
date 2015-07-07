@@ -14,7 +14,7 @@ Pass: abstract class {
 
     size: Vec2i
     projectionMatrix: Matrix4
-    clearColor := Color new(0, 0, 0)
+    clearColor := Color black
     clearAlpha := 0.0f
     group := Group new()
     fbo: Fbo
@@ -66,7 +66,7 @@ Pass: abstract class {
  */
 TexturePass: class extends Pass {
 
-    init: func (=size) {
+    init: func (size: Vec2i) {
         super(size, Fbo new(size))
     }
 
@@ -76,9 +76,10 @@ TexturePass: class extends Pass {
         computeProjection()
         // fbo too small? resize!
         if (fbo size x < size x || fbo size y < size y) {
-            newFboSize := vec2i(_nextPo2(size x), _nextPo2(size y))
+            newW := _nextPo2(size x)
+            newH := _nextPo2(size y)
             fbo dispose()
-            fbo = Fbo new(newFboSize)
+            fbo = Fbo new((newW, newH) as Vec2i)
             resized = true
         }
 
@@ -127,7 +128,7 @@ WindowPass: class extends Pass {
     scale := 1.0
 
     init: func (=dye, .fbo) {
-        super(vec2i(dye windowSize x, dye windowSize y), fbo)
+        super(dye windowSize, fbo)
 
         sprite = Sprite new(fbo texture)
         sprite center = false

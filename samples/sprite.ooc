@@ -10,7 +10,6 @@ SpriteTest: class extends App {
 
     init: func {
         super("Sprite test", 1280, 720)
-        dye setClearColor(Color black())
     }
 
     setup: func {
@@ -23,7 +22,7 @@ SpriteTest: class extends App {
         {
             sprite := Sprite new("images/ship.png")
             sprite pos = vec2(400, 200)
-            sprite color set!(Color green())
+            sprite color = Color green
             dye add(sprite)
         }
     }

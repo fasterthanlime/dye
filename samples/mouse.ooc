@@ -13,7 +13,7 @@ MouseTest: class extends App {
     init: func {
         super("Mouse demo", 640, 480)
         dye setShowCursor(false)
-        dye setClearColor(Color new(30, 30, 30))
+        dye setClearColor(30, 30, 30)
 
         dye input onMousePress(1, |mp|
             loop running = false

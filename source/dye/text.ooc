@@ -7,9 +7,6 @@ import dye/base/[font, rectanglebinpack]
 // third-party stuff
 import sdl2/[OpenGL]
 
-use deadlogger
-import deadlogger/[Log, Logger]
-
 // sdk stuff
 import structs/HashMap
 
@@ -20,7 +17,6 @@ Text: class extends Geometry {
 
     // static stuff
     cache := static HashMap<String, Font> new()
-    logger := static Log getLogger(This name)
 
     // our font
     fontPath: String
@@ -92,7 +88,6 @@ Text: class extends Geometry {
         if (cache contains?(key)) {
             cache get(key)
         } else {
-            logger debug("Loading font %s at size %d" format(fontPath, fontSize))
             font := Font new(fontSize, fontPath)
             cache put(key, font)
             font

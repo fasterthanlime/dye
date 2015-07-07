@@ -20,7 +20,6 @@ CairoStarTest: class extends App {
 
     init: func {
         super("Cairo star test", 1280, 720)
-        dye setClearColor(Color black())
     }
 
     setup: func {

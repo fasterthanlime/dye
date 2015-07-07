@@ -34,7 +34,7 @@ App: class {
         setupLogging()
 
         dye = Context new(width, height, title, fullscreen, windowWidth, windowHeight)
-        dye setClearColor(Color black())
+        dye setClearColor(Color black)
 
         initEvents()
         setup()

@@ -210,17 +210,17 @@ Context: class {
         // SDL glSetSwapInterval(0)
 
         logger info("Size = %s, Window size = %s", size _, windowSize _)
-        mainPass = TexturePass new(size)
-        mainPass clearColor set!(72, 60, 50) // taupe!
+        mainPass = TexturePass new((size x, size y) as Vec2i)
+        mainPass clearColor = Color taupe
         windowPass = WindowPass new(this, mainPass fbo)
     }
 
     setClearColor: func (r, g, b: Int) {
-        mainPass clearColor set!(r, g, b)
+        mainPass clearColor = (r, g, b) as Color
     }
 
     setClearColor: func ~color (c: Color) {
-        mainPass clearColor set!(c)
+        mainPass clearColor = c
     }
 
     add: func (d: Drawable) {
@@ -354,7 +354,7 @@ SortedGroup: class extends Group {
  */
 SpriteLike: abstract class extends Drawable {
 
-    color := Color white()
+    color := Color white
     program: ShaderProgram
     opacity := 1.0f
     effects: ArrayList<Effect> = null

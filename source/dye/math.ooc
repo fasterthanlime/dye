@@ -873,30 +873,22 @@ AABB2i: class {
 /**
  * An RGB color
  */
-Color: class {
+Color: cover {
 
     /* r, g, b = [0, 255] UInt8 */
     r, g, b: UInt8
-    init: func (=r, =g, =b)
 
     /* R, G, B = [0.0, 1.0] Float */
     R: Float { get { r / 255.0f } }
     G: Float { get { g / 255.0f } }
     B: Float { get { b / 255.0f } }
 
-    set!: func ~self (c: This) {
-        r = c r
-        g = c g
-        b = c b
-    }
-
-    set!: func (=r, =g, =b)
-
-    black: static func -> This { new(0, 0, 0) }
-    white: static func -> This { new(255, 255, 255) }
-    red: static func -> This { new(255, 0, 0) }
-    green: static func -> This { new(0, 255, 0) }
-    blue: static func -> This { new(0, 0, 255) }
+    black := static (0, 0, 0) as This
+    white := static (255, 255, 255) as This
+    red := static (255, 0, 0) as This
+    green := static (0, 255, 0) as This
+    blue := static (0, 0, 255) as This
+    taupe := static (72, 60, 50) as This
 
     toString: func -> String {
         "(%d, %d, %d)" format(r, g, b)
@@ -905,11 +897,11 @@ Color: class {
     _: String { get { toString() } }
 
     lighten: func (factor: Float) -> This {
-        new(r as Float / factor, g as Float / factor, b as Float / factor)
+        (r as Float / factor, g as Float / factor, b as Float / factor) as This
     }
 
     mul: func (factor: Float) -> This {
-        new(r * factor, g * factor, b * factor)
+        (r * factor, g * factor, b * factor) as This
     }
 
 }
@@ -932,7 +924,7 @@ PolyUtils: class {
 
         if (!valid) {
             // reveeeeeeeeerse o/
-            bytes := Pointer size * count
+            bytes := Vec2 size * count
             copy := gc_malloc(bytes) as Vec2*
             memcpy(copy, vecs, bytes)
 

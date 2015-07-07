@@ -12,7 +12,7 @@ FontTest: class extends App {
 
     init: func {
         super("Font test", 1280, 768)
-        dye setClearColor(Color white())
+        dye setClearColor(Color white)
     }
 
     setup: func {
@@ -43,14 +43,14 @@ FontTest: class extends App {
     addText: func (fontName: String, pos: Vec2, fontSize: Int) {
         fontPath := "fonts/%s.ttf" format(fontName)
         text := Text new(fontPath, testString, fontSize)
-        text color = Color black()
+        text color = Color black
         text pos = pos
 
         size := text size
 
         rect := Rectangle new(text size x, 2)
         rect pos = text pos sub(0, 2)
-        rect color = Color new(150, 40, 40)
+        rect color = (150, 40, 40) as Color
         rect center = false
 
         dye add(rect)

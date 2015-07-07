@@ -16,7 +16,7 @@ NinePatchTest: class extends App {
     init: func {
         super("NinePatch test", 1280, 720)
         Drawable round = true
-        dye setClearColor(Color new(20, 20, 20))
+        dye setClearColor(20, 20, 20)
     }
 
     setup: func {

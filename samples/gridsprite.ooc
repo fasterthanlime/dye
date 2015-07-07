@@ -13,7 +13,6 @@ GridSpriteTest: class extends App {
 
     init: func {
         super("Grid sprite test", 1280, 720)
-        dye setClearColor(Color black())
     }
 
     setup: func {

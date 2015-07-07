@@ -16,7 +16,6 @@ TriGeomTest: class extends App {
 
     init: func {
         super("TriGeom test", 1280, 768)
-        dye setClearColor(Color black())
     }
 
     setup: func {

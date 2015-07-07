@@ -16,7 +16,7 @@ Rectangle: class extends Drawable {
 
     EPSILON := 0.1
 
-    color := Color green()
+    color := Color green
     opacity := 1.0
 
     center := true
@@ -132,7 +132,7 @@ Poly: class extends Drawable {
 
     EPSILON := 0.1
 
-    color := Color green()
+    color := Color green
     opacity := 1.0
 
     program: ShaderProgram

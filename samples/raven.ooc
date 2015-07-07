@@ -20,7 +20,7 @@ FontTest: class extends App {
 
     init: func {
         super("Font packing test", 1280, 720)
-        dye setClearColor(Color black())
+        dye setClearColor(Color black)
     }
 
     setup: func {
@@ -30,7 +30,7 @@ FontTest: class extends App {
     addText: func (fontName: String, pos: Vec2, fontSize: Int) {
         fontPath := "fonts/%s.ttf" format(fontName)
         text = Text new(fontPath, "", fontSize)
-        text color = Color white()
+        text color = Color white
         text pos = pos
         text scale = text scale mul(1.1f)
         dye add(text)

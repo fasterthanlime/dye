@@ -142,7 +142,7 @@ TextureLoader: class {
 
     _placeholder: static Texture
 
-    load: static func (path: String, color: Color = null) -> Texture {
+    load: static func (path: String) -> Texture {
         if (cache contains?(path)) {
             return cache get(path)
         }
@@ -178,9 +178,6 @@ TextureLoader: class {
         texture := Texture new(width, height, path)
 
         _flip(data, width, height)
-        if (color) {
-            _colorize(data, width, height, color r, color g, color b)
-        }
         _premultiply(data, width, height)
         texture upload(data)
 
