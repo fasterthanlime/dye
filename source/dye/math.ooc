@@ -656,6 +656,154 @@ Matrix4: cover {
         ) as This
     }
 
+    inverse: func -> This {
+        inv: Float[16]
+
+        inv[0] = b2 * c3 * d4 - 
+                 b2 * c4 * d3 - 
+                 c2 * b3 * d4 + 
+                 c2 * b4 * d3 +
+                 d2 * b3 * c4 - 
+                 d2 * b4 * c3
+
+        inv[4] = -b1 * c3 * d4 + 
+                  b1 * c4 * d3 + 
+                  c1 * b3 * d4 - 
+                  c1 * b4 * d3 - 
+                  d1 * b3 * c4 + 
+                  d1 * b4 * c3
+
+        inv[8] = b1 * c2 * d4 - 
+                 b1 * c4 * d2 - 
+                 c1 * b2 * d4 + 
+                 c1 * b4 * d2 + 
+                 d1 * b2 * c4 - 
+                 d1 * b4 * c2
+
+        inv[12] = -b1 * c2 * d3 + 
+                   b1 * c3 * d2 +
+                   c1 * b2 * d3 - 
+                   c1 * b3 * d2 - 
+                   d1 * b2 * c3 + 
+                   d1 * b3 * c2
+
+        inv[1] = -a2 * c3 * d4 + 
+                  a2 * c4 * d3 + 
+                  c2 * a3 * d4 - 
+                  c2 * a4 * d3 - 
+                  d2 * a3 * c4 + 
+                  d2 * a4 * c3
+
+        inv[5] = a1 * c3 * d4 - 
+                 a1 * c4 * d3 - 
+                 c1 * a3 * d4 + 
+                 c1 * a4 * d3 + 
+                 d1 * a3 * c4 - 
+                 d1 * a4 * c3
+
+        inv[9] = -a1 * c2 * d4 + 
+                  a1 * c4 * d2 + 
+                  c1 * a2 * d4 - 
+                  c1 * a4 * d2 - 
+                  d1 * a2 * c4 + 
+                  d1 * a4 * c2
+
+        inv[13] = a1 * c2 * d3 - 
+                  a1 * c3 * d2 - 
+                  c1 * a2 * d3 + 
+                  c1 * a3 * d2 + 
+                  d1 * a2 * c3 - 
+                  d1 * a3 * c2
+
+        inv[2] = a2 * b3 * d4 - 
+                 a2 * b4 * d3 - 
+                 b2 * a3 * d4 + 
+                 b2 * a4 * d3 + 
+                 d2 * a3 * b4 - 
+                 d2 * a4 * b3
+
+        inv[6] = -a1 * b3 * d4 + 
+                  a1 * b4 * d3 + 
+                  b1 * a3 * d4 - 
+                  b1 * a4 * d3 - 
+                  d1 * a3 * b4 + 
+                  d1 * a4 * b3
+
+        inv[10] = a1 * b2 * d4 - 
+                  a1 * b4 * d2 - 
+                  b1 * a2 * d4 + 
+                  b1 * a4 * d2 + 
+                  d1 * a2 * b4 - 
+                  d1 * a4 * b2
+
+        inv[14] = -a1 * b2 * d3 + 
+                   a1 * b3 * d2 + 
+                   b1 * a2 * d3 - 
+                   b1 * a3 * d2 - 
+                   d1 * a2 * b3 + 
+                   d1 * a3 * b2
+
+        inv[3] = -a2 * b3 * c4 + 
+                  a2 * b4 * c3 + 
+                  b2 * a3 * c4 - 
+                  b2 * a4 * c3 - 
+                  c2 * a3 * b4 + 
+                  c2 * a4 * b3
+
+        inv[7] = a1 * b3 * c4 - 
+                 a1 * b4 * c3 - 
+                 b1 * a3 * c4 + 
+                 b1 * a4 * c3 + 
+                 c1 * a3 * b4 - 
+                 c1 * a4 * b3
+
+        inv[11] = -a1 * b2 * c4 + 
+                   a1 * b4 * c2 + 
+                   b1 * a2 * c4 - 
+                   b1 * a4 * c2 - 
+                   c1 * a2 * b4 + 
+                   c1 * a4 * b2
+
+        inv[15] = a1 * b2 * c3 - 
+                  a1 * b3 * c2 - 
+                  b1 * a2 * c3 + 
+                  b1 * a3 * c2 + 
+                  c1 * a2 * b3 - 
+                  c1 * a3 * b2
+
+        det: Float = a1 * inv[0] + a2 * inv[4] + a3 * inv[8] + a4 * inv[12]
+
+        if (det == 0.0f) {
+            raise("Cannot invert matrix!")
+        }
+
+        det = 1.0f / det
+
+        result: Matrix4
+
+        result a1 = inv[0]  * det
+        result a2 = inv[1]  * det
+        result a3 = inv[2]  * det
+        result a4 = inv[3]  * det
+
+        result b1 = inv[4]  * det
+        result b2 = inv[5]  * det
+        result b3 = inv[6]  * det
+        result b4 = inv[7]  * det
+
+        result c1 = inv[8]  * det
+        result c2 = inv[9]  * det
+        result c3 = inv[10] * det
+        result c4 = inv[11] * det
+
+        result d1 = inv[12] * det
+        result d2 = inv[13] * det
+        result d3 = inv[14] * det
+        result d4 = inv[15] * det
+
+        result
+    }
+
 }
 
 operator * (m1, m2: Matrix4) -> Matrix4 {
