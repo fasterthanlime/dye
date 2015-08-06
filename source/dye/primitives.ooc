@@ -32,8 +32,6 @@ Rectangle: class extends Drawable {
     vbo: FloatVBO
     vertices: Float[]
 
-    outlineIndices := [0, 1, 3, 2]
-
     /* Uniforms */
     projLoc, modelLoc, colorLoc: Int
 
@@ -95,12 +93,14 @@ Rectangle: class extends Drawable {
 
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA)
 
-        match filled {
-            case true  =>
-                glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
-            case false =>
-                glLineWidth(lineWidth)
-                glDrawElements(GL_LINE_LOOP, 4, GL_UNSIGNED_INT, outlineIndices data)
+        if (!filled) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+        }
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+
+        if (!filled) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
         }
 
         vao detach()
