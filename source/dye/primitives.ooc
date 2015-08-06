@@ -21,7 +21,7 @@ Rectangle: class extends Drawable {
 
     center := true
     filled := true
-    lineWidth := 2.0
+    lineWidth := 1.0
 
     width: Float { get { size x } }
     height: Float { get { size y } }
