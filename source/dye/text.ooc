@@ -29,6 +29,7 @@ Text: class extends Geometry {
     init: func (fontPath: String, =value, fontSize := 40) {
         font = loadFont(fontPath, fontSize)
         super(font atlas texture)
+        center = false
         rebuild()
     }
 
@@ -99,10 +100,20 @@ Text: class extends Geometry {
      */
 
     render: func (pass: Pass, modelView: Matrix4) {
+        if (!visible) return
+
         if (_cachedValue != value) {
             rebuild()
         }
-        super(pass, modelView)
+
+        mv := computeModelView(modelView)
+
+        if (center) {
+            bounds := this size
+            mv = mv * Matrix4 newTranslate(bounds x * -0.5, bounds y * -0.5, 0.0)
+        }
+
+        draw(pass, mv)
     }
 
     rebuild: func {
